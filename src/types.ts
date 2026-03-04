@@ -1,4 +1,4 @@
-export type UserRole = 'PM' | 'PMO' | 'Sponsor' | 'Team Member' | 'Admin';
+export type UserRole = 'PM' | 'PMO' | 'Sponsor' | 'Team Member' | 'Admin' | 'Stakeholder';
 
 export interface User {
   id: string;
@@ -23,18 +23,33 @@ export interface Project {
   name: string;
   description: string;
   status: ProjectStatus;
-  budget: number; // Total budget
+  budget: number; // BAC: Budget at Completion
   startDate: string;
   endDate: string;
   pmId: string;
   pmoId?: string;
   sponsorIds: string[];
   teamMemberIds: string[];
+  
+  // PMBOK Charter Fields
+  businessCase?: string;
+  strategicAlignment?: string;
   objectives?: string;
   benefits?: string;
-  strategicAlignment?: string;
+  assumptions?: string;
+  constraints?: string;
+  successCriteria?: string;
+  
   progress: number;
-  budgetLines?: BudgetLine[]; // New: Detailed planning
+  
+  // PMBOK EVM Metrics (Current Status)
+  plannedValue?: number;  // PV
+  earnedValue?: number;   // EV
+  actualCost?: number;    // AC
+  cpi?: number;           // Cost Performance Index
+  spi?: number;           // Schedule Performance Index
+  
+  budgetLines?: BudgetLine[];
 }
 
 export interface BudgetLine {
@@ -42,6 +57,9 @@ export interface BudgetLine {
   category: 'Hardware' | 'Software' | 'Services' | 'Labor' | 'Others';
   description: string;
   plannedAmount: number;
+  status: 'Pending' | 'Approved' | 'Rejected';
+  approvedBy?: string;
+  approvalDate?: string;
 }
 
 export interface Milestone {
@@ -49,10 +67,12 @@ export interface Milestone {
   projectId: string;
   name: string;
   description: string;
-  targetDate: string;
+  startDate: string; // PMBOK: Phase start
+  endDate: string;   // PMBOK: Phase end / Target
   weight: number; // 0-100
   status: 'Pending' | 'In Progress' | 'Completed';
   progress: number;
+  acceptanceCriteria?: string; // PMBOK Scope Management
 }
 
 export interface Task {
@@ -66,7 +86,21 @@ export interface Task {
   progress: number;
   status: 'Pending' | 'In Progress' | 'Blocked' | 'Completed';
   priority: 'Low' | 'Medium' | 'High';
+  predecessorId?: string; // PMBOK: Sequence Activities (Dependencies)
 }
+
+export interface TaskLog {
+  id: string;
+  taskId: string;
+  userId: string;
+  date: string;
+  comment: string;
+  previousProgress: number;
+  newProgress: number;
+  statusChange?: string;
+}
+
+export type RiskStrategy = 'Avoid' | 'Mitigate' | 'Transfer' | 'Accept' | 'Escalate';
 
 export interface Risk {
   id: string;
@@ -75,7 +109,19 @@ export interface Risk {
   probability: number; // 0-1
   impact: number; // 0-1
   status: 'Open' | 'Closed';
-  category: 'Time' | 'Scope' | 'Cost';
+  category: 'Time' | 'Scope' | 'Cost' | 'Quality' | 'Resources';
+  strategy: RiskStrategy; // PMBOK Risk Management
+  ownerId: string;
+  mitigationPlan?: string;
+}
+
+export interface RiskAction {
+  id: string;
+  riskId: string;
+  description: string;
+  ownerId: string;
+  dueDate: string;
+  status: 'Pending' | 'In Progress' | 'Completed';
 }
 
 export interface Issue {
@@ -86,11 +132,13 @@ export interface Issue {
   severity: 'Low' | 'Medium' | 'High' | 'Critical';
   status: 'Open' | 'Resolved' | 'Closed';
   resolutionDate?: string;
+  ownerId?: string;
 }
 
 export interface Expense {
   id: string;
   projectId: string;
+  budgetLineId?: string; // Link to planning
   amount: number;
   date: string;
   description: string;
@@ -119,8 +167,35 @@ export interface ProjectSnapshot {
   risksIds: string[];
   issuesIds: string[];
   milestonesProgress: Record<string, number>;
-  totalBudget: number;
-  actualSpent: number;
-  plannedSpentToDate: number; // For CPI/SPI analysis
+  
+  // PMBOK EVM Metrics
+  plannedValue: number;  // PV: What we should have spent
+  earnedValue: number;   // EV: Progress * Budget
+  actualSpent: number;    // AC: What we actually spent
+  cv: number;            // Cost Variance (EV - AC)
+  sv: number;            // Schedule Variance (EV - PV)
+  cpi: number;           // Cost Performance Index (EV / AC)
+  spi: number;           // Schedule Performance Index (EV / PV)
+  eac: number;           // Estimate At Completion (BAC / CPI)
+  
   status: 'Open' | 'Closed';
+}
+
+export interface LessonLearned {
+  id: string;
+  projectId: string;
+  category: 'Technical' | 'Management' | 'Communication' | 'Procurement';
+  description: string;
+  recommendation: string;
+  submittedBy: string;
+  date: string;
+}
+
+export interface Stakeholder {
+  id: string;
+  projectId: string;
+  userId: string;
+  power: 'Low' | 'High';
+  interest: 'Low' | 'High';
+  influenceStrategy: string;
 }

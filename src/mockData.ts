@@ -24,11 +24,20 @@ export const mockProjects: Project[] = [
     objectives: 'Improve system availability to 99.9% and reduce maintenance costs.',
     benefits: 'Scalability, Disaster Recovery, Cost efficiency.',
     strategicAlignment: 'Digital Transformation 2026.',
+    businessCase: 'The current on-premise infrastructure is reaching its end-of-life. Migration to Cloud will reduce downtime by 40% and infrastructure costs by 15% annually.',
+    assumptions: 'AWS service availability remains constant; Internal IT staff is available for migration tasks.',
+    constraints: 'Migration must be completed before the current hardware lease expires in Dec 2026.',
+    successCriteria: 'Zero data loss during migration; System availability > 99.9%; Cost reduction of 15%.',
     progress: 35,
+    plannedValue: 45000,
+    earnedValue: 52500,
+    actualCost: 55000,
+    cpi: 0.95,
+    spi: 1.16,
     budgetLines: [
-      { id: 'bl1', category: 'Software', description: 'AWS Subscription', plannedAmount: 40000 },
-      { id: 'bl2', category: 'Services', description: 'Migration Consulting', plannedAmount: 60000 },
-      { id: 'bl3', category: 'Labor', description: 'Internal IT Staff', plannedAmount: 50000 },
+      { id: 'bl1', category: 'Software', description: 'AWS Subscription', plannedAmount: 40000, status: 'Approved' },
+      { id: 'bl2', category: 'Services', description: 'Migration Consulting', plannedAmount: 60000, status: 'Approved' },
+      { id: 'bl3', category: 'Labor', description: 'Internal IT Staff', plannedAmount: 50000, status: 'Approved' },
     ]
   },
   {
@@ -45,8 +54,8 @@ export const mockProjects: Project[] = [
     teamMemberIds: ['4'],
     progress: 0,
     budgetLines: [
-      { id: 'bl4', category: 'Labor', description: 'Developer Time', plannedAmount: 35000 },
-      { id: 'bl5', category: 'Software', description: 'Cloud Platform Fees', plannedAmount: 15000 },
+      { id: 'bl4', category: 'Labor', description: 'Developer Time', plannedAmount: 35000, status: 'Approved' },
+      { id: 'bl5', category: 'Software', description: 'Cloud Platform Fees', plannedAmount: 15000, status: 'Approved' },
     ]
   }
 ];
@@ -57,7 +66,8 @@ export const mockMilestones: Milestone[] = [
     projectId: 'p1',
     name: 'Cloud Infrastructure Setup',
     description: 'Provisioning VPC, EC2, and RDS instances.',
-    targetDate: '2026-03-15',
+    startDate: '2026-01-01',
+    endDate: '2026-03-15',
     weight: 30,
     status: 'In Progress',
     progress: 80,
@@ -67,7 +77,8 @@ export const mockMilestones: Milestone[] = [
     projectId: 'p1',
     name: 'Data Migration',
     description: 'Migrating legacy SQL data to RDS.',
-    targetDate: '2026-06-30',
+    startDate: '2026-03-16',
+    endDate: '2026-06-30',
     weight: 40,
     status: 'Pending',
     progress: 0,
@@ -98,6 +109,7 @@ export const mockTasks: Task[] = [
     progress: 60,
     status: 'In Progress',
     priority: 'Medium',
+    predecessorId: 't1'
   }
 ];
 
@@ -110,6 +122,40 @@ export const mockRisks: Risk[] = [
     impact: 0.8,
     status: 'Open',
     category: 'Time',
+    strategy: 'Mitigate',
+    ownerId: '4',
+    mitigationPlan: 'Setup dedicated Direct Connect line for migration.'
+  },
+  {
+    id: 'r2',
+    projectId: 'p1',
+    description: 'Internal IT staff availability.',
+    probability: 0.5,
+    impact: 0.6,
+    status: 'Open',
+    category: 'Resources',
+    strategy: 'Accept',
+    ownerId: '3',
+    mitigationPlan: 'Monitor workload and hire contractors if needed.'
+  }
+];
+
+export const mockStakeholders: any[] = [
+  {
+    id: 's1',
+    projectId: 'p1',
+    userId: '1', // Rafael Sponsor
+    power: 'High',
+    interest: 'High',
+    influenceStrategy: 'Manage Closely: Weekly 1-on-1 updates.'
+  },
+  {
+    id: 's2',
+    projectId: 'p1',
+    userId: '2', // Maria PMO
+    power: 'High',
+    interest: 'Low',
+    influenceStrategy: 'Keep Satisfied: Monthly progress reports.'
   }
 ];
 
@@ -126,6 +172,7 @@ export const mockExpenses: Expense[] = [
   {
     id: 'e1',
     projectId: 'p1',
+    budgetLineId: 'bl2',
     amount: 12000,
     date: '2026-01-20',
     description: 'AWS Advance Payment (Software)',
@@ -135,6 +182,7 @@ export const mockExpenses: Expense[] = [
   {
     id: 'e2',
     projectId: 'p1',
+    budgetLineId: 'bl2',
     amount: 25000,
     date: '2026-02-15',
     description: 'Initial Consulting Fee',
@@ -144,6 +192,7 @@ export const mockExpenses: Expense[] = [
   {
     id: 'e3',
     projectId: 'p1',
+    budgetLineId: 'bl3',
     amount: 8000,
     date: '2026-02-20',
     description: 'Labor Month Jan-Feb',
