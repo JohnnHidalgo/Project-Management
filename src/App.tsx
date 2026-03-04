@@ -1476,9 +1476,10 @@ const ProjectDetail = ({
   const project = projects.find(p => p.id === id);
   const [activeTab, setActiveTab] = useState<'overview' | 'planning' | 'execution' | 'sppm' | 'costs' | 'risks' | 'stakeholders' | 'gantt'>('overview');
   const [scheduleView, setScheduleView] = useState<'gantt' | 'calendar'>('gantt');
-  const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | null>(null);
+  const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | 'rejection' | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null);
+  const [rejectionComment, setRejectionComment] = useState('');
   
   const projectMilestones = (milestones || []).filter(m => m.projectId === id);
   const totalWeight = projectMilestones.reduce((sum, m) => sum + m.weight, 0);
@@ -1533,16 +1534,16 @@ const ProjectDetail = ({
         </div>
         <div className="actions">
           {currentUser.role === 'PMO' && project.status === 'Draft' && (
-            <button className="btn btn-primary" onClick={() => onUpdateProject(project.id, { status: 'Pending Initial Approval' })}>Solicitar Revisión Inicial</button>
+            <button className="btn btn-primary" onClick={() => onUpdateProject(project.id, { status: 'Pending Initial Approval' })}>Solicitar Revisión de Sponsor</button>
           )}
-          {currentUser.role === 'PMO' && project.status === 'Pending Initial Approval' && (
-            <button className="btn btn-primary" onClick={() => onUpdateProject(project.id, { status: 'Planning' })}>Aprobar Anteproyecto</button>
+          {project.sponsorIds.includes(currentUser.id) && project.status === 'Pending Initial Approval' && (
+            <button className="btn btn-success" onClick={() => onUpdateProject(project.id, { status: 'Planning' })}>Aprobar Inicio de Planificación</button>
           )}
           {currentUser.id === project.pmId && project.status === 'Planning' && (
-            <button className="btn btn-primary" onClick={handleSendToCharter}>Enviar a Aprobación Sponsor</button>
+            <button className="btn btn-primary" onClick={handleSendToCharter}>Enviar Charter a Sponsor</button>
           )}
           {project.sponsorIds.includes(currentUser.id) && project.status === 'Charter Approval' && (
-            <button className="btn btn-primary" onClick={() => onUpdateProject(project.id, { status: 'Active' })}>Aprobar Project Charter</button>
+            <button className="btn btn-success" onClick={() => onUpdateProject(project.id, { status: 'Active' })}>Aprobar Project Charter</button>
           )}
           <button className="btn btn-secondary">
             <FileText size={18} />
@@ -1643,6 +1644,44 @@ const ProjectDetail = ({
       {activeTab === 'overview' && (
         <div className="project-detail-grid">
           <div className="main-content">
+            {/* PANEL DE FEEDBACK DE RECHAZO PARA EL PM */}
+            {project.status === 'Planning' && project.rejectionComments && project.pmId === currentUser.id && (
+              <div className="card" style={{ border: '2px solid var(--error)', backgroundColor: '#fef2f2', marginBottom: '2rem' }}>
+                <h3 style={{ color: 'var(--error)', margin: 0 }}>⚠️ Ajustes Solicitados por el Sponsor</h3>
+                <p style={{ margin: '0.5rem 0', fontWeight: 600 }}>Comentarios: "{project.rejectionComments}"</p>
+                <p style={{ margin: 0, fontSize: '0.875rem' }}>Por favor, realice las modificaciones en el cronograma, presupuesto o alcance y vuelva a solicitar la aprobación.</p>
+              </div>
+            )}
+
+            {/* PANEL DE APROBACIÓN DEL SPONSOR */}
+            {project.status === 'Charter Approval' && project.sponsorIds.includes(currentUser.id) && (
+              <div className="card" style={{ border: '2px solid var(--accent)', backgroundColor: '#eff6ff', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ color: 'var(--primary)', margin: 0 }}>📋 Decisión del Project Charter</h3>
+                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.9rem' }}>Como Sponsor, debe validar si el alcance, presupuesto y cronograma propuestos son correctos para iniciar la ejecución.</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <button 
+                      className="btn btn-error" 
+                      onClick={() => setActiveModal('rejection')}
+                    >
+                      Rechazar / Solicitar Ajustes
+                    </button>
+                    <button 
+                      className="btn btn-success" 
+                      onClick={() => {
+                        onUpdateProject(project.id, { status: 'Active', rejectionComments: '' });
+                        alert("¡Project Charter Aprobado! El proyecto ahora está en fase de ejecución.");
+                      }}
+                    >
+                      Aprobar e Iniciar Proyecto
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <PMBOKHealthDashboard project={project} milestones={projectMilestones} tasks={projectTasks} expenses={projectExpenses} />
             
             <div className="card" style={{ marginBottom: '2rem' }}>
@@ -2289,6 +2328,41 @@ const ProjectDetail = ({
         onAddAction={onAddRiskAction} 
         onUpdateActionStatus={onUpdateRiskActionStatus} 
       />
+
+      <Modal
+        isOpen={activeModal === 'rejection'}
+        onClose={() => setActiveModal(null)}
+        title="Solicitar Ajustes al Proyecto"
+      >
+        <div className="form-group">
+          <label>Motivos del Rechazo / Ajustes Solicitados</label>
+          <textarea 
+            required 
+            value={rejectionComment}
+            onChange={(e) => setRejectionComment(e.target.value)}
+            placeholder="Escriba aquí las razones por las cuales no se aprueba el Charter..."
+            style={{ minHeight: '120px' }}
+          />
+        </div>
+        <div className="form-actions" style={{ marginTop: '1rem' }}>
+          <button className="btn btn-secondary" onClick={() => setActiveModal(null)}>Cancelar</button>
+          <button 
+            className="btn btn-error" 
+            disabled={!rejectionComment.trim()}
+            onClick={() => {
+              onUpdateProject(project.id, { 
+                status: 'Planning', 
+                rejectionComments: rejectionComment 
+              });
+              setActiveModal(null);
+              setRejectionComment('');
+              alert("Proyecto devuelto a planificación con sus comentarios.");
+            }}
+          >
+            Confirmar Rechazo
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

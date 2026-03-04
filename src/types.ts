@@ -39,6 +39,7 @@ export interface Project {
   assumptions?: string;
   constraints?: string;
   successCriteria?: string;
+  rejectionComments?: string;
   
   progress: number;
   
