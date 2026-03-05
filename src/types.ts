@@ -18,6 +18,13 @@ export type ProjectStatus =
   | 'Completed' 
   | 'Cancelled';
 
+export interface SpecificObjective {
+  id: string;
+  description: string;
+  successCriteria: string;
+  kpi: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -34,11 +41,11 @@ export interface Project {
   // PMBOK Charter Fields
   businessCase?: string;
   strategicAlignment?: string;
-  objectives?: string;
+  generalObjective?: string;
+  specificObjectives?: SpecificObjective[];
   benefits?: string;
   assumptions?: string;
   constraints?: string;
-  successCriteria?: string;
   rejectionComments?: string;
   
   progress: number;
@@ -56,6 +63,7 @@ export interface Project {
 export interface BudgetLine {
   id: string;
   category: 'Hardware' | 'Software' | 'Services' | 'Labor' | 'Others';
+  budgetType: 'CAPEX' | 'OPEX';
   description: string;
   plannedAmount: number;
   status: 'Pending' | 'Approved' | 'Rejected';

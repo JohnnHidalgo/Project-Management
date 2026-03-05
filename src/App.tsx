@@ -13,7 +13,7 @@ import {
   UserCircle,
   RefreshCw
 } from 'lucide-react';
-import { mockUsers, mockProjects, mockExpenses, mockRisks, mockStakeholders } from './mockData';
+import { mockUsers, mockProjects, mockExpenses, mockRisks, mockStakeholders, mockMilestones, mockTasks, mockTaskLogs, mockChangeRequests, mockRiskActions, mockIssues } from './mockData';
 import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue } from './types';
 import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbokUtils';
 import './globals.css';
@@ -99,15 +99,41 @@ const ProjectForm = ({ onSave }: { onSave: (p: Partial<Project>) => void }) => {
     budget: 0,
     startDate: '',
     endDate: '',
-    objectives: '',
+    generalObjective: '',
+    specificObjectives: [] as { id: string, description: string, successCriteria: string, kpi: string }[],
     strategicAlignment: '',
     businessCase: '',
     assumptions: '',
     constraints: '',
-    successCriteria: '',
     pmId: '',
     sponsorId: '',
   });
+
+  const addSpecificObjective = () => {
+    setFormData({
+      ...formData,
+      specificObjectives: [
+        ...formData.specificObjectives,
+        { id: Math.random().toString(36).substr(2, 9), description: '', successCriteria: '', kpi: '' }
+      ]
+    });
+  };
+
+  const updateSpecificObjective = (id: string, field: string, value: string) => {
+    setFormData({
+      ...formData,
+      specificObjectives: formData.specificObjectives.map(so => 
+        so.id === id ? { ...so, [field]: value } : so
+      )
+    });
+  };
+
+  const removeSpecificObjective = (id: string) => {
+    setFormData({
+      ...formData,
+      specificObjectives: formData.specificObjectives.filter(so => so.id !== id)
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,6 +238,59 @@ const ProjectForm = ({ onSave }: { onSave: (p: Partial<Project>) => void }) => {
           />
         </div>
 
+        <div className="form-group">
+          <label>Objetivo General</label>
+          <textarea 
+            value={formData.generalObjective}
+            onChange={e => setFormData({...formData, generalObjective: e.target.value})}
+            placeholder="Objetivo principal del proyecto..." 
+          />
+        </div>
+
+        <div className="form-group">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <label>Objetivos Específicos</label>
+            <button type="button" className="btn btn-secondary btn-xs" onClick={addSpecificObjective}>+ Agregar Objetivo</button>
+          </div>
+          {formData.specificObjectives.map((so, index) => (
+            <div key={so.id} className="card" style={{ padding: '1rem', marginBottom: '1rem', backgroundColor: '#f8fafc' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <strong>Objetivo #{index + 1}</strong>
+                <button type="button" className="btn-icon" onClick={() => removeSpecificObjective(so.id)}>×</button>
+              </div>
+              <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+                <label style={{ fontSize: '0.75rem' }}>Descripción</label>
+                <input 
+                  type="text" 
+                  value={so.description} 
+                  onChange={e => updateSpecificObjective(so.id, 'description', e.target.value)}
+                  placeholder="Descripción del objetivo específico..."
+                />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label style={{ fontSize: '0.75rem' }}>Criterio de Éxito</label>
+                  <input 
+                    type="text" 
+                    value={so.successCriteria} 
+                    onChange={e => updateSpecificObjective(so.id, 'successCriteria', e.target.value)}
+                    placeholder="¿Cómo se mide el éxito?"
+                  />
+                </div>
+                <div className="form-group">
+                  <label style={{ fontSize: '0.75rem' }}>KPI</label>
+                  <input 
+                    type="text" 
+                    value={so.kpi} 
+                    onChange={e => updateSpecificObjective(so.id, 'kpi', e.target.value)}
+                    placeholder="Indicador clave de desempeño..."
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="form-row">
           <div className="form-group">
             <label>Supuestos (Assumptions)</label>
@@ -229,15 +308,6 @@ const ProjectForm = ({ onSave }: { onSave: (p: Partial<Project>) => void }) => {
               placeholder="Limitaciones de tiempo, costo o recursos..." 
             />
           </div>
-        </div>
-
-        <div className="form-group">
-          <label>Criterios de Éxito</label>
-          <textarea 
-            value={formData.successCriteria}
-            onChange={e => setFormData({...formData, successCriteria: e.target.value})}
-            placeholder="¿Cómo sabremos que el proyecto fue exitoso?" 
-          />
         </div>
 
         <div className="form-actions">
@@ -549,7 +619,17 @@ const SPPMReport = ({
           </h3>
           <div style={{ fontSize: '0.875rem', display: 'grid', gap: '0.75rem' }}>
             <p><strong>Caso de Negocio:</strong> {project.businessCase || 'N/A'}</p>
-            <p><strong>Objetivos:</strong> {project.objectives || 'N/A'}</p>
+            <p><strong>Objetivo General:</strong> {project.generalObjective || 'N/A'}</p>
+            {project.specificObjectives && project.specificObjectives.length > 0 && (
+              <div style={{ marginTop: '0.5rem' }}>
+                <strong>Objetivos Específicos:</strong>
+                <ul style={{ paddingLeft: '1.2rem', marginTop: '0.25rem', fontSize: '0.8rem' }}>
+                  {project.specificObjectives.map(so => (
+                    <li key={so.id}>{so.description} <br/><span className="text-muted">KPI: {so.kpi} | Éxito: {so.successCriteria}</span></li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="indicator-row" style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
               <div className="indicator">
                 <div className={`dot dot-${evm.spi >= 1 ? 'success' : (evm.spi > 0.8 ? 'warning' : 'error')}`}></div>
@@ -751,68 +831,206 @@ const RiskRegistry = ({ risks, onAddRisk, onOpenModal, onOpenActionModal, setSel
   onOpenActionModal: () => void,
   setSelectedRisk: (r: Risk) => void
 }) => {
+  const [filterLevel, setFilterLevel] = useState<string | null>(null);
+
+  const riskCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      'Critical': 0,
+      'High': 0,
+      'Medium': 0,
+      'Low': 0
+    };
+    risks.forEach(r => {
+      const score = calculateRiskScore(r.probability, r.impact);
+      counts[score]++;
+    });
+    return counts;
+  }, [risks]);
+
+  const filteredRisks = useMemo(() => {
+    if (!filterLevel) return risks;
+    return risks.filter(r => calculateRiskScore(r.probability, r.impact) === filterLevel);
+  }, [risks, filterLevel]);
+
+  const matrixCells = [
+    { label: 'H/H', score: 'Critical', bg: 'bg-error' },
+    { label: 'H/M', score: 'High', bg: 'bg-error' },
+    { label: 'H/L', score: 'Medium', bg: 'bg-warning' },
+    { label: 'M/H', score: 'High', bg: 'bg-error' },
+    { label: 'M/M', score: 'Medium', bg: 'bg-warning' },
+    { label: 'M/L', score: 'Low', bg: 'bg-success' },
+    { label: 'L/H', score: 'Medium', bg: 'bg-warning' },
+    { label: 'L/M', score: 'Low', bg: 'bg-success' },
+    { label: 'L/L', score: 'Low', bg: 'bg-success' },
+  ];
+
   return (
     <div className="risk-registry">
       <div className="card" style={{ marginBottom: '2rem' }}>
         <div className="section-header">
-          <h3>Matriz de Riesgos (Heatmap)</h3>
-          <button className="btn btn-secondary btn-sm" onClick={onOpenModal}>+ Identificar Riesgo</button>
-        </div>
-        <div className="risk-matrix-grid">
-          {/* Simplified CSS-based Heatmap */}
-          <div className="risk-heatmap">
-            <div className="heatmap-cell bg-error">H/H</div>
-            <div className="heatmap-cell bg-error">H/M</div>
-            <div className="heatmap-cell bg-warning">H/L</div>
-            <div className="heatmap-cell bg-error">M/H</div>
-            <div className="heatmap-cell bg-warning">M/M</div>
-            <div className="heatmap-cell bg-success">M/L</div>
-            <div className="heatmap-cell bg-warning">L/H</div>
-            <div className="heatmap-cell bg-success">L/M</div>
-            <div className="heatmap-cell bg-success">L/L</div>
+          <div>
+            <h3>Matriz de Probabilidad e Impacto (PMBOK)</h3>
+            <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>Haga clic en una celda para filtrar el registro inferior</p>
           </div>
-          <div className="risk-stats">
-            <p className="text-muted" style={{ fontSize: '0.875rem' }}>La matriz clasifica los riesgos por Probabilidad e Impacto según los estándares del PMBOK.</p>
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            {filterLevel && (
+              <button className="btn btn-secondary btn-sm" onClick={() => setFilterLevel(null)}>Ver Todos</button>
+            )}
+            <button className="btn btn-primary btn-sm" onClick={onOpenModal}>+ Identificar Riesgo</button>
+          </div>
+        </div>
+        
+        <div className="risk-matrix-layout" style={{ display: 'flex', gap: '3rem', alignItems: 'center', marginTop: '1.5rem', padding: '1rem' }}>
+          <div className="matrix-wrapper" style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', left: '-50px', top: '50%', transform: 'rotate(-90deg) translateY(-50%)', fontWeight: 700, fontSize: '0.75rem', color: 'var(--text-muted)' }}>PROBABILIDAD</div>
+            <div style={{ position: 'absolute', bottom: '-30px', left: '50%', transform: 'translateX(-50%)', fontWeight: 700, fontSize: '0.75rem', color: 'var(--text-muted)' }}>IMPACTO</div>
+            
+            <div className="risk-heatmap-interactive" style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(3, 80px)', 
+              gridTemplateRows: 'repeat(3, 80px)', 
+              gap: '4px',
+              backgroundColor: '#f1f5f9',
+              padding: '4px',
+              borderRadius: '8px'
+            }}>
+              {matrixCells.map((cell, idx) => {
+                const risksInCell = risks.filter(r => {
+                  const score = calculateRiskScore(r.probability, r.impact);
+                  // Simplified cell matching: This is a 3x3 matrix. 
+                  // Probabilities: H(>0.6), M(0.4-0.6), L(<0.4)
+                  // Impacts: H(>0.6), M(0.4-0.6), L(<0.4)
+                  const p = r.probability;
+                  const i = r.impact;
+                  const row = p > 0.6 ? 0 : (p >= 0.4 ? 1 : 2);
+                  const col = i > 0.6 ? 0 : (i >= 0.4 ? 1 : 2);
+                  return (row * 3 + col) === idx;
+                });
+
+                return (
+                  <div 
+                    key={idx} 
+                    className={`heatmap-cell ${cell.bg} ${filterLevel === cell.score ? 'active' : ''}`}
+                    onClick={() => setFilterLevel(cell.score)}
+                    style={{ 
+                      cursor: 'pointer', 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      borderRadius: '4px',
+                      position: 'relative',
+                      transition: 'transform 0.2s',
+                      opacity: filterLevel && filterLevel !== cell.score ? 0.4 : 1,
+                      border: filterLevel === cell.score ? '3px solid var(--primary)' : 'none'
+                    }}
+                    title={`${cell.label} - Severidad: ${cell.score}`}
+                  >
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700, opacity: 0.6, position: 'absolute', top: '4px', left: '4px' }}>{cell.label}</span>
+                    {risksInCell.length > 0 && (
+                      <div style={{ 
+                        background: 'white', 
+                        color: 'black', 
+                        borderRadius: '50%', 
+                        width: '24px', 
+                        height: '24px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                      }}>
+                        {risksInCell.length}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="risk-summary-legend" style={{ flex: 1 }}>
+            <h4 style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Resumen por Severidad</h4>
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {Object.entries(riskCounts).map(([level, count]) => (
+                <div 
+                  key={level} 
+                  onClick={() => setFilterLevel(level === filterLevel ? null : level)}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between', 
+                    padding: '0.5rem 1rem', 
+                    borderRadius: '6px', 
+                    backgroundColor: filterLevel === level ? 'var(--primary-light)' : '#f8fafc',
+                    cursor: 'pointer',
+                    border: filterLevel === level ? '1px solid var(--primary)' : '1px solid transparent'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div className={`dot dot-${level.toLowerCase()}`} style={{ width: '12px', height: '12px' }}></div>
+                    <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{level}</span>
+                  </div>
+                  <span style={{ fontWeight: 700 }}>{count}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="card">
-        <h3>Registro de Riesgos</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <h3>Registro de Riesgos {filterLevel ? `(${filterLevel})` : ''}</h3>
+          <p className="text-muted" style={{ fontSize: '0.8rem' }}>Mostrando {filteredRisks.length} riesgos</p>
+        </div>
         <table className="data-table">
           <thead>
             <tr>
               <th>Descripción</th>
+              <th>Prob / Imp</th>
               <th>Puntaje</th>
               <th>Estrategia</th>
               <th>Dueño</th>
-              <th>Tratamiento</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {risks.map(r => {
+            {filteredRisks.map(r => {
               const score = calculateRiskScore(r.probability, r.impact);
               const owner = mockUsers.find(u => u.id === r.ownerId);
               return (
                 <tr key={r.id}>
-                  <td>{r.description}</td>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{r.description}</div>
+                    <div className="text-muted" style={{ fontSize: '0.7rem' }}>Cat: {r.category} | Estado: {r.status}</div>
+                  </td>
+                  <td>
+                    <div style={{ fontSize: '0.8rem' }}>
+                      P: {r.probability.toFixed(1)} <br/> I: {r.impact.toFixed(1)}
+                    </div>
+                  </td>
                   <td><span className={`badge badge-${score.toLowerCase()}`}>{score}</span></td>
                   <td><span className="badge badge-secondary">{r.strategy}</span></td>
                   <td>{owner?.name}</td>
                   <td>
                     <button 
-                      className="btn btn-secondary btn-sm" 
+                      className="btn btn-secondary btn-xs" 
                       onClick={() => {
                         setSelectedRisk(r);
                         onOpenActionModal();
                       }}
                     >
-                      Planes de Acción
+                      Plan de Acción
                     </button>
                   </td>
                 </tr>
               );
             })}
+            {filteredRisks.length === 0 && (
+              <tr><td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>No hay riesgos para este nivel de severidad.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -1474,11 +1692,12 @@ const ProjectDetail = ({
 }) => {
   const { id } = useParams();
   const project = projects.find(p => p.id === id);
-  const [activeTab, setActiveTab] = useState<'overview' | 'planning' | 'execution' | 'sppm' | 'costs' | 'risks' | 'stakeholders' | 'gantt'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'sppm' | 'costs' | 'risks' | 'stakeholders' | 'gantt'>('overview');
   const [scheduleView, setScheduleView] = useState<'gantt' | 'calendar'>('gantt');
   const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | 'rejection' | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null);
+  const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
   const [rejectionComment, setRejectionComment] = useState('');
   
   const projectMilestones = (milestones || []).filter(m => m.projectId === id);
@@ -1495,6 +1714,50 @@ const ProjectDetail = ({
   [projectExpenses]);
 
   const budgetProgress = project ? (totalActualSpent / (project.budget || 1)) * 100 : 0;
+
+  const projectActivities = useMemo(() => {
+    const activities: any[] = [];
+    
+    // Task Logs
+    taskLogs.filter(log => projectTasks.some(t => t.id === log.taskId)).forEach(log => {
+      const task = projectTasks.find(t => t.id === log.taskId);
+      activities.push({
+        id: log.id,
+        date: log.date,
+        type: 'Tarea',
+        description: `Actualización en "${task?.name}": ${log.comment} (${log.previousProgress}% -> ${log.newProgress}%)`,
+        user: mockUsers.find(u => u.id === log.userId)?.name,
+        icon: '📝'
+      });
+    });
+
+    // Change Requests
+    projectChangeRequests.forEach(cr => {
+      const task = projectTasks.find(t => t.id === cr.taskId);
+      activities.push({
+        id: cr.id,
+        date: cr.requestedDate,
+        type: 'Control de Cambios',
+        description: `Solicitud de reprogramación para "${task?.name}": ${cr.justification} [${cr.status}]`,
+        user: mockUsers.find(u => u.id === cr.requestedBy)?.name,
+        icon: '🔄'
+      });
+    });
+
+    // Expenses
+    projectExpenses.forEach(exp => {
+      activities.push({
+        id: exp.id,
+        date: exp.date,
+        type: 'Gasto',
+        description: `Registro de gasto: ${exp.description} ($${exp.amount.toLocaleString()})`,
+        user: 'Sistema',
+        icon: '💰'
+      });
+    });
+
+    return activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [taskLogs, projectChangeRequests, projectExpenses, projectTasks]);
 
   if (!project) return (
     <div className="page">
@@ -1554,9 +1817,8 @@ const ProjectDetail = ({
 
       <div className="tabs">
         <button className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>Vista General</button>
-        <button className={`tab-btn ${activeTab === 'planning' ? 'active' : ''}`} onClick={() => setActiveTab('planning')}>Planificación</button>
+        <button className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`} onClick={() => setActiveTab('schedule')}>Gestión del Cronograma</button>
         <button className={`tab-btn ${activeTab === 'costs' ? 'active' : ''}`} onClick={() => setActiveTab('costs')}>Costos</button>
-        <button className={`tab-btn ${activeTab === 'execution' ? 'active' : ''}`} onClick={() => setActiveTab('execution')}>Ejecución y Cambios</button>
         <button className={`tab-btn ${activeTab === 'gantt' ? 'active' : ''}`} onClick={() => setActiveTab('gantt')}>Cronograma (Gantt)</button>
         <button className={`tab-btn ${activeTab === 'risks' ? 'active' : ''}`} onClick={() => setActiveTab('risks')}>Riesgos</button>
         <button className={`tab-btn ${activeTab === 'stakeholders' ? 'active' : ''}`} onClick={() => setActiveTab('stakeholders')}>Interesados</button>
@@ -1598,14 +1860,16 @@ const ProjectDetail = ({
               </div>
               <table className="data-table">
                 <thead>
-                  <tr><th>Categoría</th><th>Descripción</th><th>Monto Planeado</th><th>Estado</th><th>Acciones</th></tr>
+                  <tr><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Monto Planeado</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
                   {project.budgetLines?.map(bl => (
                     <tr key={bl.id}>
+                      <td><span className={`badge ${bl.budgetType === 'CAPEX' ? 'badge-primary' : 'badge-secondary'}`}>{bl.budgetType}</span></td>
                       <td><span className="badge badge-secondary">{bl.category}</span></td>
                       <td>{bl.description}</td>
                       <td>${bl.plannedAmount.toLocaleString()}</td>
+                      <td><span className={`badge badge-${bl.status.toLowerCase()}`}>{bl.status}</span></td>
                     </tr>
                   ))}
                 </tbody>
@@ -1743,14 +2007,28 @@ const ProjectDetail = ({
                   </div>
                 </div>
                 <div>
-                  <h4 className="label" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>CRITERIOS DE ÉXITO</h4>
-                  <p style={{ fontSize: '0.875rem' }}>{project.successCriteria || 'No definidos'}</p>
+                  <h4 className="label" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>OBJETIVO GENERAL</h4>
+                  <p style={{ fontSize: '0.875rem' }}>{project.generalObjective || 'No definido'}</p>
                 </div>
+                {project.specificObjectives && project.specificObjectives.length > 0 && (
+                  <div>
+                    <h4 className="label" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>OBJETIVOS ESPECÍFICOS</h4>
+                    <ul style={{ paddingLeft: '1.2rem', marginTop: '0.5rem' }}>
+                      {project.specificObjectives.map(so => (
+                        <li key={so.id} style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                          <strong>{so.description}</strong>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                            KPI: {so.kpi} | Éxito: {so.successCriteria}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
             <div className="card">
-              <h3>Objetivos</h3><p>{project.objectives || 'No definidos'}</p>
-              <h3 style={{ marginTop: '1.5rem' }}>Alineación Estratégica</h3><p>{project.strategicAlignment || 'No definida'}</p>
+              <h3>Alineación Estratégica</h3><p>{project.strategicAlignment || 'No definida'}</p>
             </div>
 
             <div className="card" style={{ marginTop: '2rem' }}>
@@ -1815,131 +2093,142 @@ const ProjectDetail = ({
               <div className="progress-bar-container"><div className="progress-bar" style={{ width: `${project.progress}%` }}></div></div>
               <p className="progress-text">{project.progress}% Completado</p>
             </div>
+
+            <div className="card" style={{ marginTop: '1.5rem' }}>
+              <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={18} /> Historial de Actividades
+              </h3>
+              <div className="activity-timeline" style={{ display: 'grid', gap: '1rem', maxHeight: '500px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                {projectActivities.length > 0 ? projectActivities.map(activity => (
+                  <div key={activity.id} style={{ display: 'flex', gap: '0.75rem', fontSize: '0.8125rem', borderLeft: '2px solid var(--border)', paddingLeft: '1rem', position: 'relative' }}>
+                    <div style={{ position: 'absolute', left: '-9px', top: '0', background: 'white', borderRadius: '50%', fontSize: '12px' }}>{activity.icon}</div>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.2rem' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{activity.type}</span>
+                        <span className="text-muted" style={{ fontSize: '0.7rem' }}>{activity.date}</span>
+                      </div>
+                      <p style={{ margin: 0, lineHeight: 1.4 }}>{activity.description}</p>
+                      <p className="text-muted" style={{ margin: '0.2rem 0 0', fontSize: '0.7rem', fontStyle: 'italic' }}>Por: {activity.user}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="text-muted" style={{ textAlign: 'center' }}>No hay actividades registradas.</p>
+                )}
+              </div>
+            </div>
           </aside>
         </div>
       )}
 
-      {activeTab === 'planning' && (
-        <div className="planning-view card">
-          <div className="section-header">
-            <h3>Hitos del Cronograma</h3>
-            <button className="btn btn-secondary btn-sm" onClick={() => setActiveModal('milestone')}>+ Nuevo Hito</button>
-          </div>
-          <table className="data-table">
-            <thead>
-              <tr><th>Hito</th><th>Inicio</th><th>Fin</th><th>Peso (%)</th><th>Acciones</th></tr>
-            </thead>
-            <tbody>
-              {projectMilestones.map(m => (
-                <tr key={m.id}>
-                  <td>{m.name}</td>
-                  <td>{m.startDate}</td>
-                  <td>{m.endDate}</td>
-                  <td>{m.weight}%</td>
-                  <td><button className="btn-icon" onClick={() => onDeleteMilestone(m.id)}>×</button></td>
-                </tr>
-              ))}
-              <tr className="table-footer">
-                <td colSpan={2}><strong>Total Peso</strong></td>
-                <td className={totalWeight === 100 ? 'text-success' : 'text-error'}><strong>{totalWeight}%</strong></td>
-                <td>{totalWeight !== 100 && <span className="text-error" style={{ fontSize: '0.7rem' }}>Debe ser 100%</span>}</td>
-              </tr>
-            </tbody>
-          </table>
-          {project.status === 'Planning' && (
-            <div className="form-actions" style={{ marginTop: '2rem' }}>
-              <button className="btn btn-primary" disabled={totalWeight !== 100} onClick={handleSendToCharter}>Enviar a Aprobación de Charter</button>
-            </div>
-          )}
-        </div>
-      )}
-      
-      {activeTab === 'execution' && (
-        <div className="execution-view">
-          <div className="card">
+      {activeTab === 'schedule' && (
+        <div className="schedule-management-view">
+          <div className="card" style={{ marginBottom: '2rem' }}>
             <div className="section-header">
-              <h3>Control de Tareas y Responsables</h3>
-              <button className="btn btn-secondary btn-sm" onClick={() => setActiveModal('task')}>+ Nueva Tarea</button>
-            </div>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Tarea</th>
-                  <th>Hito Relacionado</th>
-                  <th>Responsable</th>
-                  <th>Avance</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projectTasks.length > 0 ? projectTasks.map(t => {
-                  const milestone = milestones.find(m => m.id === t.milestoneId);
-                  const user = mockUsers.find(u => u.id === t.assignedTo);
-                  return (
-                    <tr key={t.id}>
-                      <td>
-                        <div style={{ fontWeight: 600 }}>{t.name}</div>
-                        <div className="text-muted" style={{ fontSize: '0.7rem' }}>{t.startDate} al {t.endDate}</div>
-                        {t.predecessorId && (
-                          <div className="text-accent" style={{ fontSize: '0.65rem', marginTop: '0.2rem' }}>
-                            ⛓️ Predecesora: {projectTasks.find(pt => pt.id === t.predecessorId)?.name}
-                          </div>
-                        )}
-                      </td>
-                      <td>{milestone?.name || 'N/A'}</td>
-                      <td>{user?.name || 'No asignado'}</td>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <input 
-                            type="range" 
-                            min="0" max="100" 
-                            value={t.progress} 
-                            onChange={(e) => onUpdateTask(t.id, { progress: parseInt(e.target.value) })}
-                          />
-                          <span>{t.progress}%</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button 
-                            className="btn btn-secondary btn-sm" 
-                            onClick={() => {
-                              setSelectedTask(t);
-                              setActiveModal('taskHistory');
-                            }}
-                          >
-                            Seguimiento
-                          </button>
-                          <button 
-                            className="btn btn-secondary btn-sm" 
-                            onClick={() => {
-                              setSelectedTask(t);
-                              setActiveModal('changeRequest');
-                            }}
-                          >
-                            Reprogramar
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                }) : (
-                  <tr><td colSpan={5} className="text-muted" style={{ textAlign: 'center' }}>No hay tareas registradas.</td></tr>
+              <div>
+                <h3>Gestión del Cronograma (Hitos y Tareas)</h3>
+                <p className="text-muted" style={{ fontSize: '0.8rem' }}>Suma de pesos: <span className={totalWeight === 100 ? 'text-success' : 'text-error'} style={{ fontWeight: 700 }}>{totalWeight}%</span></p>
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                {(currentUser.role === 'PM' || currentUser.role === 'PMO') && (
+                  <button className="btn btn-primary btn-sm" onClick={() => setActiveModal('milestone')}>+ Nuevo Hito</button>
                 )}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            <div className="milestone-task-hierarchy" style={{ marginTop: '1.5rem', display: 'grid', gap: '1.5rem' }}>
+              {projectMilestones.sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()).map(m => {
+                const mTasks = projectTasks.filter(t => t.milestoneId === m.id);
+                return (
+                  <div key={m.id} className="milestone-group card" style={{ padding: 0, border: '1px solid var(--border)', overflow: 'hidden' }}>
+                    <div className="milestone-header" style={{ backgroundColor: '#f8fafc', padding: '1rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div className={`dot dot-${m.status === 'Completed' ? 'success' : 'accent'}`}></div>
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: '1rem' }}>{m.name} <span className="text-muted" style={{ fontWeight: 400, fontSize: '0.8rem' }}>({m.weight}%)</span></h4>
+                          <p className="text-muted" style={{ margin: 0, fontSize: '0.75rem' }}>{m.startDate} al {m.endDate}</p>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <div style={{ textAlign: 'right', marginRight: '1rem' }}>
+                          <div style={{ fontSize: '0.75rem', fontWeight: 700 }}>{m.progress}%</div>
+                          <div className="progress-bar-container" style={{ width: '80px', height: '6px', margin: 0 }}>
+                            <div className="progress-bar" style={{ width: `${m.progress}%` }}></div>
+                          </div>
+                        </div>
+                        <button className="btn btn-secondary btn-xs" onClick={() => { setSelectedMilestoneId(m.id); setActiveModal('task'); }}>+ Tarea</button>
+                        <button className="btn-icon" onClick={() => onDeleteMilestone(m.id)}>×</button>
+                      </div>
+                    </div>
+                    
+                    <div className="milestone-content" style={{ padding: '0.5rem' }}>
+                      <table className="data-table" style={{ fontSize: '0.875rem' }}>
+                        <thead>
+                          <tr>
+                            <th>Tarea</th>
+                            <th>Responsable</th>
+                            <th>Fechas</th>
+                            <th style={{ width: '150px' }}>Avance</th>
+                            <th>Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {mTasks.map(t => {
+                            const user = mockUsers.find(u => u.id === t.assignedTo);
+                            return (
+                              <tr key={t.id}>
+                                <td>
+                                  <div style={{ fontWeight: 600 }}>{t.name}</div>
+                                  <span className={`badge badge-${t.priority.toLowerCase()}`} style={{ fontSize: '0.6rem', padding: '1px 4px' }}>{t.priority}</span>
+                                </td>
+                                <td>{user?.name || '---'}</td>
+                                <td style={{ fontSize: '0.75rem' }}>{t.startDate} <br/> {t.endDate}</td>
+                                <td>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <input 
+                                      type="range" min="0" max="100" value={t.progress} 
+                                      onChange={(e) => onUpdateTask(t.id, { progress: parseInt(e.target.value) })}
+                                      style={{ flex: 1 }}
+                                    />
+                                    <span style={{ fontWeight: 700, minWidth: '25px' }}>{t.progress}%</span>
+                                  </div>
+                                </td>
+                                <td>
+                                  <div style={{ display: 'flex', gap: '0.25rem' }}>
+                                    <button className="btn btn-secondary btn-xs" onClick={() => { setSelectedTask(t); setActiveModal('taskHistory'); }}>Log</button>
+                                    <button className="btn btn-secondary btn-xs" onClick={() => { setSelectedTask(t); setActiveModal('changeRequest'); }}>📅</button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                          {mTasks.length === 0 && (
+                            <tr><td colSpan={5} style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>Sin tareas asignadas.</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {project.status === 'Planning' && (
+              <div style={{ marginTop: '2rem', textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
+                <button className="btn btn-primary" disabled={totalWeight !== 100} onClick={handleSendToCharter}>
+                  Finalizar Planificación y Enviar Charter
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="card" style={{ marginTop: '2rem' }}>
-            <div className="section-header">
-              <h3>Solicitudes de Cambio (Reprogramación)</h3>
-            </div>
+          <div className="card">
+            <h3 style={{ marginBottom: '1.5rem' }}>Solicitudes de Cambio y Reprogramaciones</h3>
             {projectChangeRequests.length > 0 ? (
               <table className="data-table">
                 <thead>
                   <tr>
                     <th>Tarea</th>
-                    <th>Fechas Solicitadas</th>
+                    <th>Cambio de Fechas</th>
                     <th>Justificación</th>
                     <th>Solicitado por</th>
                     <th>Estado</th>
@@ -1951,21 +2240,19 @@ const ProjectDetail = ({
                       <td>{projectTasks.find(t => t.id === cr.taskId)?.name}</td>
                       <td>
                         <div style={{ fontSize: '0.75rem' }}>
-                          <span className="text-muted">De:</span> {cr.originalStartDate} al {cr.originalEndDate}<br/>
-                          <span className="text-accent" style={{ fontWeight: 600 }}>A:</span> {cr.newStartDate} al {cr.newEndDate}
+                          <span className="text-muted">Actual:</span> {cr.originalEndDate}<br/>
+                          <span className="text-accent" style={{ fontWeight: 600 }}>Nueva:</span> {cr.newEndDate}
                         </div>
                       </td>
-                      <td style={{ maxWidth: '200px', fontSize: '0.8125rem' }}>{cr.justification}</td>
+                      <td style={{ maxWidth: '300px', fontSize: '0.8rem' }}>{cr.justification}</td>
                       <td>{mockUsers.find(u => u.id === cr.requestedBy)?.name}</td>
-                      <td>
-                        <span className={`badge badge-${cr.status.toLowerCase()}`}>{cr.status}</span>
-                      </td>
+                      <td><span className={`badge badge-${cr.status.toLowerCase()}`}>{cr.status}</span></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <div className="empty-state" style={{ padding: '2rem' }}>No hay solicitudes de cambio pendientes.</div>
+              <p className="text-muted" style={{ textAlign: 'center', padding: '1rem' }}>No hay solicitudes de cambio en este proyecto.</p>
             )}
           </div>
         </div>
@@ -2175,19 +2462,29 @@ const ProjectDetail = ({
           onAddBudgetLine(project.id, { 
             description: target.description.value, 
             plannedAmount: Number(target.amount.value), 
-            category: target.category.value 
+            category: target.category.value,
+            budgetType: target.budgetType.value
           });
           setActiveModal(null);
         }}>
-          <div className="form-group">
-            <label>Categoría</label>
-            <select name="category" required>
-              <option value="Hardware">Hardware</option>
-              <option value="Software">Software</option>
-              <option value="Services">Servicios</option>
-              <option value="Labor">Mano de Obra</option>
-              <option value="Others">Otros</option>
-            </select>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Categoría</label>
+              <select name="category" required>
+                <option value="Hardware">Hardware</option>
+                <option value="Software">Software</option>
+                <option value="Services">Servicios</option>
+                <option value="Labor">Mano de Obra</option>
+                <option value="Others">Otros</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Tipo de Presupuesto</label>
+              <select name="budgetType" required>
+                <option value="CAPEX">CAPEX (Inversión)</option>
+                <option value="OPEX">OPEX (Gasto Operativo)</option>
+              </select>
+            </div>
           </div>
           <div className="form-group">
             <label>Descripción</label>
@@ -2374,60 +2671,154 @@ const MyTasksView = ({ tasks, milestones, projects, currentUser, onUpdateTask }:
   currentUser: User,
   onUpdateTask: (id: string, updates: Partial<Task>) => void
 }) => {
-  const myTasks = useMemo(() => tasks.filter(t => t.assignedTo === currentUser.id), [tasks, currentUser]);
+  const [projectFilter, setProjectFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('Active');
+
+  const myTasks = useMemo(() => {
+    let filtered = tasks.filter(t => t.assignedTo === currentUser.id);
+    
+    if (projectFilter !== 'All') {
+      filtered = filtered.filter(t => {
+        const m = milestones.find(ms => ms.id === t.milestoneId);
+        return m?.projectId === projectFilter;
+      });
+    }
+
+    if (statusFilter === 'Active') {
+      filtered = filtered.filter(t => t.status !== 'Completed');
+    } else if (statusFilter === 'Completed') {
+      filtered = filtered.filter(t => t.status === 'Completed');
+    }
+
+    return filtered.sort((a, b) => new Date(a.endDate).getTime() - new Date(b.endDate).getTime());
+  }, [tasks, milestones, currentUser, projectFilter, statusFilter]);
+
+  const tasksByProject = useMemo(() => {
+    const groups: Record<string, Task[]> = {};
+    myTasks.forEach(task => {
+      const m = milestones.find(ms => ms.id === task.milestoneId);
+      const pId = m?.projectId || 'unknown';
+      if (!groups[pId]) groups[pId] = [];
+      groups[pId].push(task);
+    });
+    return groups;
+  }, [myTasks, milestones]);
+
+  const getDaysLeft = (endDate: string) => {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const end = new Date(endDate);
+    const diff = end.getTime() - today.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
 
   return (
-    <div className="page" style={{ maxWidth: '1000px' }}>
-      <header className="page-header">
-        <h1>Mis Tareas Pendientes</h1>
-        <p className="text-muted">Lista de actividades asignadas y seguimiento de progreso</p>
+    <div className="page" style={{ maxWidth: '1100px' }}>
+      <header className="page-header" style={{ marginBottom: '1.5rem' }}>
+        <div>
+          <h1>Mis Tareas Pendientes</h1>
+          <p className="text-muted">Gestione sus asignaciones y reporte avances diarios</p>
+        </div>
       </header>
 
-      <div className="task-list-container" style={{ display: 'grid', gap: '1rem' }}>
-        {myTasks.length > 0 ? myTasks.map(task => {
-          const milestone = milestones.find(m => m.id === task.milestoneId);
-          const project = projects.find(p => p.id === milestone?.projectId);
-          
-          return (
-            <div key={task.id} className="card task-item-card" style={{ padding: '1.25rem', borderLeft: `5px solid ${task.status === 'Completed' ? 'var(--success)' : (task.priority === 'High' ? 'var(--error)' : 'var(--accent)')}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                <div>
-                  <div className="text-muted" style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 700 }}>{project?.name} / {milestone?.name}</div>
-                  <h3 style={{ margin: '0.25rem 0', fontSize: '1.1rem' }}>{task.name}</h3>
-                  <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>{task.description}</p>
-                </div>
-                <span className={`badge badge-${task.priority.toLowerCase()}`}>{task.priority}</span>
-              </div>
+      <div className="card" style={{ marginBottom: '2rem', padding: '1rem', display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <div style={{ flex: 1, minWidth: '200px' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.4rem' }}>Filtrar por Proyecto</label>
+          <select value={projectFilter} onChange={e => setProjectFilter(e.target.value)} style={{ width: '100%' }}>
+            <option value="All">Todos los proyectos</option>
+            {projects.filter(p => p.teamMemberIds.includes(currentUser.id) || p.pmId === currentUser.id).map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ width: '180px' }}>
+          <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.4rem' }}>Estado</label>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ width: '100%' }}>
+            <option value="Active">Pendientes / En Curso</option>
+            <option value="Completed">Completadas</option>
+            <option value="All">Todas</option>
+          </select>
+        </div>
+        <div className="stat" style={{ marginLeft: 'auto', textAlign: 'right' }}>
+          <span className="text-muted" style={{ fontSize: '0.8rem' }}>Total tareas: </span>
+          <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--primary)' }}>{myTasks.length}</span>
+        </div>
+      </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', alignItems: 'center', marginTop: '1rem' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.4rem' }}>
-                    <span>Progreso Actual</span>
-                    <span style={{ fontWeight: 700 }}>{task.progress}%</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" max="100" 
-                    value={task.progress} 
-                    onChange={(e) => onUpdateTask(task.id, { 
-                      progress: parseInt(e.target.value),
-                      status: parseInt(e.target.value) === 100 ? 'Completed' : 'In Progress'
-                    })}
-                    style={{ width: '100%' }}
-                  />
-                </div>
-                <div style={{ textAlign: 'right', fontSize: '0.8rem' }}>
-                  <div className="text-muted">Fecha Límite</div>
-                  <div style={{ fontWeight: 600 }}>{task.endDate}</div>
-                </div>
+      <div className="task-groups">
+        {Object.keys(tasksByProject).length > 0 ? Object.entries(tasksByProject).map(([pId, pTasks]) => {
+          const project = projects.find(p => p.id === pId);
+          return (
+            <div key={pId} className="project-task-group" style={{ marginBottom: '2.5rem' }}>
+              <h2 style={{ fontSize: '1rem', borderBottom: '2px solid var(--border)', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Briefcase size={18} /> {project?.name || 'Proyecto no especificado'}
+              </h2>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {pTasks.map(task => {
+                  const daysLeft = getDaysLeft(task.endDate);
+                  const isOverdue = daysLeft < 0 && task.status !== 'Completed';
+                  const isCritical = daysLeft <= 3 && daysLeft >= 0 && task.status !== 'Completed';
+
+                  return (
+                    <div key={task.id} className="card" style={{ padding: '1rem', borderLeft: `5px solid ${task.status === 'Completed' ? 'var(--success)' : (isOverdue ? 'var(--error)' : (isCritical ? 'var(--warning)' : 'var(--accent)'))}` }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
+                            <span className={`badge badge-${task.priority.toLowerCase()}`} style={{ fontSize: '0.6rem' }}>{task.priority}</span>
+                            <span className="text-muted" style={{ fontSize: '0.75rem' }}>Hito: {milestones.find(m => m.id === task.milestoneId)?.name}</span>
+                          </div>
+                          <h3 style={{ fontSize: '1.05rem', margin: '0 0 0.5rem 0' }}>{task.name}</h3>
+                          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: '0 0 1rem 0', maxWidth: '600px' }}>{task.description}</p>
+                        </div>
+                        
+                        <div style={{ textAlign: 'right', minWidth: '120px' }}>
+                          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: isOverdue ? 'var(--error)' : (isCritical ? 'var(--warning)' : 'var(--text-muted)') }}>
+                            {task.status === 'Completed' ? '✅ Finalizada' : (isOverdue ? `🔴 ATRASADA (${Math.abs(daysLeft)}d)` : `⏳ Faltan ${daysLeft} días`)}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Vence: {task.endDate}</div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginTop: '0.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.4rem' }}>
+                            <span>Avance reportado</span>
+                            <span style={{ fontWeight: 700 }}>{task.progress}%</span>
+                          </div>
+                          <div className="progress-bar-container" style={{ margin: 0, height: '8px' }}>
+                            <div className="progress-bar" style={{ width: `${task.progress}%` }}></div>
+                          </div>
+                        </div>
+                        
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <input 
+                            type="number" 
+                            min="0" max="100" 
+                            value={task.progress} 
+                            onChange={(e) => onUpdateTask(task.id, { progress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
+                            style={{ width: '60px', padding: '0.25rem', textAlign: 'center' }}
+                          />
+                          {task.status !== 'Completed' && (
+                            <button 
+                              className="btn btn-success btn-xs"
+                              onClick={() => onUpdateTask(task.id, { progress: 100, status: 'Completed' })}
+                            >
+                              Finalizar
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );
         }) : (
-          <div className="card empty-state" style={{ padding: '3rem', textAlign: 'center' }}>
-            <CheckSquare size={48} style={{ margin: '0 auto 1rem', opacity: 0.2 }} />
-            <h3>No tienes tareas pendientes</h3>
-            <p className="text-muted">¡Buen trabajo! Estás al día con tus asignaciones.</p>
+          <div className="card empty-state" style={{ padding: '4rem', textAlign: 'center' }}>
+            <CheckSquare size={64} style={{ margin: '0 auto 1.5rem', opacity: 0.1, color: 'var(--primary)' }} />
+            <h3>No se encontraron tareas</h3>
+            <p className="text-muted">Ajuste los filtros o celebre, ¡está al día con sus asignaciones!</p>
           </div>
         )}
       </div>
@@ -2440,36 +2831,16 @@ const MyTasksView = ({ tasks, milestones, projects, currentUser, onUpdateTask }:
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User>(mockUsers[2]); // Default Juan PM
   const [projects, setProjects] = useState<Project[]>(mockProjects);
-  const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>(mockMilestones);
+  const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [expenses, setExpenses] = useState<Expense[]>(mockExpenses);
   const [snapshots, setSnapshots] = useState<ProjectSnapshot[]>([]);
   const [risks, setRisks] = useState<Risk[]>(mockRisks);
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>(mockStakeholders);
-  const [taskLogs, setTaskLogs] = useState<TaskLog[]>([]);
-  const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>([]);
-  const [riskActions, setRiskActions] = useState<RiskAction[]>([]);
-  const [issues, setIssues] = useState<Issue[]>([]);
-
-  useEffect(() => {
-    // ... initial data
-    setIssues([
-      { id: 'i1', projectId: 'p1', description: 'Latencia de red en servidores de pruebas', severity: 'High', status: 'Open', ownerId: '3' }
-    ]);
-
-    setMilestones([
-      { id: 'm1', projectId: 'p1', name: 'Infraestructura Cloud', description: '', startDate: '2026-01-01', endDate: '2026-03-15', weight: 30, status: 'In Progress', progress: 80 },
-      { id: 'm2', projectId: 'p1', name: 'Migración de Datos', description: '', startDate: '2026-03-16', endDate: '2026-06-30', weight: 40, status: 'Pending', progress: 0 },
-    ]);
-    
-    setTasks([
-      { id: 't1', milestoneId: 'm1', name: 'Configuración VPC', description: 'Setup de red segura en AWS', startDate: '2026-01-10', endDate: '2026-01-25', assignedTo: '4', progress: 100, status: 'Completed', priority: 'High' },
-      { id: 't2', milestoneId: 'm1', name: 'Provisioning RDS', description: 'Base de datos para producción', startDate: '2026-02-01', endDate: '2026-02-28', assignedTo: '4', progress: 60, status: 'In Progress', priority: 'Medium' },
-      { id: 't3', milestoneId: 'm1', name: 'Revisión de Arquitectura', description: 'Validación técnica con PMO', startDate: '2026-01-05', endDate: '2026-01-15', assignedTo: '3', progress: 90, status: 'In Progress', priority: 'High' },
-      { id: 't4', milestoneId: 'm2', name: 'Mapeo de Datos Legacy', description: 'Definición de ETLs', startDate: '2026-03-20', endDate: '2026-04-10', assignedTo: '4', progress: 10, status: 'Pending', priority: 'Medium' },
-      { id: 't5', milestoneId: 'm2', name: 'Plan de Comunicación', description: 'Kickoff con stakeholders', startDate: '2026-03-16', endDate: '2026-03-25', assignedTo: '3', progress: 0, status: 'Pending', priority: 'Low' },
-    ]);
-  }, []);
+  const [taskLogs, setTaskLogs] = useState<TaskLog[]>(mockTaskLogs);
+  const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>(mockChangeRequests);
+  const [riskActions, setRiskActions] = useState<RiskAction[]>(mockRiskActions);
+  const [issues, setIssues] = useState<Issue[]>(mockIssues);
 
   const handleRoleChange = (role: UserRole) => {
     const user = mockUsers.find(u => u.role === role) || mockUsers[0];
@@ -2488,12 +2859,12 @@ export default function App() {
       pmId: projectData.pmId || currentUser.id,
       sponsorIds: projectData.sponsorId ? [projectData.sponsorId] : [],
       teamMemberIds: [],
-      objectives: projectData.objectives,
+      generalObjective: projectData.generalObjective,
+      specificObjectives: projectData.specificObjectives,
       strategicAlignment: projectData.strategicAlignment,
       businessCase: projectData.businessCase,
       assumptions: projectData.assumptions,
       constraints: projectData.constraints,
-      successCriteria: projectData.successCriteria,
       progress: 0,
       plannedValue: 0,
       earnedValue: 0,
@@ -2570,6 +2941,7 @@ export default function App() {
         const newLine: BudgetLine = {
           id: `bl${Date.now()}`,
           category: line.category || 'Others',
+          budgetType: (line.budgetType as 'CAPEX' | 'OPEX') || 'OPEX',
           description: line.description || '',
           plannedAmount: line.plannedAmount || 0,
           status: 'Pending'
