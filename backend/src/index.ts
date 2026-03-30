@@ -1,19 +1,24 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../.prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const { PrismaClient: GeneratedPrismaClient } = require('../prisma/.prisma/client');
+import projectsRouter from './routes/projects';
+import usersRouter from './routes/users';
+import tasksRouter from './routes/tasks';
+import risksRouter from './routes/risks';
+import milestonesRouter from './routes/milestones';
+import issuesRouter from './routes/issues';
+import expensesRouter from './routes/expenses';
+import stakeholdersRouter from './routes/stakeholders';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL not set in .env');
 }
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new GeneratedPrismaClient({ adapter });
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+});
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -26,7 +31,17 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// TODO: Add routes for projects, users, etc.
+// API routes
+app.use('/api/projects', projectsRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/tasks', tasksRouter);
+app.use('/api/risks', risksRouter);
+app.use('/api/milestones', milestonesRouter);
+app.use('/api/issues', issuesRouter);
+app.use('/api/expenses', expensesRouter);
+app.use('/api/stakeholders', stakeholdersRouter);
+
+// TODO: Add routes for budget lines, snapshots, lessons learned, etc.
 
 app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);

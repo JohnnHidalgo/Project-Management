@@ -1,4 +1,4 @@
-import { Project, User, Milestone, Task, Risk, Issue, Expense, Stakeholder, BudgetLine, TaskLog } from './types';
+import { Project, User, Milestone, Task, Risk, Issue, Expense, Stakeholder, BudgetLine, TaskLog, ChangeRequest, RiskAction } from './types';
 
 export const mockUsers: User[] = [
   { id: '1', name: 'Rafael Sponsor', role: 'Sponsor', department: 'Executive', phone: '123456', position: 'Director General' },

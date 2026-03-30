@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  PlusSquare, 
-  Briefcase, 
-  CheckSquare, 
-  PieChart, 
+import {
+  LayoutDashboard,
+  PlusSquare,
+  Briefcase,
+  CheckSquare,
+  PieChart,
   AlertTriangle,
   ChevronRight,
   Target,
@@ -13,10 +13,14 @@ import {
   UserCircle,
   RefreshCw
 } from 'lucide-react';
-import { mockUsers, mockProjects, mockExpenses, mockRisks, mockStakeholders, mockMilestones, mockTasks, mockTaskLogs, mockChangeRequests, mockRiskActions, mockIssues } from './mockData';
+import { apiService } from './services/apiService';
 import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue } from './types';
 import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbokUtils';
+import { mockUsers, mockProjects, mockMilestones, mockTasks, mockRisks, mockIssues, mockExpenses, mockStakeholders, mockTaskLogs, mockChangeRequests, mockRiskActions } from './mockData';
 import './globals.css';
+
+const getProjectSponsorIds = (project: any): string[] => project?.sponsorIds ?? project?.sponsors?.map((s: any) => s.sponsorId) ?? [];
+const getProjectTeamMemberIds = (project: any): string[] => project?.teamMemberIds ?? project?.teamMembers?.map((t: any) => t.teamMemberId) ?? [];
 
 // --- Sub-components (Layout) ---
 
@@ -330,8 +334,8 @@ const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses }:
     if (currentUser.role !== 'PMO' && currentUser.role !== 'Admin') {
       result = result.filter(p => 
         p.pmId === currentUser.id || 
-        p.sponsorIds.includes(currentUser.id) || 
-        p.teamMemberIds.includes(currentUser.id)
+        getProjectSponsorIds(p).includes(currentUser.id) || 
+        getProjectTeamMemberIds(p).includes(currentUser.id)
       );
     }
 
@@ -468,8 +472,8 @@ const Dashboard = ({ projects, currentUser, milestones, tasks, expenses }: { pro
     if (currentUser.role === 'PMO' || currentUser.role === 'Admin') return projects;
     return projects.filter(p => 
       p.pmId === currentUser.id || 
-      p.sponsorIds.includes(currentUser.id) || 
-      p.teamMemberIds.includes(currentUser.id)
+      getProjectSponsorIds(p).includes(currentUser.id) || 
+      getProjectTeamMemberIds(p).includes(currentUser.id)
     );
   }, [projects, currentUser]);
 
@@ -1808,7 +1812,7 @@ const ProjectDetail = ({
           {currentUser.id === project.pmId && (project.status === 'Draft' || project.status === 'Planning') && (
             <button className="btn btn-primary" onClick={handleSendToCharter}>Enviar Charter a Sponsor</button>
           )}
-          {project.sponsorIds.includes(currentUser.id) && project.status === 'Charter Approval' && (
+          {getProjectSponsorIds(project).includes(currentUser.id) && project.status === 'Charter Approval' && (
             <button className="btn btn-success" onClick={() => onUpdateProject(project.id, { status: 'Active', rejectionComments: '' })}>Aprobar Project Charter</button>
           )}
           <button className="btn btn-secondary">
@@ -1921,7 +1925,7 @@ const ProjectDetail = ({
             )}
 
             {/* PANEL DE APROBACIÓN DEL SPONSOR */}
-            {project.status === 'Charter Approval' && project.sponsorIds.includes(currentUser.id) && (
+            {project.status === 'Charter Approval' && getProjectSponsorIds(project).includes(currentUser.id) && (
               <div className="card" style={{ border: '2px solid var(--accent)', backgroundColor: '#eff6ff', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
@@ -2844,6 +2848,58 @@ export default function App() {
   const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>(mockChangeRequests);
   const [riskActions, setRiskActions] = useState<RiskAction[]>(mockRiskActions);
   const [issues, setIssues] = useState<Issue[]>(mockIssues);
+
+  // Load data from APIs on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [
+          projectsData,
+          usersData,
+          milestonesData,
+          tasksData,
+          risksData,
+          issuesData,
+          expensesData,
+          stakeholdersData
+        ] = await Promise.all([
+          apiService.getProjects().catch(() => mockProjects),
+          apiService.getUsers().catch(() => mockUsers),
+          apiService.getMilestones().catch(() => mockMilestones),
+          apiService.getTasks().catch(() => mockTasks),
+          apiService.getRisks().catch(() => mockRisks),
+          apiService.getIssues().catch(() => mockIssues),
+          apiService.getExpenses().catch(() => mockExpenses),
+          apiService.getStakeholders().catch(() => mockStakeholders)
+        ]);
+
+        const normalizeProject = (project: any): Project => ({
+          ...project,
+          sponsorIds: project.sponsorIds ?? project.sponsors?.map((s: any) => s.sponsorId) ?? [],
+          teamMemberIds: project.teamMemberIds ?? project.teamMembers?.map((t: any) => t.teamMemberId) ?? [],
+          specificObjectives: project.specificObjectives ?? [],
+          budgetLines: project.budgetLines ?? [],
+          progress: project.progress ?? 0,
+          status: project.status?.replace('_', ' ') as Project['status'] ?? 'Draft',
+          startDate: project.startDate?.split?.('T')[0] ?? project.startDate ?? '',
+          endDate: project.endDate?.split?.('T')[0] ?? project.endDate ?? ''
+        });
+
+        setProjects(Array.isArray(projectsData) ? projectsData.map(normalizeProject) : mockProjects);
+        setMilestones(Array.isArray(milestonesData) ? milestonesData.map((m: any) => ({ ...m, startDate: m.startDate?.split?.('T')[0] ?? m.startDate ?? '', endDate: m.endDate?.split?.('T')[0] ?? m.endDate ?? '' })) : mockMilestones);
+        setTasks(Array.isArray(tasksData) ? tasksData.map((t: any) => ({ ...t, startDate: t.startDate?.split?.('T')[0] ?? t.startDate ?? '', endDate: t.endDate?.split?.('T')[0] ?? t.endDate ?? '' })) : mockTasks);
+        setRisks(Array.isArray(risksData) ? risksData : mockRisks);
+        setIssues(Array.isArray(issuesData) ? issuesData : mockIssues);
+        setExpenses(Array.isArray(expensesData) ? expensesData.map((e: any) => ({ ...e, date: e.date?.split?.('T')[0] ?? e.date ?? '' })) : mockExpenses);
+        setStakeholders(Array.isArray(stakeholdersData) ? stakeholdersData : mockStakeholders);
+      } catch (error) {
+        console.warn('Failed to load data from API, using mock data:', error);
+        // Mock data is already set as initial state
+      }
+    };
+
+    loadData();
+  }, []);
 
   const handleRoleChange = (role: UserRole) => {
     const user = mockUsers.find(u => u.role === role) || mockUsers[0];
