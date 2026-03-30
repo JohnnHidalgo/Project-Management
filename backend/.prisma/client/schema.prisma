@@ -1,0 +1,416 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  PM
+  PMO
+  Sponsor
+  Team_Member
+  Admin
+  Stakeholder
+}
+
+enum ProjectStatus {
+  Draft
+  Pending_Initial_Approval
+  Planning
+  Charter_Approval
+  Active
+  Completed
+  Cancelled
+}
+
+enum BudgetCategory {
+  Hardware
+  Software
+  Services
+  Labor
+  Others
+}
+
+enum BudgetType {
+  CAPEX
+  OPEX
+}
+
+enum ApprovalStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum MilestoneStatus {
+  Pending
+  In_Progress
+  Completed
+}
+
+enum TaskStatus {
+  Pending
+  In_Progress
+  Blocked
+  Completed
+}
+
+enum TaskPriority {
+  Low
+  Medium
+  High
+}
+
+enum RiskStatus {
+  Open
+  Closed
+}
+
+enum RiskCategory {
+  Time
+  Scope
+  Cost
+  Quality
+  Resources
+}
+
+enum RiskStrategy {
+  Avoid
+  Mitigate
+  Transfer
+  Accept
+  Escalate
+}
+
+enum IssueSeverity {
+  Low
+  Medium
+  High
+  Critical
+}
+
+enum IssueStatus {
+  Open
+  Resolved
+  Closed
+}
+
+enum ExpenseStatus {
+  Estimated
+  Approved
+  Paid
+}
+
+enum ChangeRequestStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+enum StakeholderPower {
+  Low
+  High
+}
+
+enum StakeholderInterest {
+  Low
+  High
+}
+
+enum SnapshotStatus {
+  Open
+  Closed
+}
+
+enum LessonCategory {
+  Technical
+  Management
+  Communication
+  Procurement
+}
+
+model User {
+  id         String   @id
+  name       String
+  role       UserRole
+  department String?
+  phone      String?
+  position   String?
+
+  projectsAsPM            Project[]           @relation("ProjectPM")
+  projectsAsPMO           Project[]           @relation("ProjectPMO")
+  sponsorLinks            ProjectSponsor[]
+  teamLinks               ProjectTeamMember[]
+  tasks                   Task[]              @relation("TaskAssigned")
+  taskLogs                TaskLog[]
+  riskOwned               Risk[]              @relation("RiskOwner")
+  riskActions             RiskAction[]        @relation("RiskActionOwner")
+  issuesOwned             Issue[]
+  changeRequestsRequested ChangeRequest[]     @relation("ChangeRequestedBy")
+  stakeholders            Stakeholder[]       @relation("StakeholderUser")
+  lessonLearned           LessonLearned[]     @relation("LessonSubmittedBy")
+  approvedBudgetLines     BudgetLine[]        @relation("BudgetLineApprovedBy")
+}
+
+model Project {
+  id                 String        @id
+  name               String
+  description        String?
+  status             ProjectStatus
+  budget             Float
+  startDate          DateTime?
+  endDate            DateTime?
+  pmId               String?
+  pmoId              String?
+  businessCase       String?
+  strategicAlignment String?
+  generalObjective   String?
+  benefits           String?
+  assumptions        String?
+  constraints        String?
+  rejectionComments  String?
+  progress           Int           @default(0)
+  plannedValue       Float?
+  earnedValue        Float?
+  actualCost         Float?
+  cpi                Float?
+  spi                Float?
+
+  pm  User? @relation("ProjectPM", fields: [pmId], references: [id], onDelete: Cascade)
+  pmo User? @relation("ProjectPMO", fields: [pmoId], references: [id], onDelete: Cascade)
+
+  sponsors           ProjectSponsor[]
+  teamMembers        ProjectTeamMember[]
+  specificObjectives ProjectSpecificObjective[]
+  budgetLines        BudgetLine[]
+  milestones         Milestone[]
+  risks              Risk[]
+  issues             Issue[]
+  expenses           Expense[]
+  stakeholders       Stakeholder[]
+  projectSnapshots   ProjectSnapshot[]
+  lessonsLearned     LessonLearned[]
+}
+
+model ProjectSponsor {
+  projectId String
+  sponsorId String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sponsor User    @relation(fields: [sponsorId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, sponsorId])
+}
+
+model ProjectTeamMember {
+  projectId    String
+  teamMemberId String
+
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  teamMember User    @relation(fields: [teamMemberId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, teamMemberId])
+}
+
+model ProjectSpecificObjective {
+  id              String @id
+  projectId       String
+  description     String
+  successCriteria String
+  kpi             String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model BudgetLine {
+  id            String         @id
+  projectId     String
+  category      BudgetCategory
+  budgetType    BudgetType
+  description   String
+  plannedAmount Float
+  status        ApprovalStatus
+  approvedBy    String?
+  approvalDate  DateTime?
+
+  project        Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  approvedByUser User?     @relation("BudgetLineApprovedBy", fields: [approvedBy], references: [id], onDelete: SetNull)
+  expenses       Expense[]
+}
+
+model Milestone {
+  id                 String          @id
+  projectId          String
+  name               String
+  description        String?
+  startDate          DateTime?
+  endDate            DateTime?
+  weight             Int?
+  status             MilestoneStatus
+  progress           Int
+  acceptanceCriteria String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks   Task[]
+}
+
+model Task {
+  id            String       @id
+  milestoneId   String
+  name          String
+  description   String?
+  startDate     DateTime?
+  endDate       DateTime?
+  assignedTo    String?
+  progress      Int
+  status        TaskStatus
+  priority      TaskPriority
+  predecessorId String?
+
+  milestone      Milestone       @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  assignedUser   User?           @relation("TaskAssigned", fields: [assignedTo], references: [id], onDelete: SetNull)
+  predecessor    Task?           @relation("TaskPredecessor", fields: [predecessorId], references: [id], onDelete: SetNull)
+  successor      Task[]          @relation("TaskPredecessor")
+  logs           TaskLog[]
+  changeRequests ChangeRequest[]
+  issues         Issue[]
+}
+
+model TaskLog {
+  id               String   @id
+  taskId           String
+  userId           String
+  date             DateTime
+  comment          String
+  previousProgress Int
+  newProgress      Int
+  statusChange     String?
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Risk {
+  id             String       @id
+  projectId      String
+  description    String
+  probability    Float
+  impact         Float
+  status         RiskStatus
+  category       RiskCategory
+  strategy       RiskStrategy
+  ownerId        String?
+  mitigationPlan String?
+
+  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  owner   User?        @relation("RiskOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  actions RiskAction[]
+}
+
+model RiskAction {
+  id          String         @id
+  riskId      String
+  description String
+  ownerId     String?
+  dueDate     DateTime?
+  status      ApprovalStatus
+
+  risk  Risk  @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  owner User? @relation("RiskActionOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+}
+
+model Issue {
+  id             String        @id
+  projectId      String
+  taskId         String?
+  description    String
+  severity       IssueSeverity
+  status         IssueStatus
+  resolutionDate DateTime?
+  ownerId        String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task    Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  owner   User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+}
+
+model Expense {
+  id           String         @id
+  projectId    String
+  budgetLineId String?
+  amount       Float
+  date         DateTime
+  description  String
+  category     BudgetCategory
+  status       ExpenseStatus
+
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  budgetLine BudgetLine? @relation(fields: [budgetLineId], references: [id], onDelete: SetNull)
+}
+
+model ChangeRequest {
+  id                String              @id
+  taskId            String
+  originalStartDate DateTime
+  originalEndDate   DateTime
+  newStartDate      DateTime
+  newEndDate        DateTime
+  justification     String
+  status            ChangeRequestStatus
+  requestedBy       String
+  requestedDate     DateTime
+
+  task      Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  requester User @relation("ChangeRequestedBy", fields: [requestedBy], references: [id], onDelete: Cascade)
+}
+
+model Stakeholder {
+  id                String              @id
+  projectId         String
+  userId            String
+  power             StakeholderPower
+  interest          StakeholderInterest
+  influenceStrategy String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation("StakeholderUser", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProjectSnapshot {
+  id           String         @id
+  projectId    String
+  date         DateTime
+  highlights   String
+  plannedValue Float
+  earnedValue  Float
+  actualSpent  Float
+  cv           Float
+  sv           Float
+  cpi          Float
+  spi          Float
+  eac          Float
+  status       SnapshotStatus
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model LessonLearned {
+  id             String         @id
+  projectId      String
+  category       LessonCategory
+  description    String
+  recommendation String
+  submittedBy    String
+  date           DateTime
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  submitter User    @relation("LessonSubmittedBy", fields: [submittedBy], references: [id], onDelete: Cascade)
+}
