@@ -1,14 +1,20 @@
-import { TaskLogRepository } from '../repositories/taskLogRepository';
-import { TaskRepository } from '../repositories/taskRepository';
+import { TaskLogRepository } from '../repositories/taskLogRepository.js';
+import { TaskRepository } from '../repositories/taskRepository.js';
+import { TaskService } from './taskService.js';
+import { MilestoneService } from './milestoneService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class TaskLogService {
   private taskLogRepository: TaskLogRepository;
   private taskRepository: TaskRepository;
+  private taskService: TaskService;
+  private milestoneService: MilestoneService;
 
   constructor() {
     this.taskLogRepository = new TaskLogRepository();
     this.taskRepository = new TaskRepository();
+    this.taskService = new TaskService();
+    this.milestoneService = new MilestoneService();
   }
 
   async getAllTaskLogs() {
@@ -68,6 +74,15 @@ export class TaskLogService {
         progress: newProgress,
         status: taskStatus as any
       });
+
+      // Recalcular el progreso del milestone después de actualizar la tarea
+      const task = await this.taskRepository.findById(taskId);
+      if (task && task.milestoneId) {
+        const newMilestoneProgress = await this.taskService.calculateMilestoneProgress(task.milestoneId);
+        await this.milestoneService.updateMilestone(task.milestoneId, {
+          progress: newMilestoneProgress
+        });
+      }
     }
 
     return createdLog;

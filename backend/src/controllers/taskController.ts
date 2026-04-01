@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { TaskService } from '../services/taskService';
+import { TaskService } from '../services/taskService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class TaskController {

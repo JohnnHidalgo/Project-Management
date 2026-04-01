@@ -1,4 +1,4 @@
-import { IssueRepository } from '../repositories/issueRepository';
+import { IssueRepository } from '../repositories/issueRepository.js';
 import { Prisma } from '../../.prisma/client';
 
 export class IssueService {

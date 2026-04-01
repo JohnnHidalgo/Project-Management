@@ -1,5 +1,5 @@
 import { Prisma, Project, ProjectStatus } from '../../.prisma/client';
-import { prisma } from '../index';
+import { prisma } from '../index.js';
 
 export class ProjectRepository {
   async findAll() {

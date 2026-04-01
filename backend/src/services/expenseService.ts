@@ -1,4 +1,4 @@
-import { ExpenseRepository } from '../repositories/expenseRepository';
+import { ExpenseRepository } from '../repositories/expenseRepository.js';
 import { Prisma } from '../../.prisma/client';
 
 export class ExpenseService {

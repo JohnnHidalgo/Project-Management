@@ -93,6 +93,7 @@ export interface Task {
   endDate: string;
   assignedTo: string;
   progress: number;
+  weight: number;
   status: 'Pending' | 'In Progress' | 'Blocked' | 'Completed';
   priority: 'Low' | 'Medium' | 'High';
   predecessorId?: string; // PMBOK: Sequence Activities (Dependencies)

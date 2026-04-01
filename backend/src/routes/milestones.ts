@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { MilestoneController } from '../controllers/milestoneController';
+import { MilestoneController } from '../controllers/milestoneController.js';
 
 const router = Router();
 const milestoneController = new MilestoneController();

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/userService';
+import { UserService } from '../services/userService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class UserController {

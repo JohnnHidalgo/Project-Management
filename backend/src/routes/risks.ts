@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { RiskController } from '../controllers/riskController';
+import { RiskController } from '../controllers/riskController.js';
 
 const router = Router();
 const riskController = new RiskController();

@@ -2173,6 +2173,7 @@ const ProjectDetail = ({
                           <tr>
                             <th>Tarea</th>
                             <th>Responsable</th>
+                            <th>Peso</th>
                             <th>Fechas</th>
                             <th style={{ width: '150px' }}>Avance</th>
                             <th>Acciones</th>
@@ -2188,6 +2189,7 @@ const ProjectDetail = ({
                                   <span className={`badge badge-${t.priority.toLowerCase()}`} style={{ fontSize: '0.6rem', padding: '1px 4px' }}>{t.priority}</span>
                                 </td>
                                 <td>{user?.name || '---'}</td>
+                                <td style={{ fontWeight: 600, textAlign: 'center' }}>{t.weight}%</td>
                                 <td style={{ fontSize: '0.75rem' }}>{t.startDate} <br/> {t.endDate}</td>
                                 <td>
                                   <div className="progress-bar-container" style={{ margin: '0.35rem 0', height: '8px' }}>
@@ -2207,7 +2209,7 @@ const ProjectDetail = ({
                             );
                           })}
                           {mTasks.length === 0 && (
-                            <tr><td colSpan={5} style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>Sin tareas asignadas.</td></tr>
+                            <tr><td colSpan={6} style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>Sin tareas asignadas.</td></tr>
                           )}
                         </tbody>
                       </table>
@@ -2367,6 +2369,7 @@ const ProjectDetail = ({
             priority: target.priority.value,
             startDate: target.startDate.value,
             endDate: target.endDate.value,
+            weight: parseInt(target.weight.value) || 0,
             predecessorId: target.predecessorId.value || undefined
           });
           setActiveModal(null);
@@ -2380,6 +2383,12 @@ const ProjectDetail = ({
           <div className="form-group">
             <label>Nombre de la Tarea</label>
             <input name="name" type="text" required />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Peso en Hito (%)</label>
+              <input name="weight" type="number" min="1" max="100" required placeholder="Ej: 20" />
+            </div>
           </div>
           <div className="form-row">
             <div className="form-group">
@@ -2904,6 +2913,23 @@ export default function App() {
     loadData();
   }, []);
 
+  // Function to refresh project data after task log creation
+  const refreshProjectData = async () => {
+    try {
+      const [milestonesData, tasksData, taskLogsData] = await Promise.all([
+        apiService.getMilestones().catch(() => milestones),
+        apiService.getTasks().catch(() => tasks),
+        apiService.getTaskLogs().catch(() => taskLogs)
+      ]);
+
+      setMilestones(Array.isArray(milestonesData) ? milestonesData.map((m: any) => ({ ...m, startDate: m.startDate?.split?.('T')[0] ?? m.startDate ?? '', endDate: m.endDate?.split?.('T')[0] ?? m.endDate ?? '' })) : milestones);
+      setTasks(Array.isArray(tasksData) ? tasksData.map((t: any) => ({ ...t, startDate: t.startDate?.split?.('T')[0] ?? t.startDate ?? '', endDate: t.endDate?.split?.('T')[0] ?? t.endDate ?? '' })) : tasks);
+      setTaskLogs(Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : taskLogs);
+    } catch (error) {
+      console.error('Error refreshing project data:', error);
+    }
+  };
+
   const handleRoleChange = (role: UserRole) => {
     const user = mockUsers.find(u => u.role === role) || mockUsers[0];
     setCurrentUser(user);
@@ -3001,6 +3027,7 @@ export default function App() {
         progress: 0,
         status: 'Pending',
         priority: taskData.priority || 'Medium',
+        weight: taskData.weight || 0,
         predecessorId: taskData.predecessorId || undefined,
       };
 
@@ -3160,6 +3187,9 @@ export default function App() {
           status: normalizedLog.newProgress >= 100 ? 'Completed' : 'In Progress'
         }, true);
       }
+
+      // Refresh project data to update milestone progress
+      await refreshProjectData();
 
       alert('Log de tarea guardado y progreso persistido exitosamente.');
     } catch (error) {

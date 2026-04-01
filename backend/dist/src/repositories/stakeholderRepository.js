@@ -1,0 +1,52 @@
+import { prisma } from '../index.js';
+export class StakeholderRepository {
+    async findAll() {
+        return await prisma.stakeholder.findMany({
+            include: {
+                project: true,
+                user: true
+            }
+        });
+    }
+    async findById(id) {
+        return await prisma.stakeholder.findUnique({
+            where: { id },
+            include: {
+                project: true,
+                user: true
+            }
+        });
+    }
+    async findByProject(projectId) {
+        return await prisma.stakeholder.findMany({
+            where: { projectId },
+            include: {
+                user: true
+            }
+        });
+    }
+    async create(data) {
+        return await prisma.stakeholder.create({
+            data,
+            include: {
+                project: true,
+                user: true
+            }
+        });
+    }
+    async update(id, data) {
+        return await prisma.stakeholder.update({
+            where: { id },
+            data,
+            include: {
+                project: true,
+                user: true
+            }
+        });
+    }
+    async delete(id) {
+        return await prisma.stakeholder.delete({
+            where: { id }
+        });
+    }
+}

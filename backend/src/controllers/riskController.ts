@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { RiskService } from '../services/riskService';
+import { RiskService } from '../services/riskService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class RiskController {

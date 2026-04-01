@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { TaskLogController } from '../controllers/taskLogController';
+import { TaskLogController } from '../controllers/taskLogController.js';
 
 const router = Router();
 const taskLogController = new TaskLogController();

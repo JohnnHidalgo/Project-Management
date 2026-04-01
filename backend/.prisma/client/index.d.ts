@@ -11660,10 +11660,12 @@ export namespace Prisma {
 
   export type TaskAvgAggregateOutputType = {
     progress: number | null
+    weight: number | null
   }
 
   export type TaskSumAggregateOutputType = {
     progress: number | null
+    weight: number | null
   }
 
   export type TaskMinAggregateOutputType = {
@@ -11677,6 +11679,7 @@ export namespace Prisma {
     progress: number | null
     status: $Enums.TaskStatus | null
     priority: $Enums.TaskPriority | null
+    weight: number | null
     predecessorId: string | null
   }
 
@@ -11691,6 +11694,7 @@ export namespace Prisma {
     progress: number | null
     status: $Enums.TaskStatus | null
     priority: $Enums.TaskPriority | null
+    weight: number | null
     predecessorId: string | null
   }
 
@@ -11705,6 +11709,7 @@ export namespace Prisma {
     progress: number
     status: number
     priority: number
+    weight: number
     predecessorId: number
     _all: number
   }
@@ -11712,10 +11717,12 @@ export namespace Prisma {
 
   export type TaskAvgAggregateInputType = {
     progress?: true
+    weight?: true
   }
 
   export type TaskSumAggregateInputType = {
     progress?: true
+    weight?: true
   }
 
   export type TaskMinAggregateInputType = {
@@ -11729,6 +11736,7 @@ export namespace Prisma {
     progress?: true
     status?: true
     priority?: true
+    weight?: true
     predecessorId?: true
   }
 
@@ -11743,6 +11751,7 @@ export namespace Prisma {
     progress?: true
     status?: true
     priority?: true
+    weight?: true
     predecessorId?: true
   }
 
@@ -11757,6 +11766,7 @@ export namespace Prisma {
     progress?: true
     status?: true
     priority?: true
+    weight?: true
     predecessorId?: true
     _all?: true
   }
@@ -11858,6 +11868,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight: number
     predecessorId: string | null
     _count: TaskCountAggregateOutputType | null
     _avg: TaskAvgAggregateOutputType | null
@@ -11891,6 +11902,7 @@ export namespace Prisma {
     progress?: boolean
     status?: boolean
     priority?: boolean
+    weight?: boolean
     predecessorId?: boolean
     milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
@@ -11913,6 +11925,7 @@ export namespace Prisma {
     progress?: boolean
     status?: boolean
     priority?: boolean
+    weight?: boolean
     predecessorId?: boolean
     milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
@@ -11930,6 +11943,7 @@ export namespace Prisma {
     progress?: boolean
     status?: boolean
     priority?: boolean
+    weight?: boolean
     predecessorId?: boolean
     milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
@@ -11947,10 +11961,11 @@ export namespace Prisma {
     progress?: boolean
     status?: boolean
     priority?: boolean
+    weight?: boolean
     predecessorId?: boolean
   }
 
-  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "milestoneId" | "name" | "description" | "startDate" | "endDate" | "assignedTo" | "progress" | "status" | "priority" | "predecessorId", ExtArgs["result"]["task"]>
+  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "milestoneId" | "name" | "description" | "startDate" | "endDate" | "assignedTo" | "progress" | "status" | "priority" | "weight" | "predecessorId", ExtArgs["result"]["task"]>
   export type TaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
@@ -11994,6 +12009,7 @@ export namespace Prisma {
       progress: number
       status: $Enums.TaskStatus
       priority: $Enums.TaskPriority
+      weight: number
       predecessorId: string | null
     }, ExtArgs["result"]["task"]>
     composites: {}
@@ -12435,6 +12451,7 @@ export namespace Prisma {
     readonly progress: FieldRef<"Task", 'Int'>
     readonly status: FieldRef<"Task", 'TaskStatus'>
     readonly priority: FieldRef<"Task", 'TaskPriority'>
+    readonly weight: FieldRef<"Task", 'Int'>
     readonly predecessorId: FieldRef<"Task", 'String'>
   }
     
@@ -23451,6 +23468,7 @@ export namespace Prisma {
     progress: 'progress',
     status: 'status',
     priority: 'priority',
+    weight: 'weight',
     predecessorId: 'predecessorId'
   };
 
@@ -24540,6 +24558,7 @@ export namespace Prisma {
     progress?: IntFilter<"Task"> | number
     status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus
     priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority
+    weight?: IntFilter<"Task"> | number
     predecessorId?: StringNullableFilter<"Task"> | string | null
     milestone?: XOR<MilestoneScalarRelationFilter, MilestoneWhereInput>
     assignedUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -24561,6 +24580,7 @@ export namespace Prisma {
     progress?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    weight?: SortOrder
     predecessorId?: SortOrderInput | SortOrder
     milestone?: MilestoneOrderByWithRelationInput
     assignedUser?: UserOrderByWithRelationInput
@@ -24585,6 +24605,7 @@ export namespace Prisma {
     progress?: IntFilter<"Task"> | number
     status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus
     priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority
+    weight?: IntFilter<"Task"> | number
     predecessorId?: StringNullableFilter<"Task"> | string | null
     milestone?: XOR<MilestoneScalarRelationFilter, MilestoneWhereInput>
     assignedUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -24606,6 +24627,7 @@ export namespace Prisma {
     progress?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    weight?: SortOrder
     predecessorId?: SortOrderInput | SortOrder
     _count?: TaskCountOrderByAggregateInput
     _avg?: TaskAvgOrderByAggregateInput
@@ -24628,6 +24650,7 @@ export namespace Prisma {
     progress?: IntWithAggregatesFilter<"Task"> | number
     status?: EnumTaskStatusWithAggregatesFilter<"Task"> | $Enums.TaskStatus
     priority?: EnumTaskPriorityWithAggregatesFilter<"Task"> | $Enums.TaskPriority
+    weight?: IntWithAggregatesFilter<"Task"> | number
     predecessorId?: StringNullableWithAggregatesFilter<"Task"> | string | null
   }
 
@@ -25963,6 +25986,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     milestone: MilestoneCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
@@ -25983,6 +26007,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
     successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
@@ -25999,6 +26024,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
@@ -26019,6 +26045,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
     successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
@@ -26037,6 +26064,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
   }
 
@@ -26049,6 +26077,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
   }
 
   export type TaskUncheckedUpdateManyInput = {
@@ -26062,6 +26091,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -27567,11 +27597,13 @@ export namespace Prisma {
     progress?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    weight?: SortOrder
     predecessorId?: SortOrder
   }
 
   export type TaskAvgOrderByAggregateInput = {
     progress?: SortOrder
+    weight?: SortOrder
   }
 
   export type TaskMaxOrderByAggregateInput = {
@@ -27585,6 +27617,7 @@ export namespace Prisma {
     progress?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    weight?: SortOrder
     predecessorId?: SortOrder
   }
 
@@ -27599,11 +27632,13 @@ export namespace Prisma {
     progress?: SortOrder
     status?: SortOrder
     priority?: SortOrder
+    weight?: SortOrder
     predecessorId?: SortOrder
   }
 
   export type TaskSumOrderByAggregateInput = {
     progress?: SortOrder
+    weight?: SortOrder
   }
 
   export type EnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -30840,6 +30875,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     milestone: MilestoneCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -30858,6 +30894,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
     successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
@@ -31257,6 +31294,7 @@ export namespace Prisma {
     progress?: IntFilter<"Task"> | number
     status?: EnumTaskStatusFilter<"Task"> | $Enums.TaskStatus
     priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority
+    weight?: IntFilter<"Task"> | number
     predecessorId?: StringNullableFilter<"Task"> | string | null
   }
 
@@ -33310,6 +33348,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -33328,6 +33367,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
     successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
@@ -33529,6 +33569,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     milestone: MilestoneCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
@@ -33548,6 +33589,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
     logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
     changeRequests?: ChangeRequestUncheckedCreateNestedManyWithoutTaskInput
@@ -33568,6 +33610,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     milestone: MilestoneCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -33587,6 +33630,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
     changeRequests?: ChangeRequestUncheckedCreateNestedManyWithoutTaskInput
@@ -33807,6 +33851,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
@@ -33826,6 +33871,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
     logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
     changeRequests?: ChangeRequestUncheckedUpdateManyWithoutTaskNestedInput
@@ -33905,6 +33951,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     milestone: MilestoneCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
@@ -33924,6 +33971,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
     successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
     changeRequests?: ChangeRequestUncheckedCreateNestedManyWithoutTaskInput
@@ -34002,6 +34050,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
@@ -34021,6 +34070,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
     successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
     changeRequests?: ChangeRequestUncheckedUpdateManyWithoutTaskNestedInput
@@ -34630,6 +34680,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     milestone: MilestoneCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
@@ -34649,6 +34700,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
     successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
@@ -34808,6 +34860,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
@@ -34827,6 +34880,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
     successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
@@ -35115,6 +35169,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     milestone: MilestoneCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
@@ -35134,6 +35189,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
     successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
@@ -35212,6 +35268,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
@@ -35231,6 +35288,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
     successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
@@ -36024,6 +36082,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
   }
 
@@ -36328,6 +36387,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -36346,6 +36406,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
     successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
@@ -36363,6 +36424,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -37074,6 +37136,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
     predecessorId?: string | null
   }
 
@@ -37086,6 +37149,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -37104,6 +37168,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
     successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
@@ -37121,6 +37186,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
@@ -37135,6 +37201,7 @@ export namespace Prisma {
     progress: number
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
+    weight?: number
   }
 
   export type TaskLogCreateManyTaskInput = {
@@ -37178,6 +37245,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -37197,6 +37265,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
     successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
     changeRequests?: ChangeRequestUncheckedUpdateManyWithoutTaskNestedInput
@@ -37214,6 +37283,7 @@ export namespace Prisma {
     progress?: IntFieldUpdateOperationsInput | number
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
   }
 
   export type TaskLogUpdateWithoutTaskInput = {

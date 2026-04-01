@@ -1,4 +1,4 @@
-import { ProjectRepository } from '../repositories/projectRepository';
+import { ProjectRepository } from '../repositories/projectRepository.js';
 import { Project, ProjectStatus, Prisma } from '../../.prisma/client';
 
 export class ProjectService {

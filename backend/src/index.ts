@@ -1,17 +1,17 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { PrismaClient } from '../.prisma/client';
+import { PrismaClient } from '../.prisma/client/index.js';
 import { PrismaPg } from '@prisma/adapter-pg';
-import projectsRouter from './routes/projects';
-import usersRouter from './routes/users';
-import tasksRouter from './routes/tasks';
-import risksRouter from './routes/risks';
-import milestonesRouter from './routes/milestones';
-import issuesRouter from './routes/issues';
-import expensesRouter from './routes/expenses';
-import stakeholdersRouter from './routes/stakeholders';
-import taskLogsRouter from './routes/taskLogs';
+import projectsRouter from './routes/projects.js';
+import usersRouter from './routes/users.js';
+import tasksRouter from './routes/tasks.js';
+import risksRouter from './routes/risks.js';
+import milestonesRouter from './routes/milestones.js';
+import issuesRouter from './routes/issues.js';
+import expensesRouter from './routes/expenses.js';
+import stakeholdersRouter from './routes/stakeholders.js';
+import taskLogsRouter from './routes/taskLogs.js';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL not set in .env');

@@ -1,4 +1,4 @@
-import { TaskRepository } from '../repositories/taskRepository';
+import { TaskRepository } from '../repositories/taskRepository.js';
 import { Prisma } from '../../.prisma/client';
 
 export class TaskService {
@@ -60,7 +60,14 @@ export class TaskService {
       milestone: { connect: { id: milestoneId } },
       startDate,
       endDate,
+      weight: (data as any).weight || 0
     };
+
+    // Validar que el peso sea válido
+    const taskWeight = (data as any).weight || 0;
+    if (taskWeight < 0 || taskWeight > 100) {
+      throw new Error('Task weight must be between 0 and 100');
+    }
 
     delete payload.milestoneId;
 
@@ -81,6 +88,7 @@ export class TaskService {
 
     return await this.taskRepository.create(payload);
   }
+
 
   async updateTask(id: string, data: Prisma.TaskUpdateInput) {
     // Validate the task exists
@@ -104,5 +112,23 @@ export class TaskService {
     await this.getTaskById(id);
 
     return await this.taskRepository.delete(id);
+  }
+
+  async calculateMilestoneProgress(milestoneId: string): Promise<number> {
+    const tasks = await this.getTasksByMilestone(milestoneId);
+    
+    if (tasks.length === 0) return 0;
+
+    const totalWeight = tasks.reduce((sum, t) => sum + ((t as any).weight || 0), 0);
+    
+    if (totalWeight === 0) return 0;
+
+    const weightedProgress = tasks.reduce((sum, t) => {
+      const taskWeight = (t as any).weight || 0;
+      const taskProgress = t.progress || 0;
+      return sum + (taskProgress * taskWeight / 100);
+    }, 0);
+
+    return Math.round(weightedProgress / totalWeight * 100);
   }
 }

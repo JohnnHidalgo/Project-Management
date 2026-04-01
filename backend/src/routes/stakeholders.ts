@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { StakeholderController } from '../controllers/stakeholderController';
+import { StakeholderController } from '../controllers/stakeholderController.js';
 
 const router = Router();
 const stakeholderController = new StakeholderController();

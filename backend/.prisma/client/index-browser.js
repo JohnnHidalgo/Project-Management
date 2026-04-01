@@ -208,6 +208,7 @@ exports.Prisma.TaskScalarFieldEnum = {
   progress: 'progress',
   status: 'status',
   priority: 'priority',
+  weight: 'weight',
   predecessorId: 'predecessorId'
 };
 

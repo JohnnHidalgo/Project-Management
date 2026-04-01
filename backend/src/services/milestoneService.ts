@@ -1,4 +1,4 @@
-import { MilestoneRepository } from '../repositories/milestoneRepository';
+import { MilestoneRepository } from '../repositories/milestoneRepository.js';
 import { Prisma } from '../../.prisma/client';
 
 export class MilestoneService {

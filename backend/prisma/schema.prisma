@@ -273,6 +273,7 @@ model Task {
   progress    Int
   status      TaskStatus
   priority    TaskPriority
+  weight      Int      @default(0)
   predecessorId String?
 
   milestone Milestone @relation(fields:[milestoneId], references:[id], onDelete: Cascade)

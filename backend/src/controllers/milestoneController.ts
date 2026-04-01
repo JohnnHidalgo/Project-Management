@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { MilestoneService } from '../services/milestoneService';
+import { MilestoneService } from '../services/milestoneService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class MilestoneController {

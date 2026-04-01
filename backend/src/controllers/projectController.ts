@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ProjectService } from '../services/projectService';
+import { ProjectService } from '../services/projectService.js';
 import { ProjectStatus } from '../../.prisma/client';
 
 export class ProjectController {

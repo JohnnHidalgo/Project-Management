@@ -1,4 +1,4 @@
-import { StakeholderRepository } from '../repositories/stakeholderRepository';
+import { StakeholderRepository } from '../repositories/stakeholderRepository.js';
 import { Prisma } from '../../.prisma/client';
 
 export class StakeholderService {

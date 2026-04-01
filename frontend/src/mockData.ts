@@ -182,11 +182,11 @@ export const mockMilestones: Milestone[] = [
 ];
 
 export const mockTasks: Task[] = [
-  { id: 't1', milestoneId: 'm1', name: 'Diseño de VPC', description: 'Definir subredes y seguridad', startDate: '2026-01-05', endDate: '2026-01-15', assignedTo: '4', progress: 100, status: 'Completed', priority: 'High' },
-  { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: '2026-01-16', endDate: '2026-01-30', assignedTo: '5', progress: 100, status: 'Completed', priority: 'High' },
-  { id: 't3', milestoneId: 'm2', name: 'Limpieza de Datos', description: 'Eliminar registros obsoletos', startDate: '2026-02-20', endDate: '2026-03-30', assignedTo: '4', progress: 80, status: 'In Progress', priority: 'Medium' },
-  { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: '2026-04-01', endDate: '2026-05-15', assignedTo: '5', progress: 10, status: 'Pending', priority: 'High' },
-  { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: '2026-03-05', endDate: '2026-03-25', assignedTo: '6', progress: 40, status: 'In Progress', priority: 'High' }
+  { id: 't1', milestoneId: 'm1', name: 'Diseño de VPC', description: 'Definir subredes y seguridad', startDate: '2026-01-05', endDate: '2026-01-15', assignedTo: '4', progress: 100, status: 'Completed', priority: 'High', weight: 50 },
+  { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: '2026-01-16', endDate: '2026-01-30', assignedTo: '5', progress: 100, status: 'Completed', priority: 'High', weight: 50 },
+  { id: 't3', milestoneId: 'm2', name: 'Limpieza de Datos', description: 'Eliminar registros obsoletos', startDate: '2026-02-20', endDate: '2026-03-30', assignedTo: '4', progress: 80, status: 'In Progress', priority: 'Medium', weight: 50 },
+  { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: '2026-04-01', endDate: '2026-05-15', assignedTo: '5', progress: 10, status: 'Pending', priority: 'High', weight: 50 },
+  { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: '2026-03-05', endDate: '2026-03-25', assignedTo: '6', progress: 40, status: 'In Progress', priority: 'High', weight: 100 }
 ];
 
 export const mockExpenses: Expense[] = [

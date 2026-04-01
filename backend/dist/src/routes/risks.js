@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { RiskController } from '../controllers/riskController.js';
+const router = Router();
+const riskController = new RiskController();
+router.get('/', riskController.getAllRisks.bind(riskController));
+router.get('/:id', riskController.getRiskById.bind(riskController));
+router.get('/project/:projectId', riskController.getRisksByProject.bind(riskController));
+router.post('/', riskController.createRisk.bind(riskController));
+router.put('/:id', riskController.updateRisk.bind(riskController));
+router.delete('/:id', riskController.deleteRisk.bind(riskController));
+export default router;
