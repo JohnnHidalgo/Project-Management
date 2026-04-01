@@ -1377,13 +1377,13 @@ const TaskHistoryModal = ({
       comment,
       previousProgress: task.progress,
       newProgress,
-      date: new Date().toISOString().split('T')[0]
+      date: new Date().toISOString()
     });
     setComment('');
     onClose();
   };
 
-  const taskLogs = logs.filter(l => l.taskId === task.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const taskLogs = logs.filter(l => l.taskId == task?.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Seguimiento: ${task.name}`}>
@@ -2190,13 +2190,11 @@ const ProjectDetail = ({
                                 <td>{user?.name || '---'}</td>
                                 <td style={{ fontSize: '0.75rem' }}>{t.startDate} <br/> {t.endDate}</td>
                                 <td>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <input 
-                                      type="range" min="0" max="100" value={t.progress} 
-                                      onChange={(e) => onUpdateTask(t.id, { progress: parseInt(e.target.value) })}
-                                      style={{ flex: 1 }}
-                                    />
-                                    <span style={{ fontWeight: 700, minWidth: '25px' }}>{t.progress}%</span>
+                                  <div className="progress-bar-container" style={{ margin: '0.35rem 0', height: '8px' }}>
+                                    <div className="progress-bar" style={{ width: `${t.progress}%` }}></div>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.3rem' }}>
+                                    <span style={{ fontWeight: 700, fontSize: '0.85rem' }}>{t.progress}%</span>
                                   </div>
                                 </td>
                                 <td>
@@ -2797,22 +2795,21 @@ const MyTasksView = ({ tasks, milestones, projects, currentUser, onUpdateTask }:
                           </div>
                         </div>
                         
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                           <input 
                             type="number" 
                             min="0" max="100" 
                             value={task.progress} 
-                            onChange={(e) => onUpdateTask(task.id, { progress: Math.min(100, Math.max(0, parseInt(e.target.value) || 0)) })}
-                            style={{ width: '60px', padding: '0.25rem', textAlign: 'center' }}
+                            disabled
+                            style={{ width: '60px', padding: '0.25rem', textAlign: 'center', opacity: 0.45, cursor: 'not-allowed' }}
                           />
-                          {task.status !== 'Completed' && (
-                            <button 
-                              className="btn btn-success btn-xs"
-                              onClick={() => onUpdateTask(task.id, { progress: 100, status: 'Completed' })}
-                            >
-                              Finalizar
-                            </button>
-                          )}
+                          <button 
+                            className="btn btn-secondary btn-xs"
+                            disabled
+                            title="Use el modal de Tareas para registrar seguimiento"
+                          >
+                            Registrar seguimiento
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -2861,7 +2858,8 @@ export default function App() {
           risksData,
           issuesData,
           expensesData,
-          stakeholdersData
+          stakeholdersData,
+          taskLogsData
         ] = await Promise.all([
           apiService.getProjects().catch(() => mockProjects),
           apiService.getUsers().catch(() => mockUsers),
@@ -2870,7 +2868,8 @@ export default function App() {
           apiService.getRisks().catch(() => mockRisks),
           apiService.getIssues().catch(() => mockIssues),
           apiService.getExpenses().catch(() => mockExpenses),
-          apiService.getStakeholders().catch(() => mockStakeholders)
+          apiService.getStakeholders().catch(() => mockStakeholders),
+          apiService.getTaskLogs().catch(() => mockTaskLogs)
         ]);
 
         const normalizeProject = (project: any): Project => ({
@@ -2892,6 +2891,10 @@ export default function App() {
         setIssues(Array.isArray(issuesData) ? issuesData : mockIssues);
         setExpenses(Array.isArray(expensesData) ? expensesData.map((e: any) => ({ ...e, date: e.date?.split?.('T')[0] ?? e.date ?? '' })) : mockExpenses);
         setStakeholders(Array.isArray(stakeholdersData) ? stakeholdersData : mockStakeholders);
+        setTaskLogs(Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
+
+        console.log('Loaded taskLogsData:', taskLogsData);
+        console.log('Final taskLogs state:', Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
       } catch (error) {
         console.warn('Failed to load data from API, using mock data:', error);
         // Mock data is already set as initial state
@@ -2906,75 +2909,133 @@ export default function App() {
     setCurrentUser(user);
   };
 
-  const handleSaveProject = (projectData: Partial<Project> & { sponsorId?: string }) => {
-    const newProject: Project = {
-      id: `p${projects.length + 1}`,
-      name: projectData.name || 'Sin nombre',
-      description: projectData.description || '',
-      status: 'Draft',
-      budget: projectData.budget || 0,
-      startDate: projectData.startDate || '',
-      endDate: projectData.endDate || '',
-      pmId: projectData.pmId || currentUser.id,
-      sponsorIds: projectData.sponsorId ? [projectData.sponsorId] : [],
-      teamMemberIds: [],
-      generalObjective: projectData.generalObjective,
-      specificObjectives: projectData.specificObjectives,
-      strategicAlignment: projectData.strategicAlignment,
-      businessCase: projectData.businessCase,
-      assumptions: projectData.assumptions,
-      constraints: projectData.constraints,
-      progress: 0,
-      plannedValue: 0,
-      earnedValue: 0,
-      actualCost: 0,
-      cpi: 1,
-      spi: 1
-    };
-    setProjects([newProject, ...projects]);
+  const handleSaveProject = async (projectData: Partial<Project> & { sponsorId?: string }) => {
+    try {
+      const toSave = {
+        name: projectData.name || 'Sin nombre',
+        description: projectData.description || '',
+        status: 'Draft',
+        budget: projectData.budget ?? 0,
+        startDate: projectData.startDate || '',
+        endDate: projectData.endDate || '',
+        pmId: projectData.pmId || currentUser.id,
+        pmoId: projectData.pmoId || (currentUser.role === 'PMO' ? currentUser.id : undefined),
+        sponsorIds: projectData.sponsorId ? [projectData.sponsorId] : [],
+        teamMemberIds: projectData.teamMemberIds ?? [],
+        generalObjective: projectData.generalObjective || '',
+        specificObjectives: projectData.specificObjectives || [],
+        strategicAlignment: projectData.strategicAlignment || '',
+        businessCase: projectData.businessCase || '',
+        assumptions: projectData.assumptions || '',
+        constraints: projectData.constraints || ''
+      };
+
+      const saved = await apiService.createProject(toSave);
+      const normalizedSaved: Project = {
+        ...saved,
+        sponsorIds: saved.sponsors?.map((s: any) => s.sponsorId) || (saved.sponsorIds || []),
+        teamMemberIds: saved.teamMembers?.map((tm: any) => tm.teamMemberId) || (saved.teamMemberIds || []),
+        startDate: saved.startDate ? saved.startDate.split('T')[0] : '',
+        endDate: saved.endDate ? saved.endDate.split('T')[0] : '',
+        progress: saved.progress ?? 0,
+        plannedValue: saved.plannedValue ?? 0,
+        earnedValue: saved.earnedValue ?? 0,
+        actualCost: saved.actualCost ?? 0,
+        cpi: saved.cpi ?? 1,
+        spi: saved.spi ?? 1,
+      };
+
+      setProjects(prev => [normalizedSaved, ...prev]);
+      alert('Proyecto creado correctamente.');
+    } catch (error) {
+      console.error('Error creating project', error);
+      alert('No se pudo crear el proyecto, revisa consola para detalle.');
+    }
   };
 
   const handleUpdateProject = (id: string, updates: Partial<Project>) => {
     setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
   };
 
-  const handleAddMilestone = (projectId: string, name: string, weight: number, startDate: string, endDate: string) => {
-    const newMilestone: Milestone = {
-      id: `m${Date.now()}`,
-      projectId,
-      name,
-      description: '',
-      startDate,
-      endDate,
-      weight,
-      status: 'Pending',
-      progress: 0
-    };
-    setMilestones([...milestones, newMilestone]);
+  const handleAddMilestone = async (projectId: string, name: string, weight: number, startDate: string, endDate: string) => {
+    try {
+      const payload = {
+        projectId,
+        name,
+        description: '',
+        startDate,
+        endDate,
+        weight,
+        status: 'Pending',
+        progress: 0
+      };
+
+      const createdMilestone = await apiService.createMilestone(payload);
+      const normalizedMilestone: Milestone = {
+        ...createdMilestone,
+        startDate: createdMilestone.startDate?.split?.('T')[0] || createdMilestone.startDate || '',
+        endDate: createdMilestone.endDate?.split?.('T')[0] || createdMilestone.endDate || '',
+      };
+
+      setMilestones([...milestones, normalizedMilestone]);
+      alert('Hito creado y guardado en la base de datos.');
+    } catch (error) {
+      console.error('Error al crear hito:', error);
+      alert('No se pudo guardar el hito. Intente de nuevo.');
+    }
   };
 
   const handleDeleteMilestone = (id: string) => {
     setMilestones(milestones.filter(m => m.id !== id));
   };
 
-  const handleAddTask = (milestoneId: string, taskData: Partial<Task>) => {
-    const newTask: Task = {
-      id: `t${Date.now()}`,
-      milestoneId,
-      name: taskData.name || 'Nueva Tarea',
-      description: taskData.description || '',
-      startDate: taskData.startDate || '',
-      endDate: taskData.endDate || '',
-      assignedTo: taskData.assignedTo || '',
-      progress: 0,
-      status: 'Pending',
-      priority: taskData.priority || 'Medium',
-    };
-    setTasks([...tasks, newTask]);
+  const handleAddTask = async (milestoneId: string, taskData: Partial<Task>) => {
+    try {
+      const payload = {
+        milestoneId,
+        name: taskData.name || 'Nueva Tarea',
+        description: taskData.description || '',
+        startDate: taskData.startDate || '',
+        endDate: taskData.endDate || '',
+        assignedTo: taskData.assignedTo || '',
+        progress: 0,
+        status: 'Pending',
+        priority: taskData.priority || 'Medium',
+        predecessorId: taskData.predecessorId || undefined,
+      };
+
+      const createdTask = await apiService.createTask(payload);
+      const normalizedTask: Task = {
+        ...createdTask,
+        startDate: createdTask.startDate?.split?.('T')[0] || createdTask.startDate || '',
+        endDate: createdTask.endDate?.split?.('T')[0] || createdTask.endDate || '',
+      };
+
+      setTasks([...tasks, normalizedTask]);
+      alert('Tarea creada y guardada en la base de datos.');
+    } catch (error) {
+      console.error('Error al crear tarea:', error);
+      alert('No se pudo guardar la tarea. Intente de nuevo.');
+    }
   };
 
-  const handleUpdateTask = (id: string, updates: Partial<Task>) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
+  const handleUpdateTask = async (id: string, updates: Partial<Task>, fromLog: boolean = false) => {
+    const safeUpdates = { ...updates };
+    if (!fromLog) {
+      // El avance (progress) solo se modifica con TaskLog.
+      delete safeUpdates.progress;
+    }
+
+    // Update local state first for instant UI response
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...safeUpdates } : t));
+
+    // Persist update in backend whenever task changes
+    try {
+      await apiService.updateTask(id, safeUpdates);
+    } catch (error) {
+      console.error('Error actualizando tarea en la API:', error);
+      // Revertir a estado anterior podría implementarse si se requiere
+    }
   };
 
   const handleAddExpense = (projectId: string, expenseData: Partial<Expense>) => {
@@ -3053,34 +3114,57 @@ export default function App() {
     setRisks([...risks, newRisk]);
   };
 
-  const handleAddStakeholder = (projectId: string, sData: Partial<Stakeholder>) => {
-    const newStakeholder: Stakeholder = {
-      id: `s${Date.now()}`,
-      projectId,
-      userId: sData.userId || '',
-      power: (sData.power as 'Low' | 'High') || 'Low',
-      interest: (sData.interest as 'Low' | 'High') || 'Low',
-      influenceStrategy: sData.influenceStrategy || ''
-    };
-    setStakeholders([...stakeholders, newStakeholder]);
-    alert('Interesado agregado exitosamente a la matriz.');
+  const handleAddStakeholder = async (projectId: string, sData: Partial<Stakeholder>) => {
+    try {
+      const payload = {
+        projectId,
+        userId: sData.userId || '',
+        power: (sData.power as 'Low' | 'High') || 'Low',
+        interest: (sData.interest as 'Low' | 'High') || 'Low',
+        influenceStrategy: sData.influenceStrategy || ''
+      };
+
+      const createdStakeholder = await apiService.createStakeholder(payload);
+      setStakeholders([...stakeholders, createdStakeholder]);
+      alert('Interesado agregado exitosamente a la matriz y a la base de datos.');
+    } catch (error) {
+      console.error('Error al crear interesado:', error);
+      alert('No se pudo guardar el interesado en la base de datos. Intente de nuevo.');
+    }
   };
 
-  const handleAddTaskLog = (logData: Partial<TaskLog>) => {
-    const newLog: TaskLog = {
-      id: `log${Date.now()}`,
-      taskId: logData.taskId || '',
-      userId: logData.userId || currentUser.id,
-      date: logData.date || new Date().toISOString().split('T')[0],
-      comment: logData.comment || '',
-      previousProgress: logData.previousProgress || 0,
-      newProgress: logData.newProgress || 0,
-    };
-    setTaskLogs([newLog, ...taskLogs]);
-    
-    // Update task progress automatically
-    if (newLog.taskId) {
-      handleUpdateTask(newLog.taskId, { progress: newLog.newProgress });
+  const handleAddTaskLog = async (logData: Partial<TaskLog>) => {
+    try {
+      const payload = {
+        taskId: logData.taskId || '',
+        userId: logData.userId || currentUser.id,
+        comment: logData.comment || '',
+        previousProgress: logData.previousProgress || 0,
+        newProgress: logData.newProgress || 0,
+        statusChange: logData.statusChange,
+      };
+
+      const createdLog = await apiService.createTaskLog(payload);
+      const normalizedLog: TaskLog = {
+        ...createdLog,
+        date: createdLog.date?.split?.('T')[0] || createdLog.date || '',
+      };
+
+      setTaskLogs([normalizedLog, ...taskLogs]);
+
+      // Actualización del progreso solo a través de seguimiento (tasklog)
+      if (normalizedLog.taskId) {
+        // Aseguramos persistencia en DB y estado local
+        await handleUpdateTask(normalizedLog.taskId, {
+          progress: normalizedLog.newProgress,
+          status: normalizedLog.newProgress >= 100 ? 'Completed' : 'In Progress'
+        }, true);
+      }
+
+      alert('Log de tarea guardado y progreso persistido exitosamente.');
+    } catch (error) {
+      console.error('Error al crear log de tarea:', error);
+      alert('No se pudo guardar el log de tarea. Intente de nuevo.');
     }
   };
 

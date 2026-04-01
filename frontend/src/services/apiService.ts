@@ -268,6 +268,39 @@ class ApiService {
       method: 'DELETE',
     });
   }
+
+  // Task Logs
+  async getTaskLogs(): Promise<any[]> {
+    return this.request('/taskLogs');
+  }
+
+  async getTaskLog(id: string): Promise<any> {
+    return this.request(`/taskLogs/${id}`);
+  }
+
+  async getTaskLogsByTask(taskId: string): Promise<any[]> {
+    return this.request(`/taskLogs/task/${taskId}`);
+  }
+
+  async createTaskLog(data: any): Promise<any> {
+    return this.request('/taskLogs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateTaskLog(id: string, data: any): Promise<any> {
+    return this.request(`/taskLogs/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteTaskLog(id: string): Promise<void> {
+    return this.request(`/taskLogs/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiService = new ApiService();

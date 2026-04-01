@@ -72,7 +72,17 @@ export class ProjectRepository {
       data,
       include: {
         pm: true,
-        pmo: true
+        pmo: true,
+        sponsors: {
+          include: {
+            sponsor: true
+          }
+        },
+        teamMembers: {
+          include: {
+            teamMember: true
+          }
+        }
       }
     });
   }

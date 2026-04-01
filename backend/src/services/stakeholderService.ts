@@ -26,19 +26,31 @@ export class StakeholderService {
 
   async createStakeholder(data: Prisma.StakeholderCreateInput) {
     // Business logic validation
-    if (!data.projectId) {
+    const projectId = (data as any).projectId || (data as any).project?.connect?.id;
+    if (!projectId) {
       throw new Error('Project ID is required');
     }
 
-    if (!data.userId) {
+    const userId = (data as any).userId || (data as any).user?.connect?.id;
+    if (!userId) {
       throw new Error('User ID is required');
     }
 
-    if (!data.influenceStrategy || data.influenceStrategy.trim().length === 0) {
+    if (!data.influenceStrategy || (typeof data.influenceStrategy === 'string' && data.influenceStrategy.trim().length === 0)) {
       throw new Error('Influence strategy is required');
     }
 
-    return await this.stakeholderRepository.create(data);
+    const payload: any = {
+      ...data,
+      id: (data as any).id || `s${Date.now()}`,
+      project: { connect: { id: projectId } },
+      user: { connect: { id: userId } },
+    };
+
+    delete payload.projectId;
+    delete payload.userId;
+
+    return await this.stakeholderRepository.create(payload);
   }
 
   async updateStakeholder(id: string, data: Prisma.StakeholderUpdateInput) {

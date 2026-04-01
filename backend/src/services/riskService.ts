@@ -26,23 +26,34 @@ export class RiskService {
 
   async createRisk(data: Prisma.RiskCreateInput) {
     // Business logic validation
-    if (!data.description || data.description.trim().length === 0) {
+    if (!data.description || (typeof data.description === 'string' && data.description.trim().length === 0)) {
       throw new Error('Risk description is required');
     }
 
-    if (!data.projectId) {
+    const projectId = (data as any).projectId || (data as any).project?.connect?.id;
+    if (!projectId) {
       throw new Error('Project ID is required');
     }
 
-    if (data.probability < 0 || data.probability > 1) {
+    const probability = typeof (data as any).probability === 'number' ? (data as any).probability : undefined;
+    if (probability !== undefined && (probability < 0 || probability > 1)) {
       throw new Error('Probability must be between 0 and 1');
     }
 
-    if (data.impact < 0 || data.impact > 1) {
+    const impact = typeof (data as any).impact === 'number' ? (data as any).impact : undefined;
+    if (impact !== undefined && (impact < 0 || impact > 1)) {
       throw new Error('Impact must be between 0 and 1');
     }
 
-    return await this.riskRepository.create(data);
+    const payload: any = {
+      ...data,
+      id: (data as any).id || `r${Date.now()}`,
+      project: { connect: { id: projectId } },
+    };
+
+    delete payload.projectId;
+
+    return await this.riskRepository.create(payload);
   }
 
   async updateRisk(id: string, data: Prisma.RiskUpdateInput) {
@@ -50,11 +61,13 @@ export class RiskService {
     await this.getRiskById(id);
 
     // Business logic validation
-    if (data.probability !== undefined && (data.probability < 0 || data.probability > 1)) {
+    const probabilityValue = typeof (data as any).probability === 'number' ? (data as any).probability : undefined;
+    if (probabilityValue !== undefined && (probabilityValue < 0 || probabilityValue > 1)) {
       throw new Error('Probability must be between 0 and 1');
     }
 
-    if (data.impact !== undefined && (data.impact < 0 || data.impact > 1)) {
+    const impactValue = typeof (data as any).impact === 'number' ? (data as any).impact : undefined;
+    if (impactValue !== undefined && (impactValue < 0 || impactValue > 1)) {
       throw new Error('Impact must be between 0 and 1');
     }
 

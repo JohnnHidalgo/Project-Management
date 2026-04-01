@@ -11,6 +11,7 @@ import milestonesRouter from './routes/milestones';
 import issuesRouter from './routes/issues';
 import expensesRouter from './routes/expenses';
 import stakeholdersRouter from './routes/stakeholders';
+import taskLogsRouter from './routes/taskLogs';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL not set in .env');
@@ -40,6 +41,7 @@ app.use('/api/milestones', milestonesRouter);
 app.use('/api/issues', issuesRouter);
 app.use('/api/expenses', expensesRouter);
 app.use('/api/stakeholders', stakeholdersRouter);
+app.use('/api/taskLogs', taskLogsRouter);
 
 // TODO: Add routes for budget lines, snapshots, lessons learned, etc.
 

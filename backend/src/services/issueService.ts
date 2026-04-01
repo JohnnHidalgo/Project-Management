@@ -26,15 +26,24 @@ export class IssueService {
 
   async createIssue(data: Prisma.IssueCreateInput) {
     // Business logic validation
-    if (!data.description || data.description.trim().length === 0) {
+    if (!data.description || (typeof data.description === 'string' && data.description.trim().length === 0)) {
       throw new Error('Issue description is required');
     }
 
-    if (!data.projectId) {
+    const projectId = (data as any).projectId || (data as any).project?.connect?.id;
+    if (!projectId) {
       throw new Error('Project ID is required');
     }
 
-    return await this.issueRepository.create(data);
+    const payload: any = {
+      ...data,
+      id: (data as any).id || `i${Date.now()}`,
+      project: { connect: { id: projectId } },
+    };
+
+    delete payload.projectId;
+
+    return await this.issueRepository.create(payload);
   }
 
   async updateIssue(id: string, data: Prisma.IssueUpdateInput) {

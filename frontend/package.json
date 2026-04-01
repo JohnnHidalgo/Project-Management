@@ -30,7 +30,8 @@
     "prisma": "^7.6.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
-    "vite": "^5.2.2"
+    "vite": "^5.2.2",
+    "vitest": "^4.1.2"
   },
   "prisma": {
     "seed": "ts-node --transpile-only prisma/seed.ts"

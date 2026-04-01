@@ -26,19 +26,30 @@ export class ExpenseService {
 
   async createExpense(data: Prisma.ExpenseCreateInput) {
     // Business logic validation
-    if (!data.description || data.description.trim().length === 0) {
+    if (!data.description || (typeof data.description === 'string' && data.description.trim().length === 0)) {
       throw new Error('Expense description is required');
     }
 
-    if (!data.projectId) {
+    const projectId = (data as any).projectId || (data as any).project?.connect?.id;
+    if (!projectId) {
       throw new Error('Project ID is required');
     }
 
-    if (data.amount <= 0) {
+    const amountValue = typeof (data as any).amount === 'number' ? (data as any).amount : undefined;
+    if (amountValue !== undefined && amountValue <= 0) {
       throw new Error('Expense amount must be greater than 0');
     }
 
-    return await this.expenseRepository.create(data);
+    const payload: any = {
+      ...data,
+      id: (data as any).id || `e${Date.now()}`,
+      date: data.date && typeof data.date === 'string' ? new Date(data.date) : data.date,
+      project: { connect: { id: projectId } },
+    };
+
+    delete payload.projectId;
+
+    return await this.expenseRepository.create(payload);
   }
 
   async updateExpense(id: string, data: Prisma.ExpenseUpdateInput) {
@@ -46,7 +57,8 @@ export class ExpenseService {
     await this.getExpenseById(id);
 
     // Business logic validation
-    if (data.amount !== undefined && data.amount <= 0) {
+    const amountValue = typeof (data as any).amount === 'number' ? (data as any).amount : undefined;
+    if (amountValue !== undefined && amountValue <= 0) {
       throw new Error('Expense amount must be greater than 0');
     }
 

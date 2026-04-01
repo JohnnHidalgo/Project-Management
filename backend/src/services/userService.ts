@@ -26,7 +26,12 @@ export class UserService {
       throw new Error('User name is required');
     }
 
-    return await this.userRepository.create(data);
+    const payload = {
+      ...data,
+      id: (data as any).id || `u${Date.now()}`,
+    };
+
+    return await this.userRepository.create(payload);
   }
 
   async updateUser(id: string, data: Prisma.UserUpdateInput) {
