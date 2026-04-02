@@ -198,6 +198,7 @@ model Project {
   stakeholders Stakeholder[]
   projectSnapshots ProjectSnapshot[]
   lessonsLearned LessonLearned[]
+  projectHistories ProjectHistory[]
 }
 
 model ProjectSponsor {
@@ -297,6 +298,19 @@ model TaskLog {
 
   task Task @relation(fields:[taskId], references:[id], onDelete: Cascade)
   user User @relation(fields:[userId], references:[id], onDelete: Cascade)
+}
+
+model ProjectHistory {
+  id         String   @id
+  projectId  String?
+  entity     String
+  entityId   String?
+  action     String
+  details    Json?
+  userId     String?
+  createdAt  DateTime @default(now())
+
+  project Project? @relation(fields:[projectId], references:[id], onDelete: Cascade)
 }
 
 model Risk {

@@ -209,3 +209,14 @@ export interface Stakeholder {
   interest: 'Low' | 'High';
   influenceStrategy: string;
 }
+
+export interface ProjectHistory {
+  id: string;
+  projectId?: string;
+  entity: string;
+  entityId?: string;
+  action: string;
+  details?: any;
+  userId?: string;
+  createdAt: string;
+}

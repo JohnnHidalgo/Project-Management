@@ -274,6 +274,14 @@ class ApiService {
     return this.request('/taskLogs');
   }
 
+  async getProjectHistory(): Promise<any[]> {
+    return this.request('/projectHistory');
+  }
+
+  async getProjectHistoryByProject(projectId: string): Promise<any[]> {
+    return this.request(`/projectHistory/project/${projectId}`);
+  }
+
   async getTaskLog(id: string): Promise<any> {
     return this.request(`/taskLogs/${id}`);
   }

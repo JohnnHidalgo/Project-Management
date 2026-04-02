@@ -1,8 +1,11 @@
 import { IssueRepository } from '../repositories/issueRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 export class IssueService {
     issueRepository;
+    projectHistoryService;
     constructor() {
         this.issueRepository = new IssueRepository();
+        this.projectHistoryService = new ProjectHistoryService();
     }
     async getAllIssues() {
         return await this.issueRepository.findAll();
@@ -32,16 +35,22 @@ export class IssueService {
             project: { connect: { id: projectId } },
         };
         delete payload.projectId;
-        return await this.issueRepository.create(payload);
+        const createdIssue = await this.issueRepository.create(payload);
+        await this.projectHistoryService.record(projectId, 'Issue', createdIssue.id, 'Created', { issue: createdIssue }, data.createdBy || null);
+        return createdIssue;
     }
     async updateIssue(id, data) {
         // Validate the issue exists
         await this.getIssueById(id);
-        return await this.issueRepository.update(id, data);
+        const updatedIssue = await this.issueRepository.update(id, data);
+        await this.projectHistoryService.record(updatedIssue.projectId || null, 'Issue', id, 'Updated', { updates: data }, data.updatedBy || null);
+        return updatedIssue;
     }
     async deleteIssue(id) {
         // Validate the issue exists
-        await this.getIssueById(id);
-        return await this.issueRepository.delete(id);
+        const issueToDelete = await this.getIssueById(id);
+        const deletedIssue = await this.issueRepository.delete(id);
+        await this.projectHistoryService.record(issueToDelete.projectId || null, 'Issue', id, 'Deleted', { issue: issueToDelete });
+        return deletedIssue;
     }
 }

@@ -1,11 +1,14 @@
 import { IssueRepository } from '../repositories/issueRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class IssueService {
   private issueRepository: IssueRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.issueRepository = new IssueRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllIssues() {
@@ -43,20 +46,26 @@ export class IssueService {
 
     delete payload.projectId;
 
-    return await this.issueRepository.create(payload);
+    const createdIssue = await this.issueRepository.create(payload);
+    await this.projectHistoryService.record(projectId, 'Issue', createdIssue.id, 'Created', { issue: createdIssue }, (data as any).createdBy || null);
+    return createdIssue;
   }
 
   async updateIssue(id: string, data: Prisma.IssueUpdateInput) {
     // Validate the issue exists
     await this.getIssueById(id);
 
-    return await this.issueRepository.update(id, data);
+    const updatedIssue = await this.issueRepository.update(id, data);
+    await this.projectHistoryService.record(updatedIssue.projectId || null, 'Issue', id, 'Updated', { updates: data }, (data as any).updatedBy || null);
+    return updatedIssue;
   }
 
   async deleteIssue(id: string) {
     // Validate the issue exists
-    await this.getIssueById(id);
+    const issueToDelete = await this.getIssueById(id);
 
-    return await this.issueRepository.delete(id);
+    const deletedIssue = await this.issueRepository.delete(id);
+    await this.projectHistoryService.record(issueToDelete.projectId || null, 'Issue', id, 'Deleted', { issue: issueToDelete });
+    return deletedIssue;
   }
 }

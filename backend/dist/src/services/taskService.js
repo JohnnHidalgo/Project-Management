@@ -1,8 +1,11 @@
 import { TaskRepository } from '../repositories/taskRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 export class TaskService {
     taskRepository;
+    projectHistoryService;
     constructor() {
         this.taskRepository = new TaskRepository();
+        this.projectHistoryService = new ProjectHistoryService();
     }
     async getAllTasks() {
         return await this.taskRepository.findAll();
@@ -70,7 +73,10 @@ export class TaskService {
             payload.predecessor = { connect: { id: data.predecessorId } };
         }
         delete payload.predecessorId;
-        return await this.taskRepository.create(payload);
+        const createdTask = await this.taskRepository.create(payload);
+        const projectId = createdTask.milestone?.projectId || null;
+        await this.projectHistoryService.record(projectId, 'Task', createdTask.id, 'Created', { task: createdTask });
+        return createdTask;
     }
     async updateTask(id, data) {
         // Validate the task exists
@@ -83,12 +89,18 @@ export class TaskService {
         if (payload.status) {
             payload.status = this.normalizeTaskStatus(payload.status);
         }
-        return await this.taskRepository.update(id, payload);
+        const updatedTask = await this.taskRepository.update(id, payload);
+        const projectId = updatedTask.milestone?.projectId || null;
+        await this.projectHistoryService.record(projectId, 'Task', updatedTask.id, 'Updated', { updates: data, task: updatedTask });
+        return updatedTask;
     }
     async deleteTask(id) {
         // Validate the task exists
-        await this.getTaskById(id);
-        return await this.taskRepository.delete(id);
+        const taskToDelete = await this.getTaskById(id);
+        const deletedTask = await this.taskRepository.delete(id);
+        const projectId = taskToDelete.milestone?.projectId || null;
+        await this.projectHistoryService.record(projectId, 'Task', taskToDelete.id, 'Deleted', { task: taskToDelete });
+        return deletedTask;
     }
     async calculateMilestoneProgress(milestoneId) {
         const tasks = await this.getTasksByMilestone(milestoneId);

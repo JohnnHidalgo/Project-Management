@@ -1,11 +1,14 @@
 import { StakeholderRepository } from '../repositories/stakeholderRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class StakeholderService {
   private stakeholderRepository: StakeholderRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.stakeholderRepository = new StakeholderRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllStakeholders() {
@@ -50,7 +53,17 @@ export class StakeholderService {
     delete payload.projectId;
     delete payload.userId;
 
-    return await this.stakeholderRepository.create(payload);
+    const createdStakeholder = await this.stakeholderRepository.create(payload);
+
+    await this.projectHistoryService.record(
+      createdStakeholder.projectId,
+      'Stakeholder',
+      createdStakeholder.id,
+      'Created',
+      { stakeholder: createdStakeholder }
+    );
+
+    return createdStakeholder;
   }
 
   async updateStakeholder(id: string, data: Prisma.StakeholderUpdateInput) {
@@ -62,8 +75,18 @@ export class StakeholderService {
 
   async deleteStakeholder(id: string) {
     // Validate the stakeholder exists
-    await this.getStakeholderById(id);
+    const stakeholderToDelete = await this.getStakeholderById(id);
 
-    return await this.stakeholderRepository.delete(id);
+    const deletedStakeholder = await this.stakeholderRepository.delete(id);
+
+    await this.projectHistoryService.record(
+      stakeholderToDelete.projectId,
+      'Stakeholder',
+      stakeholderToDelete.id,
+      'Deleted',
+      { stakeholder: stakeholderToDelete }
+    );
+
+    return deletedStakeholder;
   }
 }

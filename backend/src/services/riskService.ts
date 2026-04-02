@@ -1,11 +1,14 @@
 import { RiskRepository } from '../repositories/riskRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class RiskService {
   private riskRepository: RiskRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.riskRepository = new RiskRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllRisks() {
@@ -53,7 +56,17 @@ export class RiskService {
 
     delete payload.projectId;
 
-    return await this.riskRepository.create(payload);
+    const createdRisk = await this.riskRepository.create(payload);
+
+    await this.projectHistoryService.record(
+      createdRisk.projectId,
+      'Risk',
+      createdRisk.id,
+      'Created',
+      { risk: createdRisk }
+    );
+
+    return createdRisk;
   }
 
   async updateRisk(id: string, data: Prisma.RiskUpdateInput) {
@@ -71,13 +84,33 @@ export class RiskService {
       throw new Error('Impact must be between 0 and 1');
     }
 
-    return await this.riskRepository.update(id, data);
+    const updatedRisk = await this.riskRepository.update(id, data);
+
+    await this.projectHistoryService.record(
+      updatedRisk.projectId,
+      'Risk',
+      updatedRisk.id,
+      'Updated',
+      { updates: data, risk: updatedRisk }
+    );
+
+    return updatedRisk;
   }
 
   async deleteRisk(id: string) {
     // Validate the risk exists
-    await this.getRiskById(id);
+    const riskToDelete = await this.getRiskById(id);
 
-    return await this.riskRepository.delete(id);
+    const deletedRisk = await this.riskRepository.delete(id);
+
+    await this.projectHistoryService.record(
+      riskToDelete.projectId,
+      'Risk',
+      riskToDelete.id,
+      'Deleted',
+      { risk: riskToDelete }
+    );
+
+    return deletedRisk;
   }
 }

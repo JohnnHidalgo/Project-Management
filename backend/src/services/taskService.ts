@@ -1,11 +1,14 @@
 import { TaskRepository } from '../repositories/taskRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class TaskService {
   private taskRepository: TaskRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.taskRepository = new TaskRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllTasks() {
@@ -86,9 +89,20 @@ export class TaskService {
     }
     delete payload.predecessorId;
 
-    return await this.taskRepository.create(payload);
-  }
+    const createdTask = await this.taskRepository.create(payload);
 
+    const projectId = createdTask.milestone?.projectId || null;
+
+    await this.projectHistoryService.record(
+      projectId,
+      'Task',
+      createdTask.id,
+      'Created',
+      { task: createdTask }
+    );
+
+    return createdTask;
+  }
 
   async updateTask(id: string, data: Prisma.TaskUpdateInput) {
     // Validate the task exists
@@ -104,14 +118,36 @@ export class TaskService {
       payload.status = this.normalizeTaskStatus(payload.status);
     }
 
-    return await this.taskRepository.update(id, payload);
+    const updatedTask = await this.taskRepository.update(id, payload);
+
+    const projectId = updatedTask.milestone?.projectId || null;
+    await this.projectHistoryService.record(
+      projectId,
+      'Task',
+      updatedTask.id,
+      'Updated',
+      { updates: data, task: updatedTask }
+    );
+
+    return updatedTask;
   }
 
   async deleteTask(id: string) {
     // Validate the task exists
-    await this.getTaskById(id);
+    const taskToDelete = await this.getTaskById(id);
 
-    return await this.taskRepository.delete(id);
+    const deletedTask = await this.taskRepository.delete(id);
+
+    const projectId = taskToDelete.milestone?.projectId || null;
+    await this.projectHistoryService.record(
+      projectId,
+      'Task',
+      taskToDelete.id,
+      'Deleted',
+      { task: taskToDelete }
+    );
+
+    return deletedTask;
   }
 
   async calculateMilestoneProgress(milestoneId: string): Promise<number> {

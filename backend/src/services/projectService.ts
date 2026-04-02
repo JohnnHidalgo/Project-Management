@@ -1,11 +1,14 @@
 import { ProjectRepository } from '../repositories/projectRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Project, ProjectStatus, Prisma } from '../../.prisma/client';
 
 export class ProjectService {
   private projectRepository: ProjectRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.projectRepository = new ProjectRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllProjects() {
@@ -78,7 +81,18 @@ export class ProjectService {
       payload.endDate = new Date(payload.endDate);
     }
 
-    return await this.projectRepository.create(payload);
+    const createdProject = await this.projectRepository.create(payload);
+
+    await this.projectHistoryService.record(
+      createdProject.id,
+      'Project',
+      createdProject.id,
+      'Created',
+      { project: createdProject },
+      undefined
+    );
+
+    return createdProject;
   }
 
   async updateProject(id: string, data: Partial<Project>) {
@@ -94,13 +108,35 @@ export class ProjectService {
       throw new Error('Start date cannot be after end date');
     }
 
-    return await this.projectRepository.update(id, data);
+    const updatedProject = await this.projectRepository.update(id, data);
+
+    await this.projectHistoryService.record(
+      updatedProject.id,
+      'Project',
+      updatedProject.id,
+      'Updated',
+      { updates: data, project: updatedProject },
+      undefined
+    );
+
+    return updatedProject;
   }
 
   async deleteProject(id: string) {
     // Validate the project exists
-    await this.getProjectById(id);
+    const projectToDelete = await this.getProjectById(id);
 
-    return await this.projectRepository.delete(id);
+    const deletedProject = await this.projectRepository.delete(id);
+
+    await this.projectHistoryService.record(
+      projectToDelete.id,
+      'Project',
+      projectToDelete.id,
+      'Deleted',
+      { project: projectToDelete },
+      undefined
+    );
+
+    return deletedProject;
   }
 }

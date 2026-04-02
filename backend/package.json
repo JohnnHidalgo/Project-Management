@@ -10,7 +10,7 @@
     "start": "node dist/src/index.js",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev",
-    "prisma:seed": "npx prisma db seed",
+    "prisma:seed": "tsx prisma/seed.ts",
     "create-db": "ts-node --transpile-only scripts/create-database.ts"
   },
   "dependencies": {

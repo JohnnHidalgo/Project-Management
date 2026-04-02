@@ -1,8 +1,11 @@
 import { StakeholderRepository } from '../repositories/stakeholderRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 export class StakeholderService {
     stakeholderRepository;
+    projectHistoryService;
     constructor() {
         this.stakeholderRepository = new StakeholderRepository();
+        this.projectHistoryService = new ProjectHistoryService();
     }
     async getAllStakeholders() {
         return await this.stakeholderRepository.findAll();
@@ -38,7 +41,9 @@ export class StakeholderService {
         };
         delete payload.projectId;
         delete payload.userId;
-        return await this.stakeholderRepository.create(payload);
+        const createdStakeholder = await this.stakeholderRepository.create(payload);
+        await this.projectHistoryService.record(createdStakeholder.projectId, 'Stakeholder', createdStakeholder.id, 'Created', { stakeholder: createdStakeholder });
+        return createdStakeholder;
     }
     async updateStakeholder(id, data) {
         // Validate the stakeholder exists
@@ -47,7 +52,9 @@ export class StakeholderService {
     }
     async deleteStakeholder(id) {
         // Validate the stakeholder exists
-        await this.getStakeholderById(id);
-        return await this.stakeholderRepository.delete(id);
+        const stakeholderToDelete = await this.getStakeholderById(id);
+        const deletedStakeholder = await this.stakeholderRepository.delete(id);
+        await this.projectHistoryService.record(stakeholderToDelete.projectId, 'Stakeholder', stakeholderToDelete.id, 'Deleted', { stakeholder: stakeholderToDelete });
+        return deletedStakeholder;
     }
 }

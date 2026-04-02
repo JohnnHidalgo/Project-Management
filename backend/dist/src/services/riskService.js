@@ -1,8 +1,11 @@
 import { RiskRepository } from '../repositories/riskRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 export class RiskService {
     riskRepository;
+    projectHistoryService;
     constructor() {
         this.riskRepository = new RiskRepository();
+        this.projectHistoryService = new ProjectHistoryService();
     }
     async getAllRisks() {
         return await this.riskRepository.findAll();
@@ -40,7 +43,9 @@ export class RiskService {
             project: { connect: { id: projectId } },
         };
         delete payload.projectId;
-        return await this.riskRepository.create(payload);
+        const createdRisk = await this.riskRepository.create(payload);
+        await this.projectHistoryService.record(createdRisk.projectId, 'Risk', createdRisk.id, 'Created', { risk: createdRisk });
+        return createdRisk;
     }
     async updateRisk(id, data) {
         // Validate the risk exists
@@ -54,11 +59,15 @@ export class RiskService {
         if (impactValue !== undefined && (impactValue < 0 || impactValue > 1)) {
             throw new Error('Impact must be between 0 and 1');
         }
-        return await this.riskRepository.update(id, data);
+        const updatedRisk = await this.riskRepository.update(id, data);
+        await this.projectHistoryService.record(updatedRisk.projectId, 'Risk', updatedRisk.id, 'Updated', { updates: data, risk: updatedRisk });
+        return updatedRisk;
     }
     async deleteRisk(id) {
         // Validate the risk exists
-        await this.getRiskById(id);
-        return await this.riskRepository.delete(id);
+        const riskToDelete = await this.getRiskById(id);
+        const deletedRisk = await this.riskRepository.delete(id);
+        await this.projectHistoryService.record(riskToDelete.projectId, 'Risk', riskToDelete.id, 'Deleted', { risk: riskToDelete });
+        return deletedRisk;
     }
 }

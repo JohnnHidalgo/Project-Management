@@ -2,6 +2,7 @@ import { TaskLogRepository } from '../repositories/taskLogRepository.js';
 import { TaskRepository } from '../repositories/taskRepository.js';
 import { TaskService } from './taskService.js';
 import { MilestoneService } from './milestoneService.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class TaskLogService {
@@ -9,12 +10,14 @@ export class TaskLogService {
   private taskRepository: TaskRepository;
   private taskService: TaskService;
   private milestoneService: MilestoneService;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.taskLogRepository = new TaskLogRepository();
     this.taskRepository = new TaskRepository();
     this.taskService = new TaskService();
     this.milestoneService = new MilestoneService();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllTaskLogs() {
@@ -85,20 +88,32 @@ export class TaskLogService {
       }
     }
 
+    const task = await this.taskRepository.findById(taskId);
+    const projectId = task?.milestone?.projectId ?? null;
+    await this.projectHistoryService.record(projectId, 'TaskLog', createdLog.id, 'Created', { taskLog: createdLog }, (data as any).userId || null);
+
     return createdLog;
   }
 
   async updateTaskLog(id: string, data: Prisma.TaskLogUpdateInput) {
     // Validate the task log exists
-    await this.getTaskLogById(id);
+    const existingLog = await this.getTaskLogById(id);
 
-    return await this.taskLogRepository.update(id, data);
+    const updatedLog = await this.taskLogRepository.update(id, data);
+    const task = await this.taskRepository.findById(existingLog.taskId);
+    const projectId = task?.milestone?.projectId ?? null;
+    await this.projectHistoryService.record(projectId, 'TaskLog', id, 'Updated', { updates: data }, (data as any).userId || null);
+    return updatedLog;
   }
 
   async deleteTaskLog(id: string) {
     // Validate the task log exists
-    await this.getTaskLogById(id);
+    const existingLog = await this.getTaskLogById(id);
 
-    return await this.taskLogRepository.delete(id);
+    const deletedLog = await this.taskLogRepository.delete(id);
+    const task = await this.taskRepository.findById(existingLog.taskId);
+    const projectId = task?.milestone?.projectId ?? null;
+    await this.projectHistoryService.record(projectId, 'TaskLog', id, 'Deleted', { taskLog: existingLog });
+    return deletedLog;
   }
 }

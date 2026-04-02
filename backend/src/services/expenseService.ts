@@ -1,11 +1,14 @@
 import { ExpenseRepository } from '../repositories/expenseRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class ExpenseService {
   private expenseRepository: ExpenseRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.expenseRepository = new ExpenseRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllExpenses() {
@@ -49,7 +52,17 @@ export class ExpenseService {
 
     delete payload.projectId;
 
-    return await this.expenseRepository.create(payload);
+    const createdExpense = await this.expenseRepository.create(payload);
+
+    await this.projectHistoryService.record(
+      createdExpense.projectId,
+      'Expense',
+      createdExpense.id,
+      'Created',
+      { expense: createdExpense }
+    );
+
+    return createdExpense;
   }
 
   async updateExpense(id: string, data: Prisma.ExpenseUpdateInput) {
@@ -62,13 +75,33 @@ export class ExpenseService {
       throw new Error('Expense amount must be greater than 0');
     }
 
-    return await this.expenseRepository.update(id, data);
+    const updatedExpense = await this.expenseRepository.update(id, data);
+
+    await this.projectHistoryService.record(
+      updatedExpense.projectId,
+      'Expense',
+      updatedExpense.id,
+      'Updated',
+      { updates: data, expense: updatedExpense }
+    );
+
+    return updatedExpense;
   }
 
   async deleteExpense(id: string) {
     // Validate the expense exists
-    await this.getExpenseById(id);
+    const expenseToDelete = await this.getExpenseById(id);
 
-    return await this.expenseRepository.delete(id);
+    const deletedExpense = await this.expenseRepository.delete(id);
+
+    await this.projectHistoryService.record(
+      expenseToDelete.projectId,
+      'Expense',
+      expenseToDelete.id,
+      'Deleted',
+      { expense: expenseToDelete }
+    );
+
+    return deletedExpense;
   }
 }

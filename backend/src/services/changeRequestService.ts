@@ -1,14 +1,17 @@
 import { ChangeRequestRepository } from '../repositories/changeRequestRepository.js';
 import { TaskRepository } from '../repositories/taskRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class ChangeRequestService {
   private changeRequestRepository: ChangeRequestRepository;
   private taskRepository: TaskRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.changeRequestRepository = new ChangeRequestRepository();
     this.taskRepository = new TaskRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllChangeRequests() {
@@ -63,21 +66,32 @@ export class ChangeRequestService {
     delete payload.taskId;
     delete payload.requestedBy;
 
-    return await this.changeRequestRepository.create(payload);
+    const createdCR = await this.changeRequestRepository.create(payload);
+    const projectId = task?.milestone?.projectId ?? null;
+    await this.projectHistoryService.record(projectId, 'ChangeRequest', createdCR.id, 'Created', { changeRequest: createdCR }, requestedBy);
+    return createdCR;
   }
 
   async updateChangeRequest(id: string, data: Prisma.ChangeRequestUpdateInput) {
     // Validate the change request exists
-    await this.getChangeRequestById(id);
+    const existingCR = await this.getChangeRequestById(id);
+    const task = existingCR.taskId ? await this.taskRepository.findById(existingCR.taskId) : null;
+    const projectId = task?.milestone?.projectId ?? null;
 
-    return await this.changeRequestRepository.update(id, data);
+    const updatedCR = await this.changeRequestRepository.update(id, data);
+    await this.projectHistoryService.record(projectId, 'ChangeRequest', id, 'Updated', { updates: data }, (data as any).updatedBy || null);
+    return updatedCR;
   }
 
   async deleteChangeRequest(id: string) {
     // Validate the change request exists
-    await this.getChangeRequestById(id);
+    const crToDelete = await this.getChangeRequestById(id);
 
-    return await this.changeRequestRepository.delete(id);
+    const deletedCR = await this.changeRequestRepository.delete(id);
+    const task = await this.taskRepository.findById(crToDelete.taskId);
+    const projectId = task?.milestone?.projectId ?? null;
+    await this.projectHistoryService.record(projectId, 'ChangeRequest', id, 'Deleted', { changeRequest: crToDelete });
+    return deletedCR;
   }
 
   async processChangeRequest(id: string, status: 'Approved' | 'Rejected') {

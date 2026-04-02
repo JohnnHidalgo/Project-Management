@@ -14,7 +14,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { apiService } from './services/apiService';
-import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue } from './types';
+import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue, ProjectHistory } from './types';
 import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbokUtils';
 import { mockUsers, mockProjects, mockMilestones, mockTasks, mockRisks, mockIssues, mockExpenses, mockStakeholders, mockTaskLogs, mockChangeRequests, mockRiskActions } from './mockData';
 import './globals.css';
@@ -1714,6 +1714,7 @@ const ProjectDetail = ({
   onAddExpense, onUpdateExpense, onAddBudgetLine, onApproveBudgetLine,
   snapshots, onAddSnapshot, risks, onAddRisk, stakeholders, onAddStakeholder,
   taskLogs, onAddTaskLog, changeRequests, onChangeRequest,
+  projectHistory,
   riskActions, onAddRiskAction, onUpdateRiskActionStatus, onProcessCR
 }: { 
   projects: Project[], 
@@ -1737,6 +1738,7 @@ const ProjectDetail = ({
   onAddRisk: (projectId: string, risk: Partial<Risk>) => void,
   stakeholders: Stakeholder[],
   onAddStakeholder: (projectId: string, s: Partial<Stakeholder>) => void,
+  projectHistory: ProjectHistory[],
   riskActions: RiskAction[],
   onAddRiskAction: (a: Partial<RiskAction>) => void,
   onUpdateRiskActionStatus: (id: string, status: RiskAction['status']) => void,
@@ -1855,8 +1857,50 @@ const ProjectDetail = ({
       });
     });
 
+    const formatHistoryDetails = (h: any) => {
+      if (!h.details) return '';
+      const d = h.details;
+
+      const simple = (obj: any) => Object.entries(obj)
+        .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+        .join(' | ');
+
+      switch (h.entity) {
+        case 'Project':
+          return `Proyecto: ${d.project?.name ?? d.name ?? 'N/A'} | Estado: ${d.project?.status ?? d.status ?? 'N/A'}`;
+        case 'Task':
+          return `Tarea: ${d.task?.name ?? d.name ?? h.entityId} | Estado: ${d.task?.status ?? d.status ?? 'N/A'} | Progreso: ${d.task?.progress ?? d.progress ?? 'N/A'}%`;
+        case 'Milestone':
+          return `Hito: ${d.milestone?.name ?? d.name ?? h.entityId} | Estado: ${d.milestone?.status ?? d.status ?? 'N/A'}`;
+        case 'Expense':
+          return `Gasto: ${d.expense?.description ?? d.description ?? 'N/A'} | Monto: $${d.expense?.amount ?? d.amount ?? 'N/A'}`;
+        case 'Risk':
+          return `Riesgo: ${d.risk?.description ?? d.description ?? 'N/A'} | Probabilidad: ${d.risk?.probability ?? d.probability ?? 'N/A'}`;
+        case 'Stakeholder':
+          return `Stakeholder: ${d.stakeholder?.name ?? d.name ?? 'N/A'} | Rol: ${d.stakeholder?.role ?? d.role ?? 'N/A'}`;
+        case 'ChangeRequest':
+          return `Cambio: ${d.changeRequest?.justification ?? d.justification ?? 'N/A'} | Estado: ${d.changeRequest?.status ?? d.status ?? 'N/A'}`;
+        case 'TaskLog':
+          return `Log de tarea: ${d.taskLog?.comment ?? d.comment ?? 'N/A'} | Progreso: ${d.taskLog?.newProgress ?? d.newProgress ?? 'N/A'}%`;
+        default:
+          return simple(d);
+      }
+    };
+
+    // Project History events (audit log)
+    projectHistory.filter(h => h.projectId === id).forEach(h => {
+      activities.push({
+        id: h.id,
+        date: h.createdAt,
+        type: `${h.entity} ${h.action}`,
+        description: `${h.action} ${h.entity} ${h.details ? ' - ' + formatHistoryDetails(h) : ''}`,
+        user: h.userId || 'Sistema',
+        icon: '📘'
+      });
+    });
+
     return activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [taskLogs, projectChangeRequests, projectExpenses, projectTasks]);
+  }, [taskLogs, projectChangeRequests, projectExpenses, projectTasks, projectHistory]);
 
   if (!project) return (
     <div className="page">
@@ -2199,20 +2243,36 @@ const ProjectDetail = ({
               <h3 style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <FileText size={18} /> Historial de Actividades
               </h3>
-              <div className="activity-timeline" style={{ display: 'grid', gap: '1rem', maxHeight: '500px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                {projectActivities.length > 0 ? projectActivities.map(activity => (
-                  <div key={activity.id} style={{ display: 'flex', gap: '0.75rem', fontSize: '0.8125rem', borderLeft: '2px solid var(--border)', paddingLeft: '1rem', position: 'relative' }}>
-                    <div style={{ position: 'absolute', left: '-9px', top: '0', background: 'white', borderRadius: '50%', fontSize: '12px' }}>{activity.icon}</div>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '0.2rem' }}>
-                        <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{activity.type}</span>
-                        <span className="text-muted" style={{ fontSize: '0.7rem' }}>{activity.date}</span>
+              <div className="activity-timeline" style={{ display: 'grid', gap: '1rem', maxHeight: '520px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                {projectActivities.length > 0 ? projectActivities.map(activity => {
+                  const entity = activity.type.split(' ')[0];
+                  const colorMap: Record<string, string> = {
+                    Project: '#1366d6',
+                    Task: '#1f7a36',
+                    Milestone: '#b45309',
+                    Expense: '#9d174d',
+                    Risk: '#7c3aed',
+                    Stakeholder: '#0f766e',
+                    ChangeRequest: '#d97706',
+                    TaskLog: '#0f4a96',
+                    Issue: '#991b1b'
+                  };
+                  const tagColor = colorMap[entity] || '#6b7280';
+
+                  return (
+                    <div key={activity.id} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', backgroundColor: '#fff', padding: '0.85rem', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', display: 'flex', gap: '0.8rem', alignItems: 'flex-start', position: 'relative' }}>
+                      <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', backgroundColor: tagColor, color: '#fff', display: 'grid', placeItems: 'center', fontSize: '0.85rem', fontWeight: 700, boxShadow: '0 1px 2px rgba(0,0,0,0.15)' }} aria-label={activity.type}>{activity.icon}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <span style={{ fontWeight: 700, color: '#111827', fontSize: '0.88rem' }}>{activity.type}</span>
+                          <span style={{ fontSize: '0.72rem', color: '#6b7280', minWidth: '80px', textAlign: 'right' }}>{activity.date}</span>
+                        </div>
+                        <p style={{ margin: 0, lineHeight: 1.5, color: '#374151', fontSize: '0.83rem' }}>{activity.description}</p>
+                        <span style={{ marginTop: '0.45rem', display: 'inline-block', fontSize: '0.72rem', color: '#6b7280', fontStyle: 'italic' }}>Por: {activity.user}</span>
                       </div>
-                      <p style={{ margin: 0, lineHeight: 1.4 }}>{activity.description}</p>
-                      <p className="text-muted" style={{ margin: '0.2rem 0 0', fontSize: '0.7rem', fontStyle: 'italic' }}>Por: {activity.user}</p>
                     </div>
-                  </div>
-                )) : (
+                  );
+                }) : (
                   <p className="text-muted" style={{ textAlign: 'center' }}>No hay actividades registradas.</p>
                 )}
               </div>
@@ -3054,6 +3114,7 @@ export default function App() {
   const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>(mockChangeRequests);
   const [riskActions, setRiskActions] = useState<RiskAction[]>(mockRiskActions);
   const [issues, setIssues] = useState<Issue[]>(mockIssues);
+  const [projectHistory, setProjectHistory] = useState<ProjectHistory[]>([]);
 
   // Load data from APIs on component mount
   useEffect(() => {
@@ -3069,7 +3130,8 @@ export default function App() {
           expensesData,
           stakeholdersData,
           taskLogsData,
-          changeRequestsData
+          changeRequestsData,
+          projectHistoryData
         ] = await Promise.all([
           apiService.getProjects().catch(() => mockProjects),
           apiService.getUsers().catch(() => mockUsers),
@@ -3080,7 +3142,8 @@ export default function App() {
           apiService.getExpenses().catch(() => mockExpenses),
           apiService.getStakeholders().catch(() => mockStakeholders),
           apiService.getTaskLogs().catch(() => mockTaskLogs),
-          apiService.getChangeRequests().catch(() => mockChangeRequests)
+          apiService.getChangeRequests().catch(() => mockChangeRequests),
+          apiService.getProjectHistory().catch(() => [])
         ]);
 
         const normalizeProject = (project: any): Project => ({
@@ -3104,6 +3167,7 @@ export default function App() {
         setStakeholders(Array.isArray(stakeholdersData) ? stakeholdersData : mockStakeholders);
         setTaskLogs(Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
         setChangeRequests(Array.isArray(changeRequestsData) ? changeRequestsData : mockChangeRequests);
+        setProjectHistory(Array.isArray(projectHistoryData) ? projectHistoryData.map((h: any) => ({ ...h, createdAt: h.createdAt?.split?.('T')[0] ?? h.createdAt ?? '' })) : []);
 
         console.log('Loaded taskLogsData:', taskLogsData);
         console.log('Final taskLogs state:', Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
@@ -3550,6 +3614,7 @@ export default function App() {
                 onAddRiskAction={handleAddRiskAction}
                 onUpdateRiskActionStatus={handleUpdateRiskActionStatus}
                 onProcessCR={handleProcessChangeRequest}
+                projectHistory={projectHistory}
               />
             } />
             <Route path="/new-project" element={<ProjectForm onSave={handleSaveProject} />} />

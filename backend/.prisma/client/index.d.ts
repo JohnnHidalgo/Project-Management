@@ -59,6 +59,11 @@ export type Task = $Result.DefaultSelection<Prisma.$TaskPayload>
  */
 export type TaskLog = $Result.DefaultSelection<Prisma.$TaskLogPayload>
 /**
+ * Model ProjectHistory
+ * 
+ */
+export type ProjectHistory = $Result.DefaultSelection<Prisma.$ProjectHistoryPayload>
+/**
  * Model Risk
  * 
  */
@@ -572,6 +577,16 @@ export class PrismaClient<
     * ```
     */
   get taskLog(): Prisma.TaskLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.projectHistory`: Exposes CRUD operations for the **ProjectHistory** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ProjectHistories
+    * const projectHistories = await prisma.projectHistory.findMany()
+    * ```
+    */
+  get projectHistory(): Prisma.ProjectHistoryDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.risk`: Exposes CRUD operations for the **Risk** model.
@@ -1095,6 +1110,7 @@ export namespace Prisma {
     Milestone: 'Milestone',
     Task: 'Task',
     TaskLog: 'TaskLog',
+    ProjectHistory: 'ProjectHistory',
     Risk: 'Risk',
     RiskAction: 'RiskAction',
     Issue: 'Issue',
@@ -1118,7 +1134,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "project" | "projectSponsor" | "projectTeamMember" | "projectSpecificObjective" | "budgetLine" | "milestone" | "task" | "taskLog" | "risk" | "riskAction" | "issue" | "expense" | "changeRequest" | "stakeholder" | "projectSnapshot" | "lessonLearned"
+      modelProps: "user" | "project" | "projectSponsor" | "projectTeamMember" | "projectSpecificObjective" | "budgetLine" | "milestone" | "task" | "taskLog" | "projectHistory" | "risk" | "riskAction" | "issue" | "expense" | "changeRequest" | "stakeholder" | "projectSnapshot" | "lessonLearned"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1785,6 +1801,80 @@ export namespace Prisma {
           count: {
             args: Prisma.TaskLogCountArgs<ExtArgs>
             result: $Utils.Optional<TaskLogCountAggregateOutputType> | number
+          }
+        }
+      }
+      ProjectHistory: {
+        payload: Prisma.$ProjectHistoryPayload<ExtArgs>
+        fields: Prisma.ProjectHistoryFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ProjectHistoryFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ProjectHistoryFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>
+          }
+          findFirst: {
+            args: Prisma.ProjectHistoryFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ProjectHistoryFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>
+          }
+          findMany: {
+            args: Prisma.ProjectHistoryFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>[]
+          }
+          create: {
+            args: Prisma.ProjectHistoryCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>
+          }
+          createMany: {
+            args: Prisma.ProjectHistoryCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ProjectHistoryCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>[]
+          }
+          delete: {
+            args: Prisma.ProjectHistoryDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>
+          }
+          update: {
+            args: Prisma.ProjectHistoryUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>
+          }
+          deleteMany: {
+            args: Prisma.ProjectHistoryDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ProjectHistoryUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ProjectHistoryUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>[]
+          }
+          upsert: {
+            args: Prisma.ProjectHistoryUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ProjectHistoryPayload>
+          }
+          aggregate: {
+            args: Prisma.ProjectHistoryAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateProjectHistory>
+          }
+          groupBy: {
+            args: Prisma.ProjectHistoryGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ProjectHistoryGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ProjectHistoryCountArgs<ExtArgs>
+            result: $Utils.Optional<ProjectHistoryCountAggregateOutputType> | number
           }
         }
       }
@@ -2497,6 +2587,7 @@ export namespace Prisma {
     milestone?: MilestoneOmit
     task?: TaskOmit
     taskLog?: TaskLogOmit
+    projectHistory?: ProjectHistoryOmit
     risk?: RiskOmit
     riskAction?: RiskActionOmit
     issue?: IssueOmit
@@ -2735,6 +2826,7 @@ export namespace Prisma {
     stakeholders: number
     projectSnapshots: number
     lessonsLearned: number
+    projectHistories: number
   }
 
   export type ProjectCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2749,6 +2841,7 @@ export namespace Prisma {
     stakeholders?: boolean | ProjectCountOutputTypeCountStakeholdersArgs
     projectSnapshots?: boolean | ProjectCountOutputTypeCountProjectSnapshotsArgs
     lessonsLearned?: boolean | ProjectCountOutputTypeCountLessonsLearnedArgs
+    projectHistories?: boolean | ProjectCountOutputTypeCountProjectHistoriesArgs
   }
 
   // Custom InputTypes
@@ -2837,6 +2930,13 @@ export namespace Prisma {
    */
   export type ProjectCountOutputTypeCountLessonsLearnedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: LessonLearnedWhereInput
+  }
+
+  /**
+   * ProjectCountOutputType without action
+   */
+  export type ProjectCountOutputTypeCountProjectHistoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectHistoryWhereInput
   }
 
 
@@ -4790,6 +4890,7 @@ export namespace Prisma {
     stakeholders?: boolean | Project$stakeholdersArgs<ExtArgs>
     projectSnapshots?: boolean | Project$projectSnapshotsArgs<ExtArgs>
     lessonsLearned?: boolean | Project$lessonsLearnedArgs<ExtArgs>
+    projectHistories?: boolean | Project$projectHistoriesArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
 
@@ -4887,6 +4988,7 @@ export namespace Prisma {
     stakeholders?: boolean | Project$stakeholdersArgs<ExtArgs>
     projectSnapshots?: boolean | Project$projectSnapshotsArgs<ExtArgs>
     lessonsLearned?: boolean | Project$lessonsLearnedArgs<ExtArgs>
+    projectHistories?: boolean | Project$projectHistoriesArgs<ExtArgs>
     _count?: boolean | ProjectCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ProjectIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4914,6 +5016,7 @@ export namespace Prisma {
       stakeholders: Prisma.$StakeholderPayload<ExtArgs>[]
       projectSnapshots: Prisma.$ProjectSnapshotPayload<ExtArgs>[]
       lessonsLearned: Prisma.$LessonLearnedPayload<ExtArgs>[]
+      projectHistories: Prisma.$ProjectHistoryPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5345,6 +5448,7 @@ export namespace Prisma {
     stakeholders<T extends Project$stakeholdersArgs<ExtArgs> = {}>(args?: Subset<T, Project$stakeholdersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StakeholderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     projectSnapshots<T extends Project$projectSnapshotsArgs<ExtArgs> = {}>(args?: Subset<T, Project$projectSnapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     lessonsLearned<T extends Project$lessonsLearnedArgs<ExtArgs> = {}>(args?: Subset<T, Project$lessonsLearnedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LessonLearnedPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    projectHistories<T extends Project$projectHistoriesArgs<ExtArgs> = {}>(args?: Subset<T, Project$projectHistoriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6096,6 +6200,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: LessonLearnedScalarFieldEnum | LessonLearnedScalarFieldEnum[]
+  }
+
+  /**
+   * Project.projectHistories
+   */
+  export type Project$projectHistoriesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    where?: ProjectHistoryWhereInput
+    orderBy?: ProjectHistoryOrderByWithRelationInput | ProjectHistoryOrderByWithRelationInput[]
+    cursor?: ProjectHistoryWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ProjectHistoryScalarFieldEnum | ProjectHistoryScalarFieldEnum[]
   }
 
   /**
@@ -14151,6 +14279,1123 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: TaskLogInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ProjectHistory
+   */
+
+  export type AggregateProjectHistory = {
+    _count: ProjectHistoryCountAggregateOutputType | null
+    _min: ProjectHistoryMinAggregateOutputType | null
+    _max: ProjectHistoryMaxAggregateOutputType | null
+  }
+
+  export type ProjectHistoryMinAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    entity: string | null
+    entityId: string | null
+    action: string | null
+    userId: string | null
+    createdAt: Date | null
+  }
+
+  export type ProjectHistoryMaxAggregateOutputType = {
+    id: string | null
+    projectId: string | null
+    entity: string | null
+    entityId: string | null
+    action: string | null
+    userId: string | null
+    createdAt: Date | null
+  }
+
+  export type ProjectHistoryCountAggregateOutputType = {
+    id: number
+    projectId: number
+    entity: number
+    entityId: number
+    action: number
+    details: number
+    userId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ProjectHistoryMinAggregateInputType = {
+    id?: true
+    projectId?: true
+    entity?: true
+    entityId?: true
+    action?: true
+    userId?: true
+    createdAt?: true
+  }
+
+  export type ProjectHistoryMaxAggregateInputType = {
+    id?: true
+    projectId?: true
+    entity?: true
+    entityId?: true
+    action?: true
+    userId?: true
+    createdAt?: true
+  }
+
+  export type ProjectHistoryCountAggregateInputType = {
+    id?: true
+    projectId?: true
+    entity?: true
+    entityId?: true
+    action?: true
+    details?: true
+    userId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ProjectHistoryAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProjectHistory to aggregate.
+     */
+    where?: ProjectHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectHistories to fetch.
+     */
+    orderBy?: ProjectHistoryOrderByWithRelationInput | ProjectHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ProjectHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ProjectHistories
+    **/
+    _count?: true | ProjectHistoryCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ProjectHistoryMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ProjectHistoryMaxAggregateInputType
+  }
+
+  export type GetProjectHistoryAggregateType<T extends ProjectHistoryAggregateArgs> = {
+        [P in keyof T & keyof AggregateProjectHistory]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateProjectHistory[P]>
+      : GetScalarType<T[P], AggregateProjectHistory[P]>
+  }
+
+
+
+
+  export type ProjectHistoryGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ProjectHistoryWhereInput
+    orderBy?: ProjectHistoryOrderByWithAggregationInput | ProjectHistoryOrderByWithAggregationInput[]
+    by: ProjectHistoryScalarFieldEnum[] | ProjectHistoryScalarFieldEnum
+    having?: ProjectHistoryScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ProjectHistoryCountAggregateInputType | true
+    _min?: ProjectHistoryMinAggregateInputType
+    _max?: ProjectHistoryMaxAggregateInputType
+  }
+
+  export type ProjectHistoryGroupByOutputType = {
+    id: string
+    projectId: string | null
+    entity: string
+    entityId: string | null
+    action: string
+    details: JsonValue | null
+    userId: string | null
+    createdAt: Date
+    _count: ProjectHistoryCountAggregateOutputType | null
+    _min: ProjectHistoryMinAggregateOutputType | null
+    _max: ProjectHistoryMaxAggregateOutputType | null
+  }
+
+  type GetProjectHistoryGroupByPayload<T extends ProjectHistoryGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ProjectHistoryGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ProjectHistoryGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ProjectHistoryGroupByOutputType[P]>
+            : GetScalarType<T[P], ProjectHistoryGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ProjectHistorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    entity?: boolean
+    entityId?: boolean
+    action?: boolean
+    details?: boolean
+    userId?: boolean
+    createdAt?: boolean
+    project?: boolean | ProjectHistory$projectArgs<ExtArgs>
+  }, ExtArgs["result"]["projectHistory"]>
+
+  export type ProjectHistorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    entity?: boolean
+    entityId?: boolean
+    action?: boolean
+    details?: boolean
+    userId?: boolean
+    createdAt?: boolean
+    project?: boolean | ProjectHistory$projectArgs<ExtArgs>
+  }, ExtArgs["result"]["projectHistory"]>
+
+  export type ProjectHistorySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    projectId?: boolean
+    entity?: boolean
+    entityId?: boolean
+    action?: boolean
+    details?: boolean
+    userId?: boolean
+    createdAt?: boolean
+    project?: boolean | ProjectHistory$projectArgs<ExtArgs>
+  }, ExtArgs["result"]["projectHistory"]>
+
+  export type ProjectHistorySelectScalar = {
+    id?: boolean
+    projectId?: boolean
+    entity?: boolean
+    entityId?: boolean
+    action?: boolean
+    details?: boolean
+    userId?: boolean
+    createdAt?: boolean
+  }
+
+  export type ProjectHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "entity" | "entityId" | "action" | "details" | "userId" | "createdAt", ExtArgs["result"]["projectHistory"]>
+  export type ProjectHistoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectHistory$projectArgs<ExtArgs>
+  }
+  export type ProjectHistoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectHistory$projectArgs<ExtArgs>
+  }
+  export type ProjectHistoryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    project?: boolean | ProjectHistory$projectArgs<ExtArgs>
+  }
+
+  export type $ProjectHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ProjectHistory"
+    objects: {
+      project: Prisma.$ProjectPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      projectId: string | null
+      entity: string
+      entityId: string | null
+      action: string
+      details: Prisma.JsonValue | null
+      userId: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["projectHistory"]>
+    composites: {}
+  }
+
+  type ProjectHistoryGetPayload<S extends boolean | null | undefined | ProjectHistoryDefaultArgs> = $Result.GetResult<Prisma.$ProjectHistoryPayload, S>
+
+  type ProjectHistoryCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ProjectHistoryFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ProjectHistoryCountAggregateInputType | true
+    }
+
+  export interface ProjectHistoryDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ProjectHistory'], meta: { name: 'ProjectHistory' } }
+    /**
+     * Find zero or one ProjectHistory that matches the filter.
+     * @param {ProjectHistoryFindUniqueArgs} args - Arguments to find a ProjectHistory
+     * @example
+     * // Get one ProjectHistory
+     * const projectHistory = await prisma.projectHistory.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ProjectHistoryFindUniqueArgs>(args: SelectSubset<T, ProjectHistoryFindUniqueArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ProjectHistory that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ProjectHistoryFindUniqueOrThrowArgs} args - Arguments to find a ProjectHistory
+     * @example
+     * // Get one ProjectHistory
+     * const projectHistory = await prisma.projectHistory.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ProjectHistoryFindUniqueOrThrowArgs>(args: SelectSubset<T, ProjectHistoryFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProjectHistory that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectHistoryFindFirstArgs} args - Arguments to find a ProjectHistory
+     * @example
+     * // Get one ProjectHistory
+     * const projectHistory = await prisma.projectHistory.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ProjectHistoryFindFirstArgs>(args?: SelectSubset<T, ProjectHistoryFindFirstArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ProjectHistory that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectHistoryFindFirstOrThrowArgs} args - Arguments to find a ProjectHistory
+     * @example
+     * // Get one ProjectHistory
+     * const projectHistory = await prisma.projectHistory.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ProjectHistoryFindFirstOrThrowArgs>(args?: SelectSubset<T, ProjectHistoryFindFirstOrThrowArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ProjectHistories that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectHistoryFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ProjectHistories
+     * const projectHistories = await prisma.projectHistory.findMany()
+     * 
+     * // Get first 10 ProjectHistories
+     * const projectHistories = await prisma.projectHistory.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const projectHistoryWithIdOnly = await prisma.projectHistory.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ProjectHistoryFindManyArgs>(args?: SelectSubset<T, ProjectHistoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ProjectHistory.
+     * @param {ProjectHistoryCreateArgs} args - Arguments to create a ProjectHistory.
+     * @example
+     * // Create one ProjectHistory
+     * const ProjectHistory = await prisma.projectHistory.create({
+     *   data: {
+     *     // ... data to create a ProjectHistory
+     *   }
+     * })
+     * 
+     */
+    create<T extends ProjectHistoryCreateArgs>(args: SelectSubset<T, ProjectHistoryCreateArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ProjectHistories.
+     * @param {ProjectHistoryCreateManyArgs} args - Arguments to create many ProjectHistories.
+     * @example
+     * // Create many ProjectHistories
+     * const projectHistory = await prisma.projectHistory.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ProjectHistoryCreateManyArgs>(args?: SelectSubset<T, ProjectHistoryCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ProjectHistories and returns the data saved in the database.
+     * @param {ProjectHistoryCreateManyAndReturnArgs} args - Arguments to create many ProjectHistories.
+     * @example
+     * // Create many ProjectHistories
+     * const projectHistory = await prisma.projectHistory.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ProjectHistories and only return the `id`
+     * const projectHistoryWithIdOnly = await prisma.projectHistory.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ProjectHistoryCreateManyAndReturnArgs>(args?: SelectSubset<T, ProjectHistoryCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ProjectHistory.
+     * @param {ProjectHistoryDeleteArgs} args - Arguments to delete one ProjectHistory.
+     * @example
+     * // Delete one ProjectHistory
+     * const ProjectHistory = await prisma.projectHistory.delete({
+     *   where: {
+     *     // ... filter to delete one ProjectHistory
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ProjectHistoryDeleteArgs>(args: SelectSubset<T, ProjectHistoryDeleteArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ProjectHistory.
+     * @param {ProjectHistoryUpdateArgs} args - Arguments to update one ProjectHistory.
+     * @example
+     * // Update one ProjectHistory
+     * const projectHistory = await prisma.projectHistory.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ProjectHistoryUpdateArgs>(args: SelectSubset<T, ProjectHistoryUpdateArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ProjectHistories.
+     * @param {ProjectHistoryDeleteManyArgs} args - Arguments to filter ProjectHistories to delete.
+     * @example
+     * // Delete a few ProjectHistories
+     * const { count } = await prisma.projectHistory.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ProjectHistoryDeleteManyArgs>(args?: SelectSubset<T, ProjectHistoryDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProjectHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectHistoryUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ProjectHistories
+     * const projectHistory = await prisma.projectHistory.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ProjectHistoryUpdateManyArgs>(args: SelectSubset<T, ProjectHistoryUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ProjectHistories and returns the data updated in the database.
+     * @param {ProjectHistoryUpdateManyAndReturnArgs} args - Arguments to update many ProjectHistories.
+     * @example
+     * // Update many ProjectHistories
+     * const projectHistory = await prisma.projectHistory.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ProjectHistories and only return the `id`
+     * const projectHistoryWithIdOnly = await prisma.projectHistory.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ProjectHistoryUpdateManyAndReturnArgs>(args: SelectSubset<T, ProjectHistoryUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ProjectHistory.
+     * @param {ProjectHistoryUpsertArgs} args - Arguments to update or create a ProjectHistory.
+     * @example
+     * // Update or create a ProjectHistory
+     * const projectHistory = await prisma.projectHistory.upsert({
+     *   create: {
+     *     // ... data to create a ProjectHistory
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ProjectHistory we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ProjectHistoryUpsertArgs>(args: SelectSubset<T, ProjectHistoryUpsertArgs<ExtArgs>>): Prisma__ProjectHistoryClient<$Result.GetResult<Prisma.$ProjectHistoryPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ProjectHistories.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectHistoryCountArgs} args - Arguments to filter ProjectHistories to count.
+     * @example
+     * // Count the number of ProjectHistories
+     * const count = await prisma.projectHistory.count({
+     *   where: {
+     *     // ... the filter for the ProjectHistories we want to count
+     *   }
+     * })
+    **/
+    count<T extends ProjectHistoryCountArgs>(
+      args?: Subset<T, ProjectHistoryCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ProjectHistoryCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ProjectHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectHistoryAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ProjectHistoryAggregateArgs>(args: Subset<T, ProjectHistoryAggregateArgs>): Prisma.PrismaPromise<GetProjectHistoryAggregateType<T>>
+
+    /**
+     * Group by ProjectHistory.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ProjectHistoryGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ProjectHistoryGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ProjectHistoryGroupByArgs['orderBy'] }
+        : { orderBy?: ProjectHistoryGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ProjectHistoryGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetProjectHistoryGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ProjectHistory model
+   */
+  readonly fields: ProjectHistoryFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ProjectHistory.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ProjectHistoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    project<T extends ProjectHistory$projectArgs<ExtArgs> = {}>(args?: Subset<T, ProjectHistory$projectArgs<ExtArgs>>): Prisma__ProjectClient<$Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ProjectHistory model
+   */
+  interface ProjectHistoryFieldRefs {
+    readonly id: FieldRef<"ProjectHistory", 'String'>
+    readonly projectId: FieldRef<"ProjectHistory", 'String'>
+    readonly entity: FieldRef<"ProjectHistory", 'String'>
+    readonly entityId: FieldRef<"ProjectHistory", 'String'>
+    readonly action: FieldRef<"ProjectHistory", 'String'>
+    readonly details: FieldRef<"ProjectHistory", 'Json'>
+    readonly userId: FieldRef<"ProjectHistory", 'String'>
+    readonly createdAt: FieldRef<"ProjectHistory", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ProjectHistory findUnique
+   */
+  export type ProjectHistoryFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectHistory to fetch.
+     */
+    where: ProjectHistoryWhereUniqueInput
+  }
+
+  /**
+   * ProjectHistory findUniqueOrThrow
+   */
+  export type ProjectHistoryFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectHistory to fetch.
+     */
+    where: ProjectHistoryWhereUniqueInput
+  }
+
+  /**
+   * ProjectHistory findFirst
+   */
+  export type ProjectHistoryFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectHistory to fetch.
+     */
+    where?: ProjectHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectHistories to fetch.
+     */
+    orderBy?: ProjectHistoryOrderByWithRelationInput | ProjectHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProjectHistories.
+     */
+    cursor?: ProjectHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProjectHistories.
+     */
+    distinct?: ProjectHistoryScalarFieldEnum | ProjectHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * ProjectHistory findFirstOrThrow
+   */
+  export type ProjectHistoryFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectHistory to fetch.
+     */
+    where?: ProjectHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectHistories to fetch.
+     */
+    orderBy?: ProjectHistoryOrderByWithRelationInput | ProjectHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ProjectHistories.
+     */
+    cursor?: ProjectHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProjectHistories.
+     */
+    distinct?: ProjectHistoryScalarFieldEnum | ProjectHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * ProjectHistory findMany
+   */
+  export type ProjectHistoryFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * Filter, which ProjectHistories to fetch.
+     */
+    where?: ProjectHistoryWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ProjectHistories to fetch.
+     */
+    orderBy?: ProjectHistoryOrderByWithRelationInput | ProjectHistoryOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ProjectHistories.
+     */
+    cursor?: ProjectHistoryWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ProjectHistories from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ProjectHistories.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ProjectHistories.
+     */
+    distinct?: ProjectHistoryScalarFieldEnum | ProjectHistoryScalarFieldEnum[]
+  }
+
+  /**
+   * ProjectHistory create
+   */
+  export type ProjectHistoryCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ProjectHistory.
+     */
+    data: XOR<ProjectHistoryCreateInput, ProjectHistoryUncheckedCreateInput>
+  }
+
+  /**
+   * ProjectHistory createMany
+   */
+  export type ProjectHistoryCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ProjectHistories.
+     */
+    data: ProjectHistoryCreateManyInput | ProjectHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ProjectHistory createManyAndReturn
+   */
+  export type ProjectHistoryCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * The data used to create many ProjectHistories.
+     */
+    data: ProjectHistoryCreateManyInput | ProjectHistoryCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProjectHistory update
+   */
+  export type ProjectHistoryUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ProjectHistory.
+     */
+    data: XOR<ProjectHistoryUpdateInput, ProjectHistoryUncheckedUpdateInput>
+    /**
+     * Choose, which ProjectHistory to update.
+     */
+    where: ProjectHistoryWhereUniqueInput
+  }
+
+  /**
+   * ProjectHistory updateMany
+   */
+  export type ProjectHistoryUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ProjectHistories.
+     */
+    data: XOR<ProjectHistoryUpdateManyMutationInput, ProjectHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which ProjectHistories to update
+     */
+    where?: ProjectHistoryWhereInput
+    /**
+     * Limit how many ProjectHistories to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProjectHistory updateManyAndReturn
+   */
+  export type ProjectHistoryUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * The data used to update ProjectHistories.
+     */
+    data: XOR<ProjectHistoryUpdateManyMutationInput, ProjectHistoryUncheckedUpdateManyInput>
+    /**
+     * Filter which ProjectHistories to update
+     */
+    where?: ProjectHistoryWhereInput
+    /**
+     * Limit how many ProjectHistories to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ProjectHistory upsert
+   */
+  export type ProjectHistoryUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ProjectHistory to update in case it exists.
+     */
+    where: ProjectHistoryWhereUniqueInput
+    /**
+     * In case the ProjectHistory found by the `where` argument doesn't exist, create a new ProjectHistory with this data.
+     */
+    create: XOR<ProjectHistoryCreateInput, ProjectHistoryUncheckedCreateInput>
+    /**
+     * In case the ProjectHistory was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ProjectHistoryUpdateInput, ProjectHistoryUncheckedUpdateInput>
+  }
+
+  /**
+   * ProjectHistory delete
+   */
+  export type ProjectHistoryDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
+    /**
+     * Filter which ProjectHistory to delete.
+     */
+    where: ProjectHistoryWhereUniqueInput
+  }
+
+  /**
+   * ProjectHistory deleteMany
+   */
+  export type ProjectHistoryDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ProjectHistories to delete
+     */
+    where?: ProjectHistoryWhereInput
+    /**
+     * Limit how many ProjectHistories to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ProjectHistory.project
+   */
+  export type ProjectHistory$projectArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Project
+     */
+    select?: ProjectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Project
+     */
+    omit?: ProjectOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectInclude<ExtArgs> | null
+    where?: ProjectWhereInput
+  }
+
+  /**
+   * ProjectHistory without action
+   */
+  export type ProjectHistoryDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ProjectHistory
+     */
+    select?: ProjectHistorySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ProjectHistory
+     */
+    omit?: ProjectHistoryOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ProjectHistoryInclude<ExtArgs> | null
   }
 
 
@@ -23489,6 +24734,20 @@ export namespace Prisma {
   export type TaskLogScalarFieldEnum = (typeof TaskLogScalarFieldEnum)[keyof typeof TaskLogScalarFieldEnum]
 
 
+  export const ProjectHistoryScalarFieldEnum: {
+    id: 'id',
+    projectId: 'projectId',
+    entity: 'entity',
+    entityId: 'entityId',
+    action: 'action',
+    details: 'details',
+    userId: 'userId',
+    createdAt: 'createdAt'
+  };
+
+  export type ProjectHistoryScalarFieldEnum = (typeof ProjectHistoryScalarFieldEnum)[keyof typeof ProjectHistoryScalarFieldEnum]
+
+
   export const RiskScalarFieldEnum: {
     id: 'id',
     projectId: 'projectId',
@@ -23613,6 +24872,14 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
@@ -23627,6 +24894,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -23799,6 +25075,20 @@ export namespace Prisma {
    * Reference to a field of type 'TaskPriority[]'
    */
   export type ListEnumTaskPriorityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskPriority[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -24094,6 +25384,7 @@ export namespace Prisma {
     stakeholders?: StakeholderListRelationFilter
     projectSnapshots?: ProjectSnapshotListRelationFilter
     lessonsLearned?: LessonLearnedListRelationFilter
+    projectHistories?: ProjectHistoryListRelationFilter
   }
 
   export type ProjectOrderByWithRelationInput = {
@@ -24132,6 +25423,7 @@ export namespace Prisma {
     stakeholders?: StakeholderOrderByRelationAggregateInput
     projectSnapshots?: ProjectSnapshotOrderByRelationAggregateInput
     lessonsLearned?: LessonLearnedOrderByRelationAggregateInput
+    projectHistories?: ProjectHistoryOrderByRelationAggregateInput
   }
 
   export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -24173,6 +25465,7 @@ export namespace Prisma {
     stakeholders?: StakeholderListRelationFilter
     projectSnapshots?: ProjectSnapshotListRelationFilter
     lessonsLearned?: LessonLearnedListRelationFilter
+    projectHistories?: ProjectHistoryListRelationFilter
   }, "id">
 
   export type ProjectOrderByWithAggregationInput = {
@@ -24727,6 +26020,76 @@ export namespace Prisma {
     previousProgress?: IntWithAggregatesFilter<"TaskLog"> | number
     newProgress?: IntWithAggregatesFilter<"TaskLog"> | number
     statusChange?: StringNullableWithAggregatesFilter<"TaskLog"> | string | null
+  }
+
+  export type ProjectHistoryWhereInput = {
+    AND?: ProjectHistoryWhereInput | ProjectHistoryWhereInput[]
+    OR?: ProjectHistoryWhereInput[]
+    NOT?: ProjectHistoryWhereInput | ProjectHistoryWhereInput[]
+    id?: StringFilter<"ProjectHistory"> | string
+    projectId?: StringNullableFilter<"ProjectHistory"> | string | null
+    entity?: StringFilter<"ProjectHistory"> | string
+    entityId?: StringNullableFilter<"ProjectHistory"> | string | null
+    action?: StringFilter<"ProjectHistory"> | string
+    details?: JsonNullableFilter<"ProjectHistory">
+    userId?: StringNullableFilter<"ProjectHistory"> | string | null
+    createdAt?: DateTimeFilter<"ProjectHistory"> | Date | string
+    project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
+  }
+
+  export type ProjectHistoryOrderByWithRelationInput = {
+    id?: SortOrder
+    projectId?: SortOrderInput | SortOrder
+    entity?: SortOrder
+    entityId?: SortOrderInput | SortOrder
+    action?: SortOrder
+    details?: SortOrderInput | SortOrder
+    userId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    project?: ProjectOrderByWithRelationInput
+  }
+
+  export type ProjectHistoryWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ProjectHistoryWhereInput | ProjectHistoryWhereInput[]
+    OR?: ProjectHistoryWhereInput[]
+    NOT?: ProjectHistoryWhereInput | ProjectHistoryWhereInput[]
+    projectId?: StringNullableFilter<"ProjectHistory"> | string | null
+    entity?: StringFilter<"ProjectHistory"> | string
+    entityId?: StringNullableFilter<"ProjectHistory"> | string | null
+    action?: StringFilter<"ProjectHistory"> | string
+    details?: JsonNullableFilter<"ProjectHistory">
+    userId?: StringNullableFilter<"ProjectHistory"> | string | null
+    createdAt?: DateTimeFilter<"ProjectHistory"> | Date | string
+    project?: XOR<ProjectNullableScalarRelationFilter, ProjectWhereInput> | null
+  }, "id">
+
+  export type ProjectHistoryOrderByWithAggregationInput = {
+    id?: SortOrder
+    projectId?: SortOrderInput | SortOrder
+    entity?: SortOrder
+    entityId?: SortOrderInput | SortOrder
+    action?: SortOrder
+    details?: SortOrderInput | SortOrder
+    userId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: ProjectHistoryCountOrderByAggregateInput
+    _max?: ProjectHistoryMaxOrderByAggregateInput
+    _min?: ProjectHistoryMinOrderByAggregateInput
+  }
+
+  export type ProjectHistoryScalarWhereWithAggregatesInput = {
+    AND?: ProjectHistoryScalarWhereWithAggregatesInput | ProjectHistoryScalarWhereWithAggregatesInput[]
+    OR?: ProjectHistoryScalarWhereWithAggregatesInput[]
+    NOT?: ProjectHistoryScalarWhereWithAggregatesInput | ProjectHistoryScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ProjectHistory"> | string
+    projectId?: StringNullableWithAggregatesFilter<"ProjectHistory"> | string | null
+    entity?: StringWithAggregatesFilter<"ProjectHistory"> | string
+    entityId?: StringNullableWithAggregatesFilter<"ProjectHistory"> | string | null
+    action?: StringWithAggregatesFilter<"ProjectHistory"> | string
+    details?: JsonNullableWithAggregatesFilter<"ProjectHistory">
+    userId?: StringNullableWithAggregatesFilter<"ProjectHistory"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ProjectHistory"> | Date | string
   }
 
   export type RiskWhereInput = {
@@ -25491,6 +26854,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateInput = {
@@ -25527,6 +26891,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUpdateInput = {
@@ -25563,6 +26928,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateInput = {
@@ -25599,6 +26965,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateManyInput = {
@@ -26168,6 +27535,82 @@ export namespace Prisma {
     previousProgress?: IntFieldUpdateOperationsInput | number
     newProgress?: IntFieldUpdateOperationsInput | number
     statusChange?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ProjectHistoryCreateInput = {
+    id: string
+    entity: string
+    entityId?: string | null
+    action: string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    createdAt?: Date | string
+    project?: ProjectCreateNestedOneWithoutProjectHistoriesInput
+  }
+
+  export type ProjectHistoryUncheckedCreateInput = {
+    id: string
+    projectId?: string | null
+    entity: string
+    entityId?: string | null
+    action: string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ProjectHistoryUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entity?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    project?: ProjectUpdateOneWithoutProjectHistoriesNestedInput
+  }
+
+  export type ProjectHistoryUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    entity?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectHistoryCreateManyInput = {
+    id: string
+    projectId?: string | null
+    entity: string
+    entityId?: string | null
+    action: string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ProjectHistoryUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entity?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectHistoryUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    projectId?: NullableStringFieldUpdateOperationsInput | string | null
+    entity?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type RiskCreateInput = {
@@ -27117,6 +28560,12 @@ export namespace Prisma {
     none?: ProjectSnapshotWhereInput
   }
 
+  export type ProjectHistoryListRelationFilter = {
+    every?: ProjectHistoryWhereInput
+    some?: ProjectHistoryWhereInput
+    none?: ProjectHistoryWhereInput
+  }
+
   export type ProjectSpecificObjectiveOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -27130,6 +28579,10 @@ export namespace Prisma {
   }
 
   export type ProjectSnapshotOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ProjectHistoryOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -27732,6 +29185,91 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type ProjectNullableScalarRelationFilter = {
+    is?: ProjectWhereInput | null
+    isNot?: ProjectWhereInput | null
+  }
+
+  export type ProjectHistoryCountOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    entity?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    details?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ProjectHistoryMaxOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    entity?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ProjectHistoryMinOrderByAggregateInput = {
+    id?: SortOrder
+    projectId?: SortOrder
+    entity?: SortOrder
+    entityId?: SortOrder
+    action?: SortOrder
+    userId?: SortOrder
+    createdAt?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumRiskStatusFilter<$PrismaModel = never> = {
@@ -28894,6 +30432,13 @@ export namespace Prisma {
     connect?: LessonLearnedWhereUniqueInput | LessonLearnedWhereUniqueInput[]
   }
 
+  export type ProjectHistoryCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ProjectHistoryCreateWithoutProjectInput, ProjectHistoryUncheckedCreateWithoutProjectInput> | ProjectHistoryCreateWithoutProjectInput[] | ProjectHistoryUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectHistoryCreateOrConnectWithoutProjectInput | ProjectHistoryCreateOrConnectWithoutProjectInput[]
+    createMany?: ProjectHistoryCreateManyProjectInputEnvelope
+    connect?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+  }
+
   export type ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput = {
     create?: XOR<ProjectSponsorCreateWithoutProjectInput, ProjectSponsorUncheckedCreateWithoutProjectInput> | ProjectSponsorCreateWithoutProjectInput[] | ProjectSponsorUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: ProjectSponsorCreateOrConnectWithoutProjectInput | ProjectSponsorCreateOrConnectWithoutProjectInput[]
@@ -28969,6 +30514,13 @@ export namespace Prisma {
     connectOrCreate?: LessonLearnedCreateOrConnectWithoutProjectInput | LessonLearnedCreateOrConnectWithoutProjectInput[]
     createMany?: LessonLearnedCreateManyProjectInputEnvelope
     connect?: LessonLearnedWhereUniqueInput | LessonLearnedWhereUniqueInput[]
+  }
+
+  export type ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput = {
+    create?: XOR<ProjectHistoryCreateWithoutProjectInput, ProjectHistoryUncheckedCreateWithoutProjectInput> | ProjectHistoryCreateWithoutProjectInput[] | ProjectHistoryUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectHistoryCreateOrConnectWithoutProjectInput | ProjectHistoryCreateOrConnectWithoutProjectInput[]
+    createMany?: ProjectHistoryCreateManyProjectInputEnvelope
+    connect?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
   }
 
   export type EnumProjectStatusFieldUpdateOperationsInput = {
@@ -29177,6 +30729,20 @@ export namespace Prisma {
     deleteMany?: LessonLearnedScalarWhereInput | LessonLearnedScalarWhereInput[]
   }
 
+  export type ProjectHistoryUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ProjectHistoryCreateWithoutProjectInput, ProjectHistoryUncheckedCreateWithoutProjectInput> | ProjectHistoryCreateWithoutProjectInput[] | ProjectHistoryUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectHistoryCreateOrConnectWithoutProjectInput | ProjectHistoryCreateOrConnectWithoutProjectInput[]
+    upsert?: ProjectHistoryUpsertWithWhereUniqueWithoutProjectInput | ProjectHistoryUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ProjectHistoryCreateManyProjectInputEnvelope
+    set?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    disconnect?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    delete?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    connect?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    update?: ProjectHistoryUpdateWithWhereUniqueWithoutProjectInput | ProjectHistoryUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ProjectHistoryUpdateManyWithWhereWithoutProjectInput | ProjectHistoryUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ProjectHistoryScalarWhereInput | ProjectHistoryScalarWhereInput[]
+  }
+
   export type ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput = {
     create?: XOR<ProjectSponsorCreateWithoutProjectInput, ProjectSponsorUncheckedCreateWithoutProjectInput> | ProjectSponsorCreateWithoutProjectInput[] | ProjectSponsorUncheckedCreateWithoutProjectInput[]
     connectOrCreate?: ProjectSponsorCreateOrConnectWithoutProjectInput | ProjectSponsorCreateOrConnectWithoutProjectInput[]
@@ -29329,6 +30895,20 @@ export namespace Prisma {
     update?: LessonLearnedUpdateWithWhereUniqueWithoutProjectInput | LessonLearnedUpdateWithWhereUniqueWithoutProjectInput[]
     updateMany?: LessonLearnedUpdateManyWithWhereWithoutProjectInput | LessonLearnedUpdateManyWithWhereWithoutProjectInput[]
     deleteMany?: LessonLearnedScalarWhereInput | LessonLearnedScalarWhereInput[]
+  }
+
+  export type ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput = {
+    create?: XOR<ProjectHistoryCreateWithoutProjectInput, ProjectHistoryUncheckedCreateWithoutProjectInput> | ProjectHistoryCreateWithoutProjectInput[] | ProjectHistoryUncheckedCreateWithoutProjectInput[]
+    connectOrCreate?: ProjectHistoryCreateOrConnectWithoutProjectInput | ProjectHistoryCreateOrConnectWithoutProjectInput[]
+    upsert?: ProjectHistoryUpsertWithWhereUniqueWithoutProjectInput | ProjectHistoryUpsertWithWhereUniqueWithoutProjectInput[]
+    createMany?: ProjectHistoryCreateManyProjectInputEnvelope
+    set?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    disconnect?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    delete?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    connect?: ProjectHistoryWhereUniqueInput | ProjectHistoryWhereUniqueInput[]
+    update?: ProjectHistoryUpdateWithWhereUniqueWithoutProjectInput | ProjectHistoryUpdateWithWhereUniqueWithoutProjectInput[]
+    updateMany?: ProjectHistoryUpdateManyWithWhereWithoutProjectInput | ProjectHistoryUpdateManyWithWhereWithoutProjectInput[]
+    deleteMany?: ProjectHistoryScalarWhereInput | ProjectHistoryScalarWhereInput[]
   }
 
   export type ProjectCreateNestedOneWithoutSponsorsInput = {
@@ -29805,6 +31385,22 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutTaskLogsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTaskLogsInput, UserUpdateWithoutTaskLogsInput>, UserUncheckedUpdateWithoutTaskLogsInput>
+  }
+
+  export type ProjectCreateNestedOneWithoutProjectHistoriesInput = {
+    create?: XOR<ProjectCreateWithoutProjectHistoriesInput, ProjectUncheckedCreateWithoutProjectHistoriesInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutProjectHistoriesInput
+    connect?: ProjectWhereUniqueInput
+  }
+
+  export type ProjectUpdateOneWithoutProjectHistoriesNestedInput = {
+    create?: XOR<ProjectCreateWithoutProjectHistoriesInput, ProjectUncheckedCreateWithoutProjectHistoriesInput>
+    connectOrCreate?: ProjectCreateOrConnectWithoutProjectHistoriesInput
+    upsert?: ProjectUpsertWithoutProjectHistoriesInput
+    disconnect?: ProjectWhereInput | boolean
+    delete?: ProjectWhereInput | boolean
+    connect?: ProjectWhereUniqueInput
+    update?: XOR<XOR<ProjectUpdateToOneWithWhereWithoutProjectHistoriesInput, ProjectUpdateWithoutProjectHistoriesInput>, ProjectUncheckedUpdateWithoutProjectHistoriesInput>
   }
 
   export type ProjectCreateNestedOneWithoutRisksInput = {
@@ -30482,6 +32078,29 @@ export namespace Prisma {
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedEnumRiskStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.RiskStatus | EnumRiskStatusFieldRefInput<$PrismaModel>
@@ -30703,6 +32322,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutPmInput = {
@@ -30738,6 +32358,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutPmInput = {
@@ -30783,6 +32404,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutPmoInput = {
@@ -30818,6 +32440,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutPmoInput = {
@@ -31952,6 +33575,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ProjectHistoryCreateWithoutProjectInput = {
+    id: string
+    entity: string
+    entityId?: string | null
+    action: string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ProjectHistoryUncheckedCreateWithoutProjectInput = {
+    id: string
+    entity: string
+    entityId?: string | null
+    action: string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ProjectHistoryCreateOrConnectWithoutProjectInput = {
+    where: ProjectHistoryWhereUniqueInput
+    create: XOR<ProjectHistoryCreateWithoutProjectInput, ProjectHistoryUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ProjectHistoryCreateManyProjectInputEnvelope = {
+    data: ProjectHistoryCreateManyProjectInput | ProjectHistoryCreateManyProjectInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutProjectsAsPMInput = {
     update: XOR<UserUpdateWithoutProjectsAsPMInput, UserUncheckedUpdateWithoutProjectsAsPMInput>
     create: XOR<UserCreateWithoutProjectsAsPMInput, UserUncheckedCreateWithoutProjectsAsPMInput>
@@ -32294,6 +33947,36 @@ export namespace Prisma {
     data: XOR<LessonLearnedUpdateManyMutationInput, LessonLearnedUncheckedUpdateManyWithoutProjectInput>
   }
 
+  export type ProjectHistoryUpsertWithWhereUniqueWithoutProjectInput = {
+    where: ProjectHistoryWhereUniqueInput
+    update: XOR<ProjectHistoryUpdateWithoutProjectInput, ProjectHistoryUncheckedUpdateWithoutProjectInput>
+    create: XOR<ProjectHistoryCreateWithoutProjectInput, ProjectHistoryUncheckedCreateWithoutProjectInput>
+  }
+
+  export type ProjectHistoryUpdateWithWhereUniqueWithoutProjectInput = {
+    where: ProjectHistoryWhereUniqueInput
+    data: XOR<ProjectHistoryUpdateWithoutProjectInput, ProjectHistoryUncheckedUpdateWithoutProjectInput>
+  }
+
+  export type ProjectHistoryUpdateManyWithWhereWithoutProjectInput = {
+    where: ProjectHistoryScalarWhereInput
+    data: XOR<ProjectHistoryUpdateManyMutationInput, ProjectHistoryUncheckedUpdateManyWithoutProjectInput>
+  }
+
+  export type ProjectHistoryScalarWhereInput = {
+    AND?: ProjectHistoryScalarWhereInput | ProjectHistoryScalarWhereInput[]
+    OR?: ProjectHistoryScalarWhereInput[]
+    NOT?: ProjectHistoryScalarWhereInput | ProjectHistoryScalarWhereInput[]
+    id?: StringFilter<"ProjectHistory"> | string
+    projectId?: StringNullableFilter<"ProjectHistory"> | string | null
+    entity?: StringFilter<"ProjectHistory"> | string
+    entityId?: StringNullableFilter<"ProjectHistory"> | string | null
+    action?: StringFilter<"ProjectHistory"> | string
+    details?: JsonNullableFilter<"ProjectHistory">
+    userId?: StringNullableFilter<"ProjectHistory"> | string | null
+    createdAt?: DateTimeFilter<"ProjectHistory"> | Date | string
+  }
+
   export type ProjectCreateWithoutSponsorsInput = {
     id: string
     name: string
@@ -32327,6 +34010,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutSponsorsInput = {
@@ -32362,6 +34046,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutSponsorsInput = {
@@ -32460,6 +34145,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutSponsorsInput = {
@@ -32495,6 +34181,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutSponsorLinksInput = {
@@ -32583,6 +34270,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutTeamMembersInput = {
@@ -32618,6 +34306,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutTeamMembersInput = {
@@ -32716,6 +34405,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutTeamMembersInput = {
@@ -32751,6 +34441,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutTeamLinksInput = {
@@ -32839,6 +34530,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutSpecificObjectivesInput = {
@@ -32874,6 +34566,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutSpecificObjectivesInput = {
@@ -32925,6 +34618,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutSpecificObjectivesInput = {
@@ -32960,6 +34654,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutBudgetLinesInput = {
@@ -32995,6 +34690,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutBudgetLinesInput = {
@@ -33030,6 +34726,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutBudgetLinesInput = {
@@ -33158,6 +34855,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutBudgetLinesInput = {
@@ -33193,6 +34891,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutApprovedBudgetLinesInput = {
@@ -33297,6 +34996,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutMilestonesInput = {
@@ -33332,6 +35032,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutMilestonesInput = {
@@ -33429,6 +35130,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutMilestonesInput = {
@@ -33464,6 +35166,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type TaskUpsertWithWhereUniqueWithoutMilestoneInput = {
@@ -34130,6 +35833,166 @@ export namespace Prisma {
     approvedBudgetLines?: BudgetLineUncheckedUpdateManyWithoutApprovedByUserNestedInput
   }
 
+  export type ProjectCreateWithoutProjectHistoriesInput = {
+    id: string
+    name: string
+    description?: string | null
+    status: $Enums.ProjectStatus
+    budget: number
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    businessCase?: string | null
+    strategicAlignment?: string | null
+    generalObjective?: string | null
+    benefits?: string | null
+    assumptions?: string | null
+    constraints?: string | null
+    rejectionComments?: string | null
+    progress?: number
+    plannedValue?: number | null
+    earnedValue?: number | null
+    actualCost?: number | null
+    cpi?: number | null
+    spi?: number | null
+    pm?: UserCreateNestedOneWithoutProjectsAsPMInput
+    pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
+    sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
+    teamMembers?: ProjectTeamMemberCreateNestedManyWithoutProjectInput
+    specificObjectives?: ProjectSpecificObjectiveCreateNestedManyWithoutProjectInput
+    budgetLines?: BudgetLineCreateNestedManyWithoutProjectInput
+    milestones?: MilestoneCreateNestedManyWithoutProjectInput
+    risks?: RiskCreateNestedManyWithoutProjectInput
+    issues?: IssueCreateNestedManyWithoutProjectInput
+    expenses?: ExpenseCreateNestedManyWithoutProjectInput
+    stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
+    projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
+    lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectUncheckedCreateWithoutProjectHistoriesInput = {
+    id: string
+    name: string
+    description?: string | null
+    status: $Enums.ProjectStatus
+    budget: number
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    pmId?: string | null
+    pmoId?: string | null
+    businessCase?: string | null
+    strategicAlignment?: string | null
+    generalObjective?: string | null
+    benefits?: string | null
+    assumptions?: string | null
+    constraints?: string | null
+    rejectionComments?: string | null
+    progress?: number
+    plannedValue?: number | null
+    earnedValue?: number | null
+    actualCost?: number | null
+    cpi?: number | null
+    spi?: number | null
+    sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
+    teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
+    specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
+    budgetLines?: BudgetLineUncheckedCreateNestedManyWithoutProjectInput
+    milestones?: MilestoneUncheckedCreateNestedManyWithoutProjectInput
+    risks?: RiskUncheckedCreateNestedManyWithoutProjectInput
+    issues?: IssueUncheckedCreateNestedManyWithoutProjectInput
+    expenses?: ExpenseUncheckedCreateNestedManyWithoutProjectInput
+    stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
+    projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+    lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+  }
+
+  export type ProjectCreateOrConnectWithoutProjectHistoriesInput = {
+    where: ProjectWhereUniqueInput
+    create: XOR<ProjectCreateWithoutProjectHistoriesInput, ProjectUncheckedCreateWithoutProjectHistoriesInput>
+  }
+
+  export type ProjectUpsertWithoutProjectHistoriesInput = {
+    update: XOR<ProjectUpdateWithoutProjectHistoriesInput, ProjectUncheckedUpdateWithoutProjectHistoriesInput>
+    create: XOR<ProjectCreateWithoutProjectHistoriesInput, ProjectUncheckedCreateWithoutProjectHistoriesInput>
+    where?: ProjectWhereInput
+  }
+
+  export type ProjectUpdateToOneWithWhereWithoutProjectHistoriesInput = {
+    where?: ProjectWhereInput
+    data: XOR<ProjectUpdateWithoutProjectHistoriesInput, ProjectUncheckedUpdateWithoutProjectHistoriesInput>
+  }
+
+  export type ProjectUpdateWithoutProjectHistoriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+    budget?: FloatFieldUpdateOperationsInput | number
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    businessCase?: NullableStringFieldUpdateOperationsInput | string | null
+    strategicAlignment?: NullableStringFieldUpdateOperationsInput | string | null
+    generalObjective?: NullableStringFieldUpdateOperationsInput | string | null
+    benefits?: NullableStringFieldUpdateOperationsInput | string | null
+    assumptions?: NullableStringFieldUpdateOperationsInput | string | null
+    constraints?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectionComments?: NullableStringFieldUpdateOperationsInput | string | null
+    progress?: IntFieldUpdateOperationsInput | number
+    plannedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    earnedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    cpi?: NullableFloatFieldUpdateOperationsInput | number | null
+    spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
+    pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
+    sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
+    teamMembers?: ProjectTeamMemberUpdateManyWithoutProjectNestedInput
+    specificObjectives?: ProjectSpecificObjectiveUpdateManyWithoutProjectNestedInput
+    budgetLines?: BudgetLineUpdateManyWithoutProjectNestedInput
+    milestones?: MilestoneUpdateManyWithoutProjectNestedInput
+    risks?: RiskUpdateManyWithoutProjectNestedInput
+    issues?: IssueUpdateManyWithoutProjectNestedInput
+    expenses?: ExpenseUpdateManyWithoutProjectNestedInput
+    stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
+    projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
+    lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+  }
+
+  export type ProjectUncheckedUpdateWithoutProjectHistoriesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumProjectStatusFieldUpdateOperationsInput | $Enums.ProjectStatus
+    budget?: FloatFieldUpdateOperationsInput | number
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pmId?: NullableStringFieldUpdateOperationsInput | string | null
+    pmoId?: NullableStringFieldUpdateOperationsInput | string | null
+    businessCase?: NullableStringFieldUpdateOperationsInput | string | null
+    strategicAlignment?: NullableStringFieldUpdateOperationsInput | string | null
+    generalObjective?: NullableStringFieldUpdateOperationsInput | string | null
+    benefits?: NullableStringFieldUpdateOperationsInput | string | null
+    assumptions?: NullableStringFieldUpdateOperationsInput | string | null
+    constraints?: NullableStringFieldUpdateOperationsInput | string | null
+    rejectionComments?: NullableStringFieldUpdateOperationsInput | string | null
+    progress?: IntFieldUpdateOperationsInput | number
+    plannedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    earnedValue?: NullableFloatFieldUpdateOperationsInput | number | null
+    actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
+    cpi?: NullableFloatFieldUpdateOperationsInput | number | null
+    spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
+    teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
+    specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
+    budgetLines?: BudgetLineUncheckedUpdateManyWithoutProjectNestedInput
+    milestones?: MilestoneUncheckedUpdateManyWithoutProjectNestedInput
+    risks?: RiskUncheckedUpdateManyWithoutProjectNestedInput
+    issues?: IssueUncheckedUpdateManyWithoutProjectNestedInput
+    expenses?: ExpenseUncheckedUpdateManyWithoutProjectNestedInput
+    stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
+    projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+    lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+  }
+
   export type ProjectCreateWithoutRisksInput = {
     id: string
     name: string
@@ -34163,6 +36026,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutRisksInput = {
@@ -34198,6 +36062,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutRisksInput = {
@@ -34322,6 +36187,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutRisksInput = {
@@ -34357,6 +36223,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutRiskOwnedInput = {
@@ -34629,6 +36496,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutIssuesInput = {
@@ -34664,6 +36532,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutIssuesInput = {
@@ -34803,6 +36672,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutIssuesInput = {
@@ -34838,6 +36708,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type TaskUpsertWithoutIssuesInput = {
@@ -34973,6 +36844,7 @@ export namespace Prisma {
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutExpensesInput = {
@@ -35008,6 +36880,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutExpensesInput = {
@@ -35088,6 +36961,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutExpensesInput = {
@@ -35123,6 +36997,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type BudgetLineUpsertWithoutExpensesInput = {
@@ -35381,6 +37256,7 @@ export namespace Prisma {
     expenses?: ExpenseCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutStakeholdersInput = {
@@ -35416,6 +37292,7 @@ export namespace Prisma {
     expenses?: ExpenseUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutStakeholdersInput = {
@@ -35514,6 +37391,7 @@ export namespace Prisma {
     expenses?: ExpenseUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutStakeholdersInput = {
@@ -35549,6 +37427,7 @@ export namespace Prisma {
     expenses?: ExpenseUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutStakeholdersInput = {
@@ -35637,6 +37516,7 @@ export namespace Prisma {
     expenses?: ExpenseCreateNestedManyWithoutProjectInput
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutProjectSnapshotsInput = {
@@ -35672,6 +37552,7 @@ export namespace Prisma {
     expenses?: ExpenseUncheckedCreateNestedManyWithoutProjectInput
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     lessonsLearned?: LessonLearnedUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutProjectSnapshotsInput = {
@@ -35723,6 +37604,7 @@ export namespace Prisma {
     expenses?: ExpenseUpdateManyWithoutProjectNestedInput
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutProjectSnapshotsInput = {
@@ -35758,6 +37640,7 @@ export namespace Prisma {
     expenses?: ExpenseUncheckedUpdateManyWithoutProjectNestedInput
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectCreateWithoutLessonsLearnedInput = {
@@ -35793,6 +37676,7 @@ export namespace Prisma {
     expenses?: ExpenseCreateNestedManyWithoutProjectInput
     stakeholders?: StakeholderCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectUncheckedCreateWithoutLessonsLearnedInput = {
@@ -35828,6 +37712,7 @@ export namespace Prisma {
     expenses?: ExpenseUncheckedCreateNestedManyWithoutProjectInput
     stakeholders?: StakeholderUncheckedCreateNestedManyWithoutProjectInput
     projectSnapshots?: ProjectSnapshotUncheckedCreateNestedManyWithoutProjectInput
+    projectHistories?: ProjectHistoryUncheckedCreateNestedManyWithoutProjectInput
   }
 
   export type ProjectCreateOrConnectWithoutLessonsLearnedInput = {
@@ -35926,6 +37811,7 @@ export namespace Prisma {
     expenses?: ExpenseUpdateManyWithoutProjectNestedInput
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutLessonsLearnedInput = {
@@ -35961,6 +37847,7 @@ export namespace Prisma {
     expenses?: ExpenseUncheckedUpdateManyWithoutProjectNestedInput
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type UserUpsertWithoutLessonLearnedInput = {
@@ -36199,6 +38086,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutPmInput = {
@@ -36234,6 +38122,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutPmInput = {
@@ -36293,6 +38182,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateWithoutPmoInput = {
@@ -36328,6 +38218,7 @@ export namespace Prisma {
     stakeholders?: StakeholderUncheckedUpdateManyWithoutProjectNestedInput
     projectSnapshots?: ProjectSnapshotUncheckedUpdateManyWithoutProjectNestedInput
     lessonsLearned?: LessonLearnedUncheckedUpdateManyWithoutProjectNestedInput
+    projectHistories?: ProjectHistoryUncheckedUpdateManyWithoutProjectNestedInput
   }
 
   export type ProjectUncheckedUpdateManyWithoutPmoInput = {
@@ -36774,6 +38665,16 @@ export namespace Prisma {
     date: Date | string
   }
 
+  export type ProjectHistoryCreateManyProjectInput = {
+    id: string
+    entity: string
+    entityId?: string | null
+    action: string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: string | null
+    createdAt?: Date | string
+  }
+
   export type ProjectSponsorUpdateWithoutProjectInput = {
     sponsor?: UserUpdateOneRequiredWithoutSponsorLinksNestedInput
   }
@@ -37084,6 +38985,36 @@ export namespace Prisma {
     recommendation?: StringFieldUpdateOperationsInput | string
     submittedBy?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectHistoryUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entity?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectHistoryUncheckedUpdateWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entity?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ProjectHistoryUncheckedUpdateManyWithoutProjectInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    entity?: StringFieldUpdateOperationsInput | string
+    entityId?: NullableStringFieldUpdateOperationsInput | string | null
+    action?: StringFieldUpdateOperationsInput | string
+    details?: NullableJsonNullValueInput | InputJsonValue
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ExpenseCreateManyBudgetLineInput = {

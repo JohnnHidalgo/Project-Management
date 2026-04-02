@@ -1,11 +1,14 @@
 import { MilestoneRepository } from '../repositories/milestoneRepository.js';
+import { ProjectHistoryService } from './projectHistoryService.js';
 import { Prisma } from '../../.prisma/client';
 
 export class MilestoneService {
   private milestoneRepository: MilestoneRepository;
+  private projectHistoryService: ProjectHistoryService;
 
   constructor() {
     this.milestoneRepository = new MilestoneRepository();
+    this.projectHistoryService = new ProjectHistoryService();
   }
 
   async getAllMilestones() {
@@ -52,7 +55,17 @@ export class MilestoneService {
 
     delete payload.projectId;
 
-    return await this.milestoneRepository.create(payload);
+    const createdMilestone = await this.milestoneRepository.create(payload);
+
+    await this.projectHistoryService.record(
+      createdMilestone.projectId,
+      'Milestone',
+      createdMilestone.id,
+      'Created',
+      { milestone: createdMilestone }
+    );
+
+    return createdMilestone;
   }
 
   async updateMilestone(id: string, data: Prisma.MilestoneUpdateInput) {
@@ -64,13 +77,33 @@ export class MilestoneService {
       throw new Error('Start date cannot be after end date');
     }
 
-    return await this.milestoneRepository.update(id, data);
+    const updatedMilestone = await this.milestoneRepository.update(id, data);
+
+    await this.projectHistoryService.record(
+      updatedMilestone.projectId,
+      'Milestone',
+      updatedMilestone.id,
+      'Updated',
+      { updates: data, milestone: updatedMilestone }
+    );
+
+    return updatedMilestone;
   }
 
   async deleteMilestone(id: string) {
     // Validate the milestone exists
-    await this.getMilestoneById(id);
+    const milestoneToDelete = await this.getMilestoneById(id);
 
-    return await this.milestoneRepository.delete(id);
+    const deletedMilestone = await this.milestoneRepository.delete(id);
+
+    await this.projectHistoryService.record(
+      milestoneToDelete.projectId,
+      'Milestone',
+      milestoneToDelete.id,
+      'Deleted',
+      { milestone: milestoneToDelete }
+    );
+
+    return deletedMilestone;
   }
 }
