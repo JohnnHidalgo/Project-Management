@@ -3140,24 +3140,31 @@ export default function App() {
 
   const handleSaveProject = async (projectData: Partial<Project> & { sponsorId?: string }) => {
     try {
-      const toSave = {
+      const toSave: any = {
         name: projectData.name || 'Sin nombre',
-        description: projectData.description || '',
+        description: projectData.description || undefined,
         status: 'Draft',
         budget: projectData.budget ?? 0,
-        startDate: projectData.startDate || '',
-        endDate: projectData.endDate || '',
+        startDate: projectData.startDate ? projectData.startDate : undefined,
+        endDate: projectData.endDate ? projectData.endDate : undefined,
         pmId: projectData.pmId || currentUser.id,
         pmoId: projectData.pmoId || (currentUser.role === 'PMO' ? currentUser.id : undefined),
-        sponsorIds: projectData.sponsorId ? [projectData.sponsorId] : [],
-        teamMemberIds: projectData.teamMemberIds ?? [],
-        generalObjective: projectData.generalObjective || '',
-        specificObjectives: projectData.specificObjectives || [],
-        strategicAlignment: projectData.strategicAlignment || '',
-        businessCase: projectData.businessCase || '',
-        assumptions: projectData.assumptions || '',
-        constraints: projectData.constraints || ''
+        sponsorIds: projectData.sponsorId ? [projectData.sponsorId] : undefined,
+        teamMemberIds: projectData.teamMemberIds && projectData.teamMemberIds.length ? projectData.teamMemberIds : undefined,
+        generalObjective: projectData.generalObjective || undefined,
+        specificObjectives: projectData.specificObjectives && projectData.specificObjectives.length ? projectData.specificObjectives : undefined,
+        strategicAlignment: projectData.strategicAlignment || undefined,
+        businessCase: projectData.businessCase || undefined,
+        assumptions: projectData.assumptions || undefined,
+        constraints: projectData.constraints || undefined,
       };
+
+      // Explicitly clear empty optional fields to avoid Prisma type errors
+      Object.keys(toSave).forEach((key) => {
+        if (toSave[key] === undefined) {
+          delete toSave[key];
+        }
+      });
 
       const saved = await apiService.createProject(toSave);
       const normalizedSaved: Project = {
@@ -3178,7 +3185,8 @@ export default function App() {
       alert('Proyecto creado correctamente.');
     } catch (error) {
       console.error('Error creating project', error);
-      alert('No se pudo crear el proyecto, revisa consola para detalle.');
+      const message = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`No se pudo crear el proyecto, revisa consola para detalle: ${message}`);
     }
   };
 

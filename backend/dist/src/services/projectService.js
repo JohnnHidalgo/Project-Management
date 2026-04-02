@@ -30,20 +30,33 @@ export class ProjectService {
             status: data.status || 'Draft'
         };
         // Handle sponsor/team member join-table relations from flat array value
-        if (data.sponsorIds) {
+        if (data.sponsorIds && Array.isArray(data.sponsorIds) && data.sponsorIds.length) {
             const sponsorIds = data.sponsorIds;
             payload.sponsors = {
                 create: sponsorIds.map(sponsorId => ({ sponsor: { connect: { id: sponsorId } } }))
             };
-            delete payload.sponsorIds;
         }
-        if (data.teamMemberIds) {
+        delete payload.sponsorIds;
+        if (data.teamMemberIds && Array.isArray(data.teamMemberIds) && data.teamMemberIds.length) {
             const teamMemberIds = data.teamMemberIds;
             payload.teamMembers = {
                 create: teamMemberIds.map(memberId => ({ teamMember: { connect: { id: memberId } } }))
             };
-            delete payload.teamMemberIds;
         }
+        delete payload.teamMemberIds;
+        // Handle nested specific objectives
+        if (data.specificObjectives && Array.isArray(data.specificObjectives) && data.specificObjectives.length) {
+            const specificObjectives = data.specificObjectives;
+            payload.specificObjectives = {
+                create: specificObjectives.map(so => ({
+                    id: so.id || `so-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                    description: so.description || '',
+                    successCriteria: so.successCriteria || '',
+                    kpi: so.kpi || ''
+                }))
+            };
+        }
+        delete payload.specificObjectives;
         // Convert short object names that might arrive from frontend (strings) into Prisma-compatible Date objects if needed
         if (payload.startDate && typeof payload.startDate === 'string') {
             payload.startDate = new Date(payload.startDate);

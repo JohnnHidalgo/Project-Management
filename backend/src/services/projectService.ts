@@ -40,21 +40,35 @@ export class ProjectService {
     };
 
     // Handle sponsor/team member join-table relations from flat array value
-    if ((data as any).sponsorIds) {
+    if ((data as any).sponsorIds && Array.isArray((data as any).sponsorIds) && (data as any).sponsorIds.length) {
       const sponsorIds = (data as any).sponsorIds as string[];
       payload.sponsors = {
         create: sponsorIds.map(sponsorId => ({ sponsor: { connect: { id: sponsorId } } }))
       };
-      delete payload.sponsorIds;
     }
+    delete payload.sponsorIds;
 
-    if ((data as any).teamMemberIds) {
+    if ((data as any).teamMemberIds && Array.isArray((data as any).teamMemberIds) && (data as any).teamMemberIds.length) {
       const teamMemberIds = (data as any).teamMemberIds as string[];
       payload.teamMembers = {
         create: teamMemberIds.map(memberId => ({ teamMember: { connect: { id: memberId } } }))
       };
-      delete payload.teamMemberIds;
     }
+    delete payload.teamMemberIds;
+
+    // Handle nested specific objectives
+    if ((data as any).specificObjectives && Array.isArray((data as any).specificObjectives) && (data as any).specificObjectives.length) {
+      const specificObjectives = (data as any).specificObjectives as Array<Partial<any>>;
+      payload.specificObjectives = {
+        create: specificObjectives.map(so => ({
+          id: so.id || `so-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+          description: so.description || '',
+          successCriteria: so.successCriteria || '',
+          kpi: so.kpi || ''
+        }))
+      };
+    }
+    delete payload.specificObjectives;
 
     // Convert short object names that might arrive from frontend (strings) into Prisma-compatible Date objects if needed
     if (payload.startDate && typeof payload.startDate === 'string') {
