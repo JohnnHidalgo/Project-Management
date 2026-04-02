@@ -1710,7 +1710,7 @@ const ChangeControlBoard = ({
 
 const ProjectDetail = ({ 
   projects, currentUser, milestones, tasks, expenses,
-  onUpdateProject, onAddMilestone, onDeleteMilestone, onAddTask, onUpdateTask,
+  onUpdateProject, onAddMilestone, onDeleteMilestone, onUpdateMilestone, onAddTask, onUpdateTask,
   onAddExpense, onUpdateExpense, onAddBudgetLine, onApproveBudgetLine,
   snapshots, onAddSnapshot, risks, onAddRisk, stakeholders, onAddStakeholder,
   taskLogs, onAddTaskLog, changeRequests, onChangeRequest,
@@ -1724,6 +1724,7 @@ const ProjectDetail = ({
   onUpdateProject: (id: string, updates: Partial<Project>) => void,
   onAddMilestone: (projectId: string, name: string, weight: number, startDate: string, endDate: string) => void,
   onDeleteMilestone: (id: string) => void,
+  onUpdateMilestone: (id: string, updates: Partial<Milestone>) => void,
   onAddTask: (milestoneId: string, taskData: Partial<Task>) => void,
   onUpdateTask: (id: string, updates: Partial<Task>) => void,
   onAddExpense: (projectId: string, expense: Partial<Expense>) => void,
@@ -1749,16 +1750,21 @@ const ProjectDetail = ({
   const project = projects.find(p => p.id === id);
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'sppm' | 'costs' | 'risks' | 'stakeholders' | 'gantt'>('overview');
   const [scheduleView, setScheduleView] = useState<'gantt' | 'calendar'>('gantt');
-  const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | 'rejection' | null>(null);
+  const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | 'rejection' | 'editWeights' | 'editTaskWeights' | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null);
   const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
+  const [editTaskWeightsMilestoneId, setEditTaskWeightsMilestoneId] = useState<string | null>(null);
+  const [taskWeightsDraft, setTaskWeightsDraft] = useState<Record<string, number>>({});
   const [rejectionComment, setRejectionComment] = useState('');
   
   const projectMilestones = (milestones || []).filter(m => m.projectId === id);
   const totalWeight = projectMilestones.reduce((sum, m) => sum + m.weight, 0);
   
   const projectTasks = (tasks || []).filter(t => projectMilestones.some(m => m.id === t.milestoneId));
+  const editTaskWeightsMilestone = projectMilestones.find(m => m.id === editTaskWeightsMilestoneId);
+  const editTaskWeightsTasks = projectTasks.filter(t => t.milestoneId === editTaskWeightsMilestoneId);
+  const editTaskWeightTotal = editTaskWeightsTasks.reduce((sum, t) => sum + (taskWeightsDraft[t.id] ?? t.weight), 0);
   const projectExpenses = (expenses || []).filter(e => e.projectId === id);
   const projectRisks = (risks || []).filter(r => r.projectId === id);
   const projectStakeholders = (stakeholders || []).filter(s => s.projectId === id);
@@ -1769,6 +1775,44 @@ const ProjectDetail = ({
   [projectExpenses]);
 
   const budgetProgress = project ? (totalActualSpent / (project.budget || 1)) * 100 : 0;
+
+  const handleSaveTaskWeights = async () => {
+    if (!editTaskWeightsMilestoneId) return;
+
+    if (editTaskWeightTotal !== 100) {
+      alert('La suma de pesos debe ser exactamente 100% antes de guardar.');
+      return;
+    }
+
+    const taskUpdates = editTaskWeightsTasks
+      .map(task => {
+        const newWeight = taskWeightsDraft[task.id] ?? task.weight;
+        if (newWeight !== task.weight) return { id: task.id, weight: newWeight };
+        return null;
+      })
+      .filter((x): x is { id: string; weight: number } => x !== null);
+
+    if (taskUpdates.length === 0) {
+      setActiveModal(null);
+      setEditTaskWeightsMilestoneId(null);
+      setTaskWeightsDraft({});
+      alert('No se detectaron cambios en los pesos de las tareas.');
+      return;
+    }
+
+    try {
+      for (const update of taskUpdates) {
+        await onUpdateTask(update.id, { weight: update.weight });
+      }
+      setActiveModal(null);
+      setEditTaskWeightsMilestoneId(null);
+      setTaskWeightsDraft({});
+      alert('Pesos de tareas guardados correctamente.');
+    } catch (error) {
+      console.error('Error al guardar los pesos de tareas:', error);
+      alert('No se pudo guardar los pesos de tareas. Intente de nuevo.');
+    }
+  };
 
   const projectActivities = useMemo(() => {
     const activities: any[] = [];
@@ -2181,9 +2225,17 @@ const ProjectDetail = ({
         <div className="schedule-management-view">
           <div className="card" style={{ marginBottom: '2rem' }}>
             <div className="section-header">
-              <div>
+              <div style={{ flex: 1 }}>
                 <h3>Gestión del Cronograma (Hitos y Tareas)</h3>
-                <p className="text-muted" style={{ fontSize: '0.8rem' }}>Suma de pesos: <span className={totalWeight === 100 ? 'text-success' : 'text-error'} style={{ fontWeight: 700 }}>{totalWeight}%</span></p>
+                {totalWeight !== 100 && (
+                  <div style={{ backgroundColor: '#fee2e2', border: '1px solid #fca5a5', borderRadius: '4px', padding: '0.75rem', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#991b1b' }}>⚠️ La suma de pesos es {totalWeight}%. Debe ser exactamente 100% para enviar a aprobación.</span>
+                    <button className="btn btn-sm" style={{ backgroundColor: '#dc2626', color: 'white', marginLeft: '1rem' }} onClick={() => setActiveModal('editWeights')}>Editar Pesos</button>
+                  </div>
+                )}
+                {totalWeight === 100 && (
+                  <p className="text-muted" style={{ fontSize: '0.8rem' }}>Suma de pesos: <span className='text-success' style={{ fontWeight: 700 }}>✓ {totalWeight}%</span></p>
+                )}
               </div>
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 {(currentUser.role === 'PM' || currentUser.role === 'PMO') && (
@@ -2195,14 +2247,18 @@ const ProjectDetail = ({
             <div className="milestone-task-hierarchy" style={{ marginTop: '1.5rem', display: 'grid', gap: '1.5rem' }}>
               {projectMilestones.sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()).map(m => {
                 const mTasks = projectTasks.filter(t => t.milestoneId === m.id);
+                const mTasksWeight = mTasks.reduce((sum, t) => sum + t.weight, 0);
                 return (
                   <div key={m.id} className="milestone-group card" style={{ padding: 0, border: '1px solid var(--border)', overflow: 'hidden' }}>
                     <div className="milestone-header" style={{ backgroundColor: '#f8fafc', padding: '1rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div className={`dot dot-${m.status === 'Completed' ? 'success' : 'accent'}`}></div>
-                        <div>
-                          <h4 style={{ margin: 0, fontSize: '1rem' }}>{m.name} <span className="text-muted" style={{ fontWeight: 400, fontSize: '0.8rem' }}>({m.weight}%)</span></h4>
-                          <p className="text-muted" style={{ margin: 0, fontSize: '0.75rem' }}>{m.startDate} al {m.endDate}</p>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <div className={`dot dot-${m.status === 'Completed' ? 'success' : 'accent'}`}></div>
+                          <div>
+                            <h4 style={{ margin: 0, fontSize: '1rem' }}>{m.name} <span className="text-muted" style={{ fontWeight: 400, fontSize: '0.8rem' }}>({m.weight}%)</span></h4>
+                            <p className="text-muted" style={{ margin: '0.25rem 0 0', fontSize: '0.75rem' }}>{m.startDate} al {m.endDate}</p>
+                            <p className={mTasksWeight === 100 ? 'text-success' : 'text-error'} style={{ margin: '0.2rem 0 0', fontSize: '0.75rem' }}>Peso de tareas: {mTasksWeight}%</p>
+                          </div>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -2212,6 +2268,15 @@ const ProjectDetail = ({
                             <div className="progress-bar" style={{ width: `${m.progress}%` }}></div>
                           </div>
                         </div>
+                        {mTasksWeight !== 100 && (
+                          <button className="btn btn-error btn-xs" onClick={() => {
+                            const draft: Record<string, number> = {};
+                            mTasks.forEach(t => { draft[t.id] = t.weight; });
+                            setTaskWeightsDraft(draft);
+                            setEditTaskWeightsMilestoneId(m.id);
+                            setActiveModal('editTaskWeights');
+                          }}>Ajustar pesos</button>
+                        )}
                         <button className="btn btn-secondary btn-xs" onClick={() => { setSelectedMilestoneId(m.id); setActiveModal('task'); }}>+ Tarea</button>
                         <button className="btn-icon" onClick={() => onDeleteMilestone(m.id)}>×</button>
                       </div>
@@ -2268,14 +2333,7 @@ const ProjectDetail = ({
                 );
               })}
             </div>
-            
-            {(project.status === 'Draft' || project.status === 'Planning') && (
-              <div style={{ marginTop: '2rem', textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
-                <button className="btn btn-primary" disabled={totalWeight !== 100} onClick={handleSendToCharter}>
-                  Enviar Charter a Sponsor
-                </button>
-              </div>
-            )}
+
           </div>
 
           <div className="card">
@@ -2422,7 +2480,12 @@ const ProjectDetail = ({
         <form onSubmit={(e) => {
           e.preventDefault();
           const target = e.target as any;
-          onAddTask(target.milestoneId.value, { 
+          const milestoneId = selectedMilestoneId || projectMilestones[0]?.id;
+          if (!milestoneId) {
+            alert('No se encontró un hito válido para asociar la tarea.');
+            return;
+          }
+          onAddTask(milestoneId, { 
             name: target.name.value, 
             assignedTo: target.assignedTo.value, 
             priority: target.priority.value,
@@ -2432,12 +2495,12 @@ const ProjectDetail = ({
             predecessorId: target.predecessorId.value || undefined
           });
           setActiveModal(null);
+          setSelectedMilestoneId(null);
         }}>
+          <input type="hidden" name="milestoneId" value={selectedMilestoneId || projectMilestones[0]?.id || ''} />
           <div className="form-group">
-            <label>Seleccionar Hito</label>
-            <select name="milestoneId" required>
-              {projectMilestones.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-            </select>
+            <label>Hito</label>
+            <input type="text" value={projectMilestones.find(m => m.id === (selectedMilestoneId || projectMilestones[0]?.id))?.name || 'Sin hito'} readOnly />
           </div>
           <div className="form-group">
             <label>Nombre de la Tarea</label>
@@ -2699,6 +2762,83 @@ const ProjectDetail = ({
         onAddAction={onAddRiskAction} 
         onUpdateActionStatus={onUpdateRiskActionStatus} 
       />
+
+      <Modal
+        isOpen={activeModal === 'editWeights'}
+        onClose={() => setActiveModal(null)}
+        title="Editar Pesos de Hitos"
+      >
+        <div style={{ marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Ajuste los pesos de los hitos para que la suma sea exactamente 100%.</p>
+          <div style={{ display: 'grid', gap: '0.75rem', maxHeight: '400px', overflowY: 'auto' }}>
+            {projectMilestones.map(m => (
+              <div key={m.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+                <div>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>{m.name}</label>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    max="100" 
+                    value={m.weight}
+                    onChange={(e) => onUpdateMilestone(m.id, { weight: Number(e.target.value) })}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }}
+                  />
+                </div>
+                <div style={{ textAlign: 'right', paddingTop: '1.5rem' }}>
+                  <span style={{ fontWeight: 700 }}>{m.weight}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f0fdf4', borderRadius: '4px', border: '1px solid #86efac' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: totalWeight === 100 ? '#22c55e' : '#ef4444' }}>Total: {totalWeight}%</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <button className="btn btn-secondary" onClick={() => setActiveModal(null)}>Cancelar</button>
+          <button className="btn btn-primary" disabled={totalWeight !== 100} onClick={() => {
+            alert('Pesos guardados correctamente.');
+            setActiveModal(null);
+          }}>Guardar Cambios</button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={activeModal === 'editTaskWeights'}
+        onClose={() => { setActiveModal(null); setEditTaskWeightsMilestoneId(null); }}
+        title={`Editar Pesos de Tareas - ${editTaskWeightsMilestone?.name || ''}`}
+      >
+        <div style={{ marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Ajuste los pesos de las tareas para que la suma sea exactamente 100%.</p>
+          <div style={{ display: 'grid', gap: '0.75rem', maxHeight: '400px', overflowY: 'auto' }}>
+            {editTaskWeightsTasks.map(task => (
+              <div key={task.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+                <div>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>{task.name}</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={taskWeightsDraft[task.id] ?? task.weight}
+                    onChange={(e) => setTaskWeightsDraft(prev => ({ ...prev, [task.id]: Number(e.target.value) }))}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }}
+                  />
+                </div>
+                <div style={{ textAlign: 'right', paddingTop: '1.5rem' }}>
+                  <span style={{ fontWeight: 700 }}>{taskWeightsDraft[task.id] ?? task.weight}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f0fdf4', borderRadius: '4px', border: '1px solid #86efac' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: editTaskWeightTotal === 100 ? '#22c55e' : '#ef4444' }}>Total: {editTaskWeightTotal}%</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <button className="btn btn-secondary" onClick={() => { setActiveModal(null); setEditTaskWeightsMilestoneId(null); }}>Cancelar</button>
+          <button className="btn btn-primary" disabled={editTaskWeightTotal !== 100} onClick={handleSaveTaskWeights}>Guardar Cambios</button>
+        </div>
+      </Modal>
 
       <Modal
         isOpen={activeModal === 'rejection'}
@@ -3078,6 +3218,25 @@ export default function App() {
     setMilestones(milestones.filter(m => m.id !== id));
   };
 
+  const handleUpdateMilestone = async (id: string, updates: Partial<Milestone>) => {
+    const prevMilestones = [...milestones];
+    setMilestones(milestones.map(m => m.id === id ? { ...m, ...updates } : m));
+
+    try {
+      const updated = await apiService.updateMilestone(id, updates);
+      setMilestones(prev => prev.map(m => m.id === id ? {
+        ...m,
+        ...updated,
+        startDate: updated.startDate?.split('T')[0] ?? updated.startDate ?? m.startDate,
+        endDate: updated.endDate?.split('T')[0] ?? updated.endDate ?? m.endDate
+      } : m));
+    } catch (error) {
+      console.error('Error updating milestone in DB:', error);
+      setMilestones(prevMilestones);
+      alert('No se pudo guardar el peso del hito en la base de datos. Intente de nuevo.');
+    }
+  };
+
   const handleAddTask = async (milestoneId: string, taskData: Partial<Task>) => {
     try {
       const payload = {
@@ -3110,6 +3269,7 @@ export default function App() {
   };
 
   const handleUpdateTask = async (id: string, updates: Partial<Task>, fromLog: boolean = false) => {
+    const taskBefore = tasks.find(t => t.id === id);
     const safeUpdates = { ...updates };
     if (!fromLog) {
       // El avance (progress) solo se modifica con TaskLog.
@@ -3122,9 +3282,24 @@ export default function App() {
     // Persist update in backend whenever task changes
     try {
       await apiService.updateTask(id, safeUpdates);
+
+      // Si hubo cambio de peso, crear registro en taskLog
+      if (taskBefore && updates.weight !== undefined && updates.weight !== taskBefore.weight) {
+        await handleAddTaskLog({
+          taskId: id,
+          userId: currentUser.id,
+          comment: `Cambio de peso de tarea: ${taskBefore.weight}% → ${updates.weight}%`,
+          previousProgress: taskBefore.progress,
+          newProgress: taskBefore.progress,
+          date: new Date().toISOString()
+        });
+      }
     } catch (error) {
       console.error('Error actualizando tarea en la API:', error);
       // Revertir a estado anterior podría implementarse si se requiere
+      if (taskBefore) {
+        setTasks(prev => prev.map(t => t.id === id ? taskBefore : t));
+      }
     }
   };
 
@@ -3347,6 +3522,7 @@ export default function App() {
                 onUpdateProject={handleUpdateProject}
                 onAddMilestone={handleAddMilestone}
                 onDeleteMilestone={handleDeleteMilestone}
+                onUpdateMilestone={handleUpdateMilestone}
                 onAddTask={handleAddTask}
                 onUpdateTask={handleUpdateTask}
                 onAddExpense={handleAddExpense}
