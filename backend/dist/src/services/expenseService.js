@@ -33,13 +33,19 @@ export class ExpenseService {
         if (amountValue !== undefined && amountValue <= 0) {
             throw new Error('Expense amount must be greater than 0');
         }
+        const budgetLineId = data.budgetLineId;
         const payload = {
             ...data,
             id: data.id || `e${Date.now()}`,
             date: data.date && typeof data.date === 'string' ? new Date(data.date) : data.date,
             project: { connect: { id: projectId } },
         };
+        // Handle budgetLineId - create connection if provided
+        if (budgetLineId) {
+            payload.budgetLine = { connect: { id: budgetLineId } };
+        }
         delete payload.projectId;
+        delete payload.budgetLineId;
         const createdExpense = await this.expenseRepository.create(payload);
         await this.projectHistoryService.record(createdExpense.projectId, 'Expense', createdExpense.id, 'Created', { expense: createdExpense });
         return createdExpense;

@@ -3398,39 +3398,58 @@ export default function App() {
     }
   };
 
-  const handleAddExpense = (projectId: string, expenseData: Partial<Expense>) => {
-    const newExpense: Expense = {
-      id: `e${Date.now()}`,
-      projectId,
-      amount: expenseData.amount || 0,
-      date: expenseData.date || new Date().toISOString().split('T')[0],
-      description: expenseData.description || '',
-      category: expenseData.category || 'Others',
-      status: 'Estimated'
-    };
-    setExpenses([...expenses, newExpense]);
+  const handleAddExpense = async (projectId: string, expenseData: Partial<Expense>) => {
+    try {
+      const payload: any = {
+        projectId,
+        amount: expenseData.amount || 0,
+        date: expenseData.date || new Date().toISOString().split('T')[0],
+        description: expenseData.description || '',
+        category: expenseData.category || 'Others',
+        status: 'Estimated'
+      };
+
+      // Include budgetLineId if provided
+      if (expenseData.budgetLineId) {
+        payload.budgetLineId = expenseData.budgetLineId;
+      }
+
+      const createdExpense = await apiService.createExpense(payload);
+      setExpenses([...expenses, createdExpense]);
+      alert('Gasto registrado exitosamente.');
+    } catch (error) {
+      console.error('Error al crear gasto:', error);
+      alert('No se pudo crear el gasto. Intente de nuevo.');
+    }
   };
 
   const handleUpdateExpense = (id: string, updates: Partial<Expense>) => {
     setExpenses(prev => prev.map(e => e.id === id ? { ...e, ...updates } : e));
   };
 
-  const handleAddBudgetLine = (projectId: string, line: Partial<BudgetLine>) => {
-    setProjects(prev => prev.map(p => {
-      if (p.id === projectId) {
-        const newLine: BudgetLine = {
-          id: `bl${Date.now()}`,
-          category: line.category || 'Others',
-          budgetType: (line.budgetType as 'CAPEX' | 'OPEX') || 'OPEX',
-          description: line.description || '',
-          plannedAmount: line.plannedAmount || 0,
-          status: 'Pending'
-        };
-        return { ...p, budgetLines: [...(p.budgetLines || []), newLine] };
-      }
-      return p;
-    }));
-    alert('Nueva línea de presupuesto registrada. El Sponsor debe aprobarla.');
+  const handleAddBudgetLine = async (projectId: string, line: Partial<BudgetLine>) => {
+    try {
+      const payload = {
+        projectId,
+        category: line.category || 'Others',
+        budgetType: (line.budgetType as 'CAPEX' | 'OPEX') || 'OPEX',
+        description: line.description || '',
+        plannedAmount: line.plannedAmount || 0,
+        status: 'Pending'
+      };
+
+      const createdBudgetLine = await apiService.createBudgetLine(payload);
+      setProjects(prev => prev.map(p => {
+        if (p.id === projectId) {
+          return { ...p, budgetLines: [...(p.budgetLines || []), createdBudgetLine] };
+        }
+        return p;
+      }));
+      alert('Nueva línea de presupuesto registrada. El Sponsor debe aprobarla.');
+    } catch (error) {
+      console.error('Error al crear línea de presupuesto:', error);
+      alert('No se pudo crear la línea de presupuesto. Intente de nuevo.');
+    }
   };
 
   const handleApproveBudgetLine = (projectId: string, lineId: string, approved: boolean) => {

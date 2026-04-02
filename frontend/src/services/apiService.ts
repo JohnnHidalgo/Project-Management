@@ -349,6 +349,39 @@ class ApiService {
       method: 'DELETE',
     });
   }
+
+  // Budget Lines
+  async getBudgetLines(): Promise<any[]> {
+    return this.request('/budgetLines');
+  }
+
+  async getBudgetLineById(id: string): Promise<any> {
+    return this.request(`/budgetLines/${id}`);
+  }
+
+  async getBudgetLinesByProject(projectId: string): Promise<any[]> {
+    return this.request(`/budgetLines/project/${projectId}`);
+  }
+
+  async createBudgetLine(data: any): Promise<any> {
+    return this.request('/budgetLines', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateBudgetLine(id: string, data: any): Promise<any> {
+    return this.request(`/budgetLines/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteBudgetLine(id: string): Promise<void> {
+    return this.request(`/budgetLines/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiService = new ApiService();

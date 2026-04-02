@@ -43,6 +43,8 @@ export class ExpenseService {
       throw new Error('Expense amount must be greater than 0');
     }
 
+    const budgetLineId = (data as any).budgetLineId;
+
     const payload: any = {
       ...data,
       id: (data as any).id || `e${Date.now()}`,
@@ -50,7 +52,13 @@ export class ExpenseService {
       project: { connect: { id: projectId } },
     };
 
+    // Handle budgetLineId - create connection if provided
+    if (budgetLineId) {
+      payload.budgetLine = { connect: { id: budgetLineId } };
+    }
+
     delete payload.projectId;
+    delete payload.budgetLineId;
 
     const createdExpense = await this.expenseRepository.create(payload);
 

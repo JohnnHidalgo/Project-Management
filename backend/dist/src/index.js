@@ -14,6 +14,7 @@ import stakeholdersRouter from './routes/stakeholders.js';
 import taskLogsRouter from './routes/taskLogs.js';
 import changeRequestsRouter from './routes/changeRequests.js';
 import projectHistoryRouter from './routes/projectHistory.js';
+import budgetLinesRouter from './routes/budgetLines.js';
 if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL not set in .env');
 }
@@ -40,7 +41,8 @@ app.use('/api/stakeholders', stakeholdersRouter);
 app.use('/api/taskLogs', taskLogsRouter);
 app.use('/api/changeRequests', changeRequestsRouter);
 app.use('/api/projectHistory', projectHistoryRouter);
-// TODO: Add routes for budget lines, snapshots, lessons learned, etc.
+app.use('/api/budgetLines', budgetLinesRouter);
+// TODO: Add routes for snapshots, lessons learned, etc.
 app.listen(PORT, () => {
     console.log(`Backend server running on port ${PORT}`);
 });
