@@ -603,6 +603,18 @@ const SPPMReport = ({
   
   const projectSnapshots = snapshots.filter(s => s.projectId === project.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  // Calcular progreso del proyecto basado en hitos ponderados
+  const calculatedProjectProgress = useMemo(() => {
+    const totalWeight = projectMilestones.reduce((sum, m) => sum + (m.weight || 0), 0);
+    if (projectMilestones.length === 0 || totalWeight === 0) return 0;
+    const weightedProgress = projectMilestones.reduce((sum, m) => {
+      const weight = m.weight || 0;
+      const progress = m.progress || 0;
+      return sum + (progress * weight / 100);
+    }, 0);
+    return Math.round(weightedProgress);
+  }, [projectMilestones]);
+
   return (
     <div className="sppm-container">
       <div className="sppm-header card" style={{ background: 'var(--primary)', color: 'white' }}>
@@ -646,7 +658,7 @@ const SPPMReport = ({
               </div>
               <div className="indicator">
                 <div className="dot dot-success"></div>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>PROG: {project.progress}%</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>PROG: {calculatedProjectProgress}%</span>
               </div>
             </div>
           </div>
@@ -1778,6 +1790,17 @@ const ProjectDetail = ({
 
   const budgetProgress = project ? (totalActualSpent / (project.budget || 1)) * 100 : 0;
 
+  // Calcular progreso del proyecto basado en hitos ponderados
+  const calculatedProjectProgress = useMemo(() => {
+    if (projectMilestones.length === 0 || totalWeight === 0) return 0;
+    const weightedProgress = projectMilestones.reduce((sum, m) => {
+      const weight = m.weight || 0;
+      const progress = m.progress || 0;
+      return sum + (progress * weight / 100);
+    }, 0);
+    return Math.round(weightedProgress);
+  }, [projectMilestones, totalWeight]);
+
   const handleSaveTaskWeights = async () => {
     if (!editTaskWeightsMilestoneId) return;
 
@@ -2235,8 +2258,8 @@ const ProjectDetail = ({
           <aside className="side-content">
             <div className="card progress-card">
               <h3>Avance Global</h3>
-              <div className="progress-bar-container"><div className="progress-bar" style={{ width: `${project.progress}%` }}></div></div>
-              <p className="progress-text">{project.progress}% Completado</p>
+              <div className="progress-bar-container"><div className="progress-bar" style={{ width: `${calculatedProjectProgress}%` }}></div></div>
+              <p className="progress-text">{calculatedProjectProgress}% Completado</p>
             </div>
 
             <div className="card" style={{ marginTop: '1.5rem' }}>
