@@ -301,6 +301,46 @@ class ApiService {
       method: 'DELETE',
     });
   }
+
+  // Change Requests
+  async getChangeRequests(): Promise<any[]> {
+    return this.request('/changeRequests');
+  }
+
+  async getChangeRequest(id: string): Promise<any> {
+    return this.request(`/changeRequests/${id}`);
+  }
+
+  async getChangeRequestsByTask(taskId: string): Promise<any[]> {
+    return this.request(`/changeRequests/task/${taskId}`);
+  }
+
+  async createChangeRequest(data: any): Promise<any> {
+    return this.request('/changeRequests', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateChangeRequest(id: string, data: any): Promise<any> {
+    return this.request(`/changeRequests/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async processChangeRequest(id: string, status: 'Approved' | 'Rejected'): Promise<any> {
+    return this.request(`/changeRequests/${id}/process`, {
+      method: 'PUT',
+      body: JSON.stringify({ status }),
+    });
+  }
+
+  async deleteChangeRequest(id: string): Promise<void> {
+    return this.request(`/changeRequests/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiService = new ApiService();

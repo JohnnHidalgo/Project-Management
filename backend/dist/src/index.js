@@ -12,6 +12,7 @@ import issuesRouter from './routes/issues.js';
 import expensesRouter from './routes/expenses.js';
 import stakeholdersRouter from './routes/stakeholders.js';
 import taskLogsRouter from './routes/taskLogs.js';
+import changeRequestsRouter from './routes/changeRequests.js';
 if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL not set in .env');
 }
@@ -36,6 +37,7 @@ app.use('/api/issues', issuesRouter);
 app.use('/api/expenses', expensesRouter);
 app.use('/api/stakeholders', stakeholdersRouter);
 app.use('/api/taskLogs', taskLogsRouter);
+app.use('/api/changeRequests', changeRequestsRouter);
 // TODO: Add routes for budget lines, snapshots, lessons learned, etc.
 app.listen(PORT, () => {
     console.log(`Backend server running on port ${PORT}`);

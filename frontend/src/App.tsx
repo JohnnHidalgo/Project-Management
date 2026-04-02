@@ -1351,14 +1351,16 @@ const TaskHistoryModal = ({
   task, 
   logs, 
   onAddLog,
-  currentUser 
+  currentUser,
+  changeRequests
 }: { 
   isOpen: boolean, 
   onClose: () => void, 
   task: Task | null, 
   logs: TaskLog[], 
   onAddLog: (log: Partial<TaskLog>) => void,
-  currentUser: User
+  currentUser: User,
+  changeRequests: ChangeRequest[]
 }) => {
   const [comment, setComment] = useState('');
   const [newProgress, setNewProgress] = useState(task?.progress || 0);
@@ -1384,6 +1386,23 @@ const TaskHistoryModal = ({
   };
 
   const taskLogs = logs.filter(l => l.taskId == task?.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const taskChangeRequests = changeRequests.filter(cr => cr.taskId === task?.id);
+
+  // Combinar logs y solicitudes de cambio en un historial unificado
+  const combinedHistory = [
+    ...taskLogs.map(log => ({
+      id: log.id,
+      date: log.date,
+      type: 'log' as const,
+      data: log
+    })),
+    ...taskChangeRequests.map(cr => ({
+      id: cr.id,
+      date: cr.requestedDate,
+      type: 'changeRequest' as const,
+      data: cr
+    }))
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Seguimiento: ${task.name}`}>
@@ -1414,18 +1433,47 @@ const TaskHistoryModal = ({
 
       <div className="history-list">
         <h4 style={{ marginBottom: '1rem', fontSize: '0.875rem', textTransform: 'uppercase', color: '#64748b' }}>Historial de Cambios</h4>
-        {taskLogs.length > 0 ? taskLogs.map(log => (
-          <div key={log.id} className="card" style={{ padding: '1rem', marginBottom: '0.75rem', backgroundColor: '#f8fafc' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>{mockUsers.find(u => u.id === log.userId)?.name}</span>
-              <span className="text-muted" style={{ fontSize: '0.75rem' }}>{log.date}</span>
-            </div>
-            <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>{log.comment}</p>
-            <div style={{ fontSize: '0.7rem' }}>
-              <span className="badge badge-secondary">Avance: {log.previousProgress}% → {log.newProgress}%</span>
-            </div>
-          </div>
-        )) : <p className="text-muted" style={{ textAlign: 'center', fontSize: '0.875rem' }}>No hay historial registrado.</p>}
+        {combinedHistory.length > 0 ? combinedHistory.map(item => {
+          if (item.type === 'log') {
+            const log = item.data as TaskLog;
+            return (
+              <div key={log.id} className="card" style={{ padding: '1rem', marginBottom: '0.75rem', backgroundColor: '#f8fafc' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>📝 {mockUsers.find(u => u.id === log.userId)?.name}</span>
+                  <span className="text-muted" style={{ fontSize: '0.75rem' }}>{log.date}</span>
+                </div>
+                <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>{log.comment}</p>
+                <div style={{ fontSize: '0.7rem' }}>
+                  <span className="badge badge-secondary">Avance: {log.previousProgress}% → {log.newProgress}%</span>
+                </div>
+              </div>
+            );
+          } else {
+            const cr = item.data as ChangeRequest;
+            return (
+              <div key={cr.id} className="card" style={{ padding: '1rem', marginBottom: '0.75rem', backgroundColor: '#fef3c7', borderLeft: '3px solid #f59e0b' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>🔄 Solicitud de Cambio por {mockUsers.find(u => u.id === cr.requestedBy)?.name}</span>
+                  <span className={`badge badge-${cr.status.toLowerCase()}`}>{cr.status}</span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: '#7c3aed', marginBottom: '0.5rem', fontWeight: 500 }}>
+                  Solicitado: {cr.requestedDate?.split('T')[0] || 'N/A'}
+                </div>
+                <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                  <div className="text-muted">Justificación: {cr.justification}</div>
+                </div>
+                <div style={{ fontSize: '0.7rem', display: 'grid', gap: '0.5rem' }}>
+                  <span className="badge badge-secondary">Reprogramación: {cr.originalStartDate?.split('T')[0]} → {cr.newStartDate?.split('T')[0]}</span>
+                  {cr.status !== 'Pending' && (
+                    <span className={`badge badge-${cr.status.toLowerCase()}`}>
+                      {cr.status === 'Approved' ? '✓ Aprobado' : '✗ Rechazado'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          }
+        }) : <p className="text-muted" style={{ textAlign: 'center', fontSize: '0.875rem' }}>No hay historial registrado.</p>}
       </div>
     </Modal>
   );
@@ -1463,8 +1511,8 @@ const ChangeRequestModal = ({
       taskId: task.id,
       originalStartDate: task.startDate,
       originalEndDate: task.endDate,
-      newStartDate,
-      newEndDate,
+      newStartDate: new Date(newStartDate + 'T00:00:00.000Z').toISOString(),
+      newEndDate: new Date(newEndDate + 'T00:00:00.000Z').toISOString(),
       justification,
       requestedBy: currentUser.id,
       requestedDate: new Date().toISOString().split('T')[0],
@@ -1597,11 +1645,13 @@ const ChangeControlBoard = ({
   changeRequests, 
   projects, 
   tasks,
+  milestones,
   onProcessCR 
 }: { 
   changeRequests: ChangeRequest[], 
   projects: Project[], 
   tasks: Task[],
+  milestones: Milestone[],
   onProcessCR: (id: string, status: 'Approved' | 'Rejected') => void 
 }) => {
   return (
@@ -1626,13 +1676,12 @@ const ChangeControlBoard = ({
           <tbody>
             {changeRequests.map(cr => {
               const task = tasks.find(t => t.id === cr.taskId);
-              const project = projects.find(p => p.id === task?.milestoneId ? '' : ''); // Simplified lookup
-              // Better lookup for project
-              const realProject = projects.find(p => p.id === cr.id.split('-')[0]); // Dummy logic
+              const milestone = milestones.find(m => m.id === task?.milestoneId);
+              const project = projects.find(p => p.id === milestone?.projectId);
               
               return (
                 <tr key={cr.id}>
-                  <td>Proyecto Activo</td>
+                  <td>{project?.name || 'Proyecto no encontrado'}</td>
                   <td>{task?.name}</td>
                   <td style={{ fontSize: '0.75rem' }}>
                     <div className="text-muted">Del: {cr.originalStartDate}</div>
@@ -1665,7 +1714,7 @@ const ProjectDetail = ({
   onAddExpense, onUpdateExpense, onAddBudgetLine, onApproveBudgetLine,
   snapshots, onAddSnapshot, risks, onAddRisk, stakeholders, onAddStakeholder,
   taskLogs, onAddTaskLog, changeRequests, onChangeRequest,
-  riskActions, onAddRiskAction, onUpdateRiskActionStatus
+  riskActions, onAddRiskAction, onUpdateRiskActionStatus, onProcessCR
 }: { 
   projects: Project[], 
   currentUser: User,
@@ -1693,7 +1742,8 @@ const ProjectDetail = ({
   taskLogs: TaskLog[],
   onAddTaskLog: (log: Partial<TaskLog>) => void,
   changeRequests: ChangeRequest[],
-  onChangeRequest: (cr: Partial<ChangeRequest>) => void
+  onChangeRequest: (cr: Partial<ChangeRequest>) => void,
+  onProcessCR: (id: string, status: 'Approved' | 'Rejected') => void
 }) => {
   const { id } = useParams();
   const project = projects.find(p => p.id === id);
@@ -2239,6 +2289,7 @@ const ProjectDetail = ({
                     <th>Justificación</th>
                     <th>Solicitado por</th>
                     <th>Estado</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2254,6 +2305,14 @@ const ProjectDetail = ({
                       <td style={{ maxWidth: '300px', fontSize: '0.8rem' }}>{cr.justification}</td>
                       <td>{mockUsers.find(u => u.id === cr.requestedBy)?.name}</td>
                       <td><span className={`badge badge-${cr.status.toLowerCase()}`}>{cr.status}</span></td>
+                      <td>
+                        {cr.status === 'Pending' && (
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button className="btn btn-success btn-sm" onClick={() => onProcessCR(cr.id, 'Approved')}>Aprobar</button>
+                            <button className="btn btn-error btn-sm" onClick={() => onProcessCR(cr.id, 'Rejected')}>Rechazar</button>
+                          </div>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -2519,6 +2578,7 @@ const ProjectDetail = ({
         logs={taskLogs} 
         onAddLog={onAddTaskLog}
         currentUser={currentUser}
+        changeRequests={changeRequests}
       />
 
       <ChangeRequestModal 
@@ -2842,7 +2902,7 @@ const MyTasksView = ({ tasks, milestones, projects, currentUser, onUpdateTask }:
 // --- Main App Implementation ---
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<User>(mockUsers[2]); // Default Juan PM
+  const [currentUser, setCurrentUser] = useState<User>(mockUsers[1]); // Default Ana PMO
   const [projects, setProjects] = useState<Project[]>(mockProjects);
   const [milestones, setMilestones] = useState<Milestone[]>(mockMilestones);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
@@ -2868,7 +2928,8 @@ export default function App() {
           issuesData,
           expensesData,
           stakeholdersData,
-          taskLogsData
+          taskLogsData,
+          changeRequestsData
         ] = await Promise.all([
           apiService.getProjects().catch(() => mockProjects),
           apiService.getUsers().catch(() => mockUsers),
@@ -2878,7 +2939,8 @@ export default function App() {
           apiService.getIssues().catch(() => mockIssues),
           apiService.getExpenses().catch(() => mockExpenses),
           apiService.getStakeholders().catch(() => mockStakeholders),
-          apiService.getTaskLogs().catch(() => mockTaskLogs)
+          apiService.getTaskLogs().catch(() => mockTaskLogs),
+          apiService.getChangeRequests().catch(() => mockChangeRequests)
         ]);
 
         const normalizeProject = (project: any): Project => ({
@@ -2901,6 +2963,7 @@ export default function App() {
         setExpenses(Array.isArray(expensesData) ? expensesData.map((e: any) => ({ ...e, date: e.date?.split?.('T')[0] ?? e.date ?? '' })) : mockExpenses);
         setStakeholders(Array.isArray(stakeholdersData) ? stakeholdersData : mockStakeholders);
         setTaskLogs(Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
+        setChangeRequests(Array.isArray(changeRequestsData) ? changeRequestsData : mockChangeRequests);
 
         console.log('Loaded taskLogsData:', taskLogsData);
         console.log('Final taskLogs state:', Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
@@ -3198,21 +3261,22 @@ export default function App() {
     }
   };
 
-  const handleChangeRequest = (crData: Partial<ChangeRequest>) => {
-    const newCR: ChangeRequest = {
-      id: `cr${Date.now()}`,
-      taskId: crData.taskId || '',
-      originalStartDate: crData.originalStartDate || '',
-      originalEndDate: crData.originalEndDate || '',
-      newStartDate: crData.newStartDate || '',
-      newEndDate: crData.newEndDate || '',
-      justification: crData.justification || '',
-      status: 'Pending',
-      requestedBy: crData.requestedBy || currentUser.id,
-      requestedDate: crData.requestedDate || new Date().toISOString().split('T')[0]
-    };
-    setChangeRequests([newCR, ...changeRequests]);
-    alert('Change Request registrada. Debe ser aprobada por el PMO.');
+  const handleChangeRequest = async (crData: Partial<ChangeRequest>) => {
+    try {
+      const newCR = await apiService.createChangeRequest({
+        taskId: crData.taskId,
+        newStartDate: crData.newStartDate,
+        newEndDate: crData.newEndDate,
+        justification: crData.justification,
+        requestedBy: currentUser.id,
+        status: crData.status || 'Pending'
+      });
+      setChangeRequests([newCR, ...changeRequests]);
+      alert('Change Request registrada. Debe ser aprobada por el PMO.');
+    } catch (error) {
+      console.error('Error creating change request:', error);
+      alert('Error al registrar la solicitud de cambio. Intente nuevamente.');
+    }
   };
 
   const handleAddRiskAction = (actionData: Partial<RiskAction>) => {
@@ -3236,20 +3300,29 @@ export default function App() {
     alert('Issue marcado como Resuelto.');
   };
 
-  const handleProcessChangeRequest = (id: string, status: 'Approved' | 'Rejected') => {
-    setChangeRequests(prev => prev.map(cr => {
-      if (cr.id === id) {
-        if (status === 'Approved') {
-          // Actualizar las fechas de la tarea real
-          setTasks(prevTasks => prevTasks.map(t => 
-            t.id === cr.taskId ? { ...t, startDate: cr.newStartDate, endDate: cr.newEndDate } : t
-          ));
+  const handleProcessChangeRequest = async (id: string, status: 'Approved' | 'Rejected') => {
+    try {
+      await apiService.processChangeRequest(id, status);
+
+      // Update local state
+      setChangeRequests(prev => prev.map(cr => {
+        if (cr.id === id) {
+          if (status === 'Approved') {
+            // Actualizar las fechas de la tarea real
+            setTasks(prevTasks => prevTasks.map(t =>
+              t.id === cr.taskId ? { ...t, startDate: cr.newStartDate, endDate: cr.newEndDate } : t
+            ));
+          }
+          return { ...cr, status };
         }
-        return { ...cr, status };
-      }
-      return cr;
-    }));
-    alert(`Solicitud de cambio ${status === 'Approved' ? 'Aprobada' : 'Rechazada'}. El cronograma ha sido actualizado.`);
+        return cr;
+      }));
+
+      alert(`Solicitud de cambio ${status === 'Approved' ? 'Aprobada' : 'Rechazada'}. El cronograma ha sido actualizado.`);
+    } catch (error) {
+      console.error('Error processing change request:', error);
+      alert('Error al procesar la solicitud de cambio. Intente nuevamente.');
+    }
   };
 
   return (
@@ -3262,7 +3335,7 @@ export default function App() {
             <Route path="/projects" element={<ProjectListView projects={projects} currentUser={currentUser} milestones={milestones} tasks={tasks} expenses={expenses} />} />
             <Route path="/global-risks" element={<GlobalRisks risks={risks} projects={projects} />} />
             <Route path="/global-issues" element={<GlobalIssues issues={issues} projects={projects} onResolveIssue={handleResolveIssue} />} />
-            <Route path="/change-control" element={<ChangeControlBoard changeRequests={changeRequests} projects={projects} tasks={tasks} onProcessCR={handleProcessChangeRequest} />} />
+            <Route path="/change-control" element={<ChangeControlBoard changeRequests={changeRequests} projects={projects} tasks={tasks} milestones={milestones} onProcessCR={handleProcessChangeRequest} />} />
             <Route path="/projects/:id" element={
               <ProjectDetail 
                 projects={projects} 
@@ -3292,6 +3365,7 @@ export default function App() {
                 riskActions={riskActions}
                 onAddRiskAction={handleAddRiskAction}
                 onUpdateRiskActionStatus={handleUpdateRiskActionStatus}
+                onProcessCR={handleProcessChangeRequest}
               />
             } />
             <Route path="/new-project" element={<ProjectForm onSave={handleSaveProject} />} />
