@@ -137,6 +137,39 @@ class ApiService {
     });
   }
 
+  // Risk Actions
+  async getRiskActions(): Promise<any[]> {
+    return this.request('/riskActions');
+  }
+
+  async getRiskAction(id: string): Promise<any> {
+    return this.request(`/riskActions/${id}`);
+  }
+
+  async getRiskActionsByRisk(riskId: string): Promise<any[]> {
+    return this.request(`/riskActions/risk/${riskId}`);
+  }
+
+  async createRiskAction(data: any): Promise<any> {
+    return this.request('/riskActions', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateRiskAction(id: string, data: any): Promise<any> {
+    return this.request(`/riskActions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteRiskAction(id: string): Promise<void> {
+    return this.request(`/riskActions/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
   // Milestones
   async getMilestones(): Promise<any[]> {
     return this.request('/milestones');

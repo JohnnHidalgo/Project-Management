@@ -3135,7 +3135,7 @@ export default function App() {
   const [stakeholders, setStakeholders] = useState<Stakeholder[]>(mockStakeholders);
   const [taskLogs, setTaskLogs] = useState<TaskLog[]>(mockTaskLogs);
   const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>(mockChangeRequests);
-  const [riskActions, setRiskActions] = useState<RiskAction[]>(mockRiskActions);
+  const [riskActions, setRiskActions] = useState<RiskAction[]>([]);
   const [issues, setIssues] = useState<Issue[]>(mockIssues);
   const [projectHistory, setProjectHistory] = useState<ProjectHistory[]>([]);
 
@@ -3154,6 +3154,7 @@ export default function App() {
           stakeholdersData,
           taskLogsData,
           changeRequestsData,
+          riskActionsData,
           projectHistoryData
         ] = await Promise.all([
           apiService.getProjects().catch(() => mockProjects),
@@ -3166,6 +3167,7 @@ export default function App() {
           apiService.getStakeholders().catch(() => mockStakeholders),
           apiService.getTaskLogs().catch(() => mockTaskLogs),
           apiService.getChangeRequests().catch(() => mockChangeRequests),
+          apiService.getRiskActions().catch(() => mockRiskActions),
           apiService.getProjectHistory().catch(() => [])
         ]);
 
@@ -3190,6 +3192,7 @@ export default function App() {
         setStakeholders(Array.isArray(stakeholdersData) ? stakeholdersData : mockStakeholders);
         setTaskLogs(Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
         setChangeRequests(Array.isArray(changeRequestsData) ? changeRequestsData : mockChangeRequests);
+        setRiskActions(Array.isArray(riskActionsData) ? riskActionsData.map((ra: any) => ({ ...ra, dueDate: ra.dueDate?.split?.('T')[0] ?? ra.dueDate ?? '' })) : mockRiskActions);
         setProjectHistory(Array.isArray(projectHistoryData) ? projectHistoryData.map((h: any) => ({ ...h, createdAt: h.createdAt?.split?.('T')[0] ?? h.createdAt ?? '' })) : []);
 
         console.log('Loaded taskLogsData:', taskLogsData);
@@ -3478,19 +3481,26 @@ export default function App() {
     setSnapshots([snapshot, ...snapshots]);
   };
 
-  const handleAddRisk = (projectId: string, riskData: Partial<Risk>) => {
-    const newRisk: Risk = {
-      id: `r${Date.now()}`,
-      projectId,
-      description: riskData.description || 'Nuevo Riesgo',
-      probability: riskData.probability || 0.5,
-      impact: riskData.impact || 0.5,
-      status: 'Open',
-      category: riskData.category || 'Scope',
-      strategy: riskData.strategy || 'Mitigate',
-      ownerId: currentUser.id
-    };
-    setRisks([...risks, newRisk]);
+  const handleAddRisk = async (projectId: string, riskData: Partial<Risk>) => {
+    try {
+      const payload: any = {
+        projectId,
+        description: riskData.description || 'Nuevo Riesgo',
+        probability: riskData.probability ?? 0.5,
+        impact: riskData.impact ?? 0.5,
+        status: 'Open',
+        category: riskData.category || 'Scope',
+        strategy: riskData.strategy || 'Mitigate',
+        ownerId: currentUser.id
+      };
+
+      const createdRisk = await apiService.createRisk(payload);
+      setRisks([...risks, createdRisk]);
+      alert('Riesgo registrado exitosamente.');
+    } catch (error) {
+      console.error('Error al crear riesgo:', error);
+      alert('No se pudo crear el riesgo. Intente de nuevo.');
+    }
   };
 
   const handleAddStakeholder = async (projectId: string, sData: Partial<Stakeholder>) => {
@@ -3568,20 +3578,34 @@ export default function App() {
     }
   };
 
-  const handleAddRiskAction = (actionData: Partial<RiskAction>) => {
-    const newAction: RiskAction = {
-      id: `ra${Date.now()}`,
-      riskId: actionData.riskId || '',
-      description: actionData.description || '',
-      ownerId: actionData.ownerId || '',
-      dueDate: actionData.dueDate || '',
-      status: 'Pending'
-    };
-    setRiskActions([...riskActions, newAction]);
+  const handleAddRiskAction = async (actionData: Partial<RiskAction>) => {
+    try {
+      const payload = {
+        riskId: actionData.riskId,
+        description: actionData.description || '',
+        ownerId: actionData.ownerId || '',
+        dueDate: actionData.dueDate || '',
+        status: actionData.status || 'Pending'
+      };
+
+      const createdAction = await apiService.createRiskAction(payload);
+      setRiskActions([...riskActions, createdAction]);
+      alert('Plan de acción registrado exitosamente.');
+    } catch (error) {
+      console.error('Error al crear plan de acción:', error);
+      alert('No se pudo guardar el plan de acción. Intente de nuevo.');
+    }
   };
 
-  const handleUpdateRiskActionStatus = (id: string, status: RiskAction['status']) => {
-    setRiskActions(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+  const handleUpdateRiskActionStatus = async (id: string, status: RiskAction['status']) => {
+    try {
+      const updated = await apiService.updateRiskAction(id, { status });
+      setRiskActions(prev => prev.map(a => a.id === id ? updated : a));
+    } catch (error) {
+      console.error('Error al actualizar estado de acción:', error);
+      // fallback local update for UX
+      setRiskActions(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+    }
   };
 
   const handleResolveIssue = (id: string) => {

@@ -54,7 +54,13 @@ export class RiskService {
       project: { connect: { id: projectId } },
     };
 
+    const ownerId = (data as any).ownerId;
+    if (ownerId) {
+      payload.owner = { connect: { id: ownerId } };
+    }
+
     delete payload.projectId;
+    delete payload.ownerId;
 
     const createdRisk = await this.riskRepository.create(payload);
 
@@ -84,7 +90,13 @@ export class RiskService {
       throw new Error('Impact must be between 0 and 1');
     }
 
-    const updatedRisk = await this.riskRepository.update(id, data);
+    const updatePayload: any = { ...data };
+    if ((data as any).ownerId) {
+      updatePayload.owner = { connect: { id: (data as any).ownerId } };
+      delete updatePayload.ownerId;
+    }
+
+    const updatedRisk = await this.riskRepository.update(id, updatePayload);
 
     await this.projectHistoryService.record(
       updatedRisk.projectId,

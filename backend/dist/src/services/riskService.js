@@ -42,7 +42,12 @@ export class RiskService {
             id: data.id || `r${Date.now()}`,
             project: { connect: { id: projectId } },
         };
+        const ownerId = data.ownerId;
+        if (ownerId) {
+            payload.owner = { connect: { id: ownerId } };
+        }
         delete payload.projectId;
+        delete payload.ownerId;
         const createdRisk = await this.riskRepository.create(payload);
         await this.projectHistoryService.record(createdRisk.projectId, 'Risk', createdRisk.id, 'Created', { risk: createdRisk });
         return createdRisk;
@@ -59,7 +64,12 @@ export class RiskService {
         if (impactValue !== undefined && (impactValue < 0 || impactValue > 1)) {
             throw new Error('Impact must be between 0 and 1');
         }
-        const updatedRisk = await this.riskRepository.update(id, data);
+        const updatePayload = { ...data };
+        if (data.ownerId) {
+            updatePayload.owner = { connect: { id: data.ownerId } };
+            delete updatePayload.ownerId;
+        }
+        const updatedRisk = await this.riskRepository.update(id, updatePayload);
         await this.projectHistoryService.record(updatedRisk.projectId, 'Risk', updatedRisk.id, 'Updated', { updates: data, risk: updatedRisk });
         return updatedRisk;
     }
