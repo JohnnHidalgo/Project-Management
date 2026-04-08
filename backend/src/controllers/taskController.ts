@@ -96,4 +96,14 @@ export class TaskController {
       }
     }
   }
+
+  async getCriticalPath(req: Request, res: Response) {
+    try {
+      const { projectId } = req.params;
+      const criticalPath = await this.taskService.calculateCriticalPath(projectId);
+      res.json(criticalPath);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to calculate critical path' });
+    }
+  }
 }

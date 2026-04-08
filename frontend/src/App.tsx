@@ -14,7 +14,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { apiService } from './services/apiService';
-import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue, ProjectHistory } from './types';
+import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue, ProjectHistory, CriticalPathResult } from './types';
 import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbokUtils';
 import { mockUsers, mockProjects, mockMilestones, mockTasks, mockRisks, mockIssues, mockExpenses, mockStakeholders, mockTaskLogs, mockChangeRequests, mockRiskActions } from './mockData';
 import CashFlowChart from './components/CashFlowChart';
@@ -2127,7 +2127,7 @@ const ProjectDetail = ({
   const { id } = useParams();
   const navigate = useNavigate();
   const project = projects.find(p => p.id === id);
-  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'sppm' | 'costs' | 'risks' | 'stakeholders' | 'gantt'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'sppm' | 'costs' | 'risks' | 'stakeholders' | 'gantt' | 'critical-path'>('overview');
   const [scheduleView, setScheduleView] = useState<'gantt' | 'calendar'>('gantt');
   const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | 'rejection' | 'editWeights' | 'editTaskWeights' | 'editRiskActionTaskWeights' | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -2137,6 +2137,8 @@ const ProjectDetail = ({
   const [editTaskWeightsRiskActionId, setEditTaskWeightsRiskActionId] = useState<string | null>(null);
   const [taskWeightsDraft, setTaskWeightsDraft] = useState<Record<string, number>>({});
   const [rejectionComment, setRejectionComment] = useState('');
+  const [criticalPathData, setCriticalPathData] = useState<CriticalPathResult | null>(null);
+  const [loadingCriticalPath, setLoadingCriticalPath] = useState(false);
   
   const projectMilestones = (milestones || []).filter(m => m.projectId === id);
   const totalWeight = projectMilestones.reduce((sum, m) => sum + m.weight, 0);
@@ -2172,6 +2174,24 @@ const ProjectDetail = ({
     }, 0);
     return Math.round(weightedProgress);
   }, [projectMilestones, totalWeight]);
+
+  // Load critical path data when tab is selected
+  useEffect(() => {
+    if (activeTab === 'critical-path' && project && !criticalPathData && !loadingCriticalPath) {
+      const loadCriticalPath = async () => {
+        setLoadingCriticalPath(true);
+        try {
+          const data = await apiService.getCriticalPath(project.id);
+          setCriticalPathData(data);
+        } catch (error) {
+          console.error('Error loading critical path:', error);
+        } finally {
+          setLoadingCriticalPath(false);
+        }
+      };
+      loadCriticalPath();
+    }
+  }, [activeTab, project, criticalPathData, loadingCriticalPath]);
 
   const handleSaveTaskWeights = async () => {
     if (!editTaskWeightsMilestoneId) return;
@@ -2398,6 +2418,7 @@ const ProjectDetail = ({
         <button className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`} onClick={() => setActiveTab('schedule')}>Gestión del Cronograma</button>
         <button className={`tab-btn ${activeTab === 'costs' ? 'active' : ''}`} onClick={() => setActiveTab('costs')}>Costos</button>
         <button className={`tab-btn ${activeTab === 'gantt' ? 'active' : ''}`} onClick={() => setActiveTab('gantt')}>Cronograma (Gantt)</button>
+        <button className={`tab-btn ${activeTab === 'critical-path' ? 'active' : ''}`} onClick={() => setActiveTab('critical-path')}>Ruta Crítica</button>
         <button className={`tab-btn ${activeTab === 'risks' ? 'active' : ''}`} onClick={() => setActiveTab('risks')}>Riesgos</button>
         <button className={`tab-btn ${activeTab === 'stakeholders' ? 'active' : ''}`} onClick={() => setActiveTab('stakeholders')}>Interesados</button>
         <button className={`tab-btn ${activeTab === 'sppm' ? 'active' : ''}`} onClick={() => setActiveTab('sppm')}>Reporte SPPM</button>
@@ -2530,7 +2551,7 @@ const ProjectDetail = ({
             <CashFlowChart 
               budgetLines={project.budgetLines} 
               expenses={projectExpenses}
-              title="Flujo de Caja - Avance Planificado vs Ejecutado"
+              title="Flujo de Caja - Avance Acumulado Planificado vs Ejecutado"
             />
             
             <div className="card" style={{ marginBottom: '2rem' }}>
@@ -2903,6 +2924,127 @@ const ProjectDetail = ({
             <GanttChart milestones={projectMilestones} tasks={projectTasks} />
           ) : (
             <CalendarView milestones={projectMilestones} tasks={projectTasks} />
+          )}
+        </div>
+      )}
+
+      {activeTab === 'critical-path' && (
+        <div className="critical-path-view">
+          <div className="card" style={{ marginBottom: '1rem' }}>
+            <h3>Ruta Crítica del Proyecto</h3>
+            <p>La ruta crítica identifica las tareas que determinan la duración mínima del proyecto. Cualquier retraso en estas tareas retrasará el proyecto completo.</p>
+          </div>
+
+          {loadingCriticalPath ? (
+            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+              <p>Cargando ruta crítica...</p>
+            </div>
+          ) : criticalPathData ? (
+            <div className="critical-path-content">
+              <div className="stats-grid" style={{ marginBottom: '2rem' }}>
+                <div className="card stat-card">
+                  <p className="label">Duración Total del Proyecto</p>
+                  <p className="value">{criticalPathData.totalDuration} días</p>
+                </div>
+                <div className="card stat-card">
+                  <p className="label">Tareas en Ruta Crítica</p>
+                  <p className="value">{criticalPathData.criticalPath.length}</p>
+                </div>
+                <div className="card stat-card">
+                  <p className="label">Total de Tareas</p>
+                  <p className="value">{criticalPathData.tasks.length}</p>
+                </div>
+              </div>
+
+              <div className="card" style={{ marginBottom: '1rem' }}>
+                <h4>Ruta Crítica</h4>
+                <div className="critical-path-list">
+                  {criticalPathData.criticalPath.map((task, index) => (
+                    <div key={task.id} className="critical-task-item" style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      padding: '0.5rem', 
+                      border: '2px solid var(--error)', 
+                      borderRadius: '4px', 
+                      marginBottom: '0.5rem',
+                      backgroundColor: 'rgba(255, 107, 53, 0.1)'
+                    }}>
+                      <span style={{ fontWeight: 'bold', marginRight: '0.5rem' }}>{index + 1}.</span>
+                      <div style={{ flex: 1 }}>
+                        <strong>{task.name}</strong>
+                        <br />
+                        <small style={{ color: 'var(--text-muted)' }}>
+                          Duración: {criticalPathData.tasks.find(t => t.id === task.id)?.duration || 1} días
+                        </small>
+                      </div>
+                      {index < criticalPathData.criticalPath.length - 1 && (
+                        <span style={{ margin: '0 1rem', fontSize: '1.2rem' }}>→</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="card">
+                <h4>Análisis de Todas las Tareas</h4>
+                <div className="tasks-timing-table" style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
+                        <th style={{ padding: '0.5rem', textAlign: 'left', border: '1px solid var(--border)' }}>Tarea</th>
+                        <th style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>Duración</th>
+                        <th style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>Inicio Más Temprano</th>
+                        <th style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>Fin Más Temprano</th>
+                        <th style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>Inicio Más Tardío</th>
+                        <th style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>Fin Más Tardío</th>
+                        <th style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>Holguera</th>
+                        <th style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>Crítica</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {criticalPathData.tasks.map(task => {
+                        const slack = task.latestFinish - task.earliestFinish;
+                        return (
+                          <tr key={task.id} style={{ 
+                            backgroundColor: task.isCritical ? 'rgba(255, 107, 53, 0.1)' : 'transparent',
+                            borderBottom: '1px solid var(--border)'
+                          }}>
+                            <td style={{ padding: '0.5rem', border: '1px solid var(--border)' }}>
+                              <strong>{task.name}</strong>
+                            </td>
+                            <td style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>
+                              {task.duration} días
+                            </td>
+                            <td style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>
+                              Día {task.earliestStart}
+                            </td>
+                            <td style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>
+                              Día {task.earliestFinish}
+                            </td>
+                            <td style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>
+                              Día {task.latestStart}
+                            </td>
+                            <td style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>
+                              Día {task.latestFinish}
+                            </td>
+                            <td style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>
+                              {slack} días
+                            </td>
+                            <td style={{ padding: '0.5rem', textAlign: 'center', border: '1px solid var(--border)' }}>
+                              {task.isCritical ? 'Sí' : 'No'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+              <p>No se pudo cargar la ruta crítica. Verifique que el proyecto tenga tareas con dependencias configuradas.</p>
+            </div>
           )}
         </div>
       )}

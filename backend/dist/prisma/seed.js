@@ -165,15 +165,15 @@ async function main() {
     // Budget lines
     await prisma.budgetLine.createMany({
         data: [
-            { id: 'bl1', projectId: 'p1', category: 'Services', budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, status: 'Approved' },
-            { id: 'bl2', projectId: 'p1', category: 'Labor', budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, status: 'Approved' },
-            { id: 'bl3', projectId: 'p1', category: 'Hardware', budgetType: 'CAPEX', description: 'Servidores de Respaldo Local', plannedAmount: 20000, status: 'Approved' },
-            { id: 'bl2_1', projectId: 'p2', category: 'Software', budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, status: 'Pending' },
-            { id: 'bl2_2', projectId: 'p2', category: 'Services', budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, status: 'Pending' },
-            { id: 'bl4_1', projectId: 'p4', category: 'Hardware', budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, status: 'Approved' },
-            { id: 'bl4_2', projectId: 'p4', category: 'Services', budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, status: 'Approved' },
-            { id: 'bl6_1', projectId: 'p6', category: 'Services', budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, status: 'Approved' },
-            { id: 'bl6_2', projectId: 'p6', category: 'Labor', budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, status: 'Approved' }
+            { id: 'bl1', projectId: 'p1', category: 'Services', budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, executionDate: new Date('2026-01-05'), status: 'Approved' },
+            { id: 'bl2', projectId: 'p1', category: 'Labor', budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, executionDate: new Date('2026-02-01'), status: 'Approved' },
+            { id: 'bl3', projectId: 'p1', category: 'Hardware', budgetType: 'CAPEX', description: 'Servidores de Respaldo Local', plannedAmount: 20000, executionDate: new Date('2026-03-15'), status: 'Approved' },
+            { id: 'bl2_1', projectId: 'p2', category: 'Software', budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, executionDate: new Date('2026-03-05'), status: 'Pending' },
+            { id: 'bl2_2', projectId: 'p2', category: 'Services', budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, executionDate: new Date('2026-04-01'), status: 'Pending' },
+            { id: 'bl4_1', projectId: 'p4', category: 'Hardware', budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, executionDate: new Date('2026-02-20'), status: 'Approved' },
+            { id: 'bl4_2', projectId: 'p4', category: 'Services', budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, executionDate: new Date('2026-03-10'), status: 'Approved' },
+            { id: 'bl6_1', projectId: 'p6', category: 'Services', budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, executionDate: new Date('2026-02-10'), status: 'Approved' },
+            { id: 'bl6_2', projectId: 'p6', category: 'Labor', budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, executionDate: new Date('2026-03-01'), status: 'Approved' }
         ]
     });
     // Milestones

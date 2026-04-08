@@ -39,6 +39,12 @@ export class BudgetLineService {
         if (!payload.project) {
             payload.project = { connect: { id: projectId } };
         }
+        if (payload.executionDate && typeof payload.executionDate === 'string') {
+            payload.executionDate = new Date(payload.executionDate);
+        }
+        if (!payload.executionDate) {
+            throw new Error('Execution date is required');
+        }
         delete payload.projectId;
         const createdBudgetLine = await this.budgetLineRepository.create(payload);
         await this.projectHistoryService.record(projectId, 'BudgetLine', createdBudgetLine.id, 'Created', { budgetLine: createdBudgetLine }, undefined);
@@ -47,7 +53,11 @@ export class BudgetLineService {
     async updateBudgetLine(id, data) {
         // Validate the budget line exists
         const existingLine = await this.getBudgetLineById(id);
-        const updatedBudgetLine = await this.budgetLineRepository.update(id, data);
+        const payload = { ...data };
+        if (payload.executionDate && typeof payload.executionDate === 'string') {
+            payload.executionDate = new Date(payload.executionDate);
+        }
+        const updatedBudgetLine = await this.budgetLineRepository.update(id, payload);
         await this.projectHistoryService.record(existingLine.projectId || null, 'BudgetLine', id, 'Updated', { updates: data, budgetLine: updatedBudgetLine }, data.approvedBy || null);
         return updatedBudgetLine;
     }

@@ -200,9 +200,9 @@ async function main() {
   await prisma.task.createMany({
     data: [
       { id: 't1', milestoneId: 'm1', name: 'Diseño de VPC', description: 'Definir subredes y seguridad', startDate: new Date('2026-01-05'), endDate: new Date('2026-01-15'), assignedTo: '4', progress: 100, status: 'Completed', priority: 'High' },
-      { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: new Date('2026-01-16'), endDate: new Date('2026-01-30'), assignedTo: '5', progress: 100, status: 'Completed', priority: 'High' },
+      { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: new Date('2026-01-16'), endDate: new Date('2026-01-30'), assignedTo: '5', progress: 100, status: 'Completed', priority: 'High', predecessorId: 't1' },
       { id: 't3', milestoneId: 'm2', name: 'Limpieza de Datos', description: 'Eliminar registros obsoletos', startDate: new Date('2026-02-20'), endDate: new Date('2026-03-30'), assignedTo: '4', progress: 80, status: 'In_Progress', priority: 'Medium' },
-      { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: new Date('2026-04-01'), endDate: new Date('2026-05-15'), assignedTo: '5', progress: 10, status: 'Pending', priority: 'High' },
+      { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: new Date('2026-04-01'), endDate: new Date('2026-05-15'), assignedTo: '5', progress: 10, status: 'Pending', priority: 'High', predecessorId: 't3' },
       { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: new Date('2026-03-05'), endDate: new Date('2026-03-25'), assignedTo: '6', progress: 40, status: 'In_Progress', priority: 'High' }
     ]
   });

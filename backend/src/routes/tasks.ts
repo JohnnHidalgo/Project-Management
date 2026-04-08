@@ -8,6 +8,7 @@ router.get('/', taskController.getAllTasks.bind(taskController));
 router.get('/:id', taskController.getTaskById.bind(taskController));
 router.get('/milestone/:milestoneId', taskController.getTasksByMilestone.bind(taskController));
 router.get('/risk-action/:riskActionId', taskController.getTasksByRiskAction.bind(taskController));
+router.get('/critical-path/:projectId', taskController.getCriticalPath.bind(taskController));
 router.post('/', taskController.createTask.bind(taskController));
 router.put('/:id', taskController.updateTask.bind(taskController));
 router.delete('/:id', taskController.deleteTask.bind(taskController));

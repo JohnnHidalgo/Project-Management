@@ -94,6 +94,10 @@ class ApiService {
     return this.request(`/tasks/risk-action/${riskActionId}`);
   }
 
+  async getCriticalPath(projectId: string): Promise<any> {
+    return this.request(`/tasks/critical-path/${projectId}`);
+  }
+
   async createTask(data: any): Promise<any> {
     return this.request('/tasks', {
       method: 'POST',

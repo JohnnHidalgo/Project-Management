@@ -101,6 +101,21 @@ export interface Task {
   predecessorId?: string; // PMBOK: Sequence Activities (Dependencies)
 }
 
+export interface TaskWithTiming extends Task {
+  earliestStart: number;
+  earliestFinish: number;
+  latestStart: number;
+  latestFinish: number;
+  isCritical: boolean;
+  duration: number;
+}
+
+export interface CriticalPathResult {
+  criticalPath: Task[];
+  totalDuration: number;
+  tasks: TaskWithTiming[];
+}
+
 export interface TaskLog {
   id: string;
   taskId: string;

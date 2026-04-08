@@ -79,6 +79,48 @@ export class TaskRepository {
             }
         });
     }
+    async findByProject(projectId) {
+        return await prisma.task.findMany({
+            where: {
+                OR: [
+                    {
+                        milestone: {
+                            projectId: projectId
+                        }
+                    },
+                    {
+                        riskAction: {
+                            risk: {
+                                projectId: projectId
+                            }
+                        }
+                    }
+                ]
+            },
+            include: {
+                milestone: {
+                    include: {
+                        project: true
+                    }
+                },
+                riskAction: {
+                    include: {
+                        risk: {
+                            include: {
+                                project: true
+                            }
+                        }
+                    }
+                },
+                assignedUser: true,
+                predecessor: true,
+                successor: true,
+                logs: true,
+                changeRequests: true,
+                issues: true
+            }
+        });
+    }
     async create(data) {
         return await prisma.task.create({
             data,
