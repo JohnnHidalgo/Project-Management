@@ -265,7 +265,8 @@ model Milestone {
 
 model Task {
   id            String       @id
-  milestoneId   String
+  milestoneId   String?
+  riskActionId  String?
   name          String
   description   String?
   startDate     DateTime?
@@ -277,7 +278,8 @@ model Task {
   weight        Int          @default(0)
   predecessorId String?
 
-  milestone      Milestone       @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  milestone      Milestone?      @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  riskAction     RiskAction?     @relation(fields: [riskActionId], references: [id], onDelete: Cascade)
   assignedUser   User?           @relation("TaskAssigned", fields: [assignedTo], references: [id], onDelete: SetNull)
   predecessor    Task?           @relation("TaskPredecessor", fields: [predecessorId], references: [id], onDelete: SetNull)
   successor      Task[]          @relation("TaskPredecessor")
@@ -338,8 +340,9 @@ model RiskAction {
   dueDate     DateTime?
   status      ApprovalStatus
 
-  risk  Risk  @relation(fields: [riskId], references: [id], onDelete: Cascade)
-  owner User? @relation("RiskActionOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  risk  Risk   @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  owner User?  @relation("RiskActionOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  tasks Task[]
 }
 
 model Issue {

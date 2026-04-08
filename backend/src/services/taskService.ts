@@ -27,6 +27,10 @@ export class TaskService {
     return await this.taskRepository.findByMilestone(milestoneId);
   }
 
+  async getTasksByRiskAction(riskActionId: string) {
+    return await this.taskRepository.findByRiskAction(riskActionId);
+  }
+
   private normalizeTaskStatus(status?: string): string | undefined {
     if (!status) return undefined;
     const map: Record<string, string> = {
@@ -46,8 +50,14 @@ export class TaskService {
     }
 
     const milestoneId = (data as any).milestoneId || (data as any).milestone?.connect?.id;
-    if (!milestoneId) {
-      throw new Error('Milestone ID is required');
+    const riskActionId = (data as any).riskActionId || (data as any).riskAction?.connect?.id;
+
+    if (!milestoneId && !riskActionId) {
+      throw new Error('Either Milestone ID or Risk Action ID is required');
+    }
+
+    if (milestoneId && riskActionId) {
+      throw new Error('Task cannot belong to both a milestone and a risk action');
     }
 
     const startDate = data.startDate && typeof data.startDate === 'string' ? new Date(data.startDate) : data.startDate;
@@ -60,11 +70,16 @@ export class TaskService {
     const payload: any = {
       ...data,
       id: (data as any).id || `t${Date.now()}`,
-      milestone: { connect: { id: milestoneId } },
       startDate,
       endDate,
       weight: (data as any).weight || 0
     };
+
+    if (milestoneId) {
+      payload.milestone = { connect: { id: milestoneId } };
+    } else if (riskActionId) {
+      payload.riskAction = { connect: { id: riskActionId } };
+    }
 
     // Validar que el peso sea válido
     const taskWeight = (data as any).weight || 0;
@@ -73,6 +88,7 @@ export class TaskService {
     }
 
     delete payload.milestoneId;
+    delete payload.riskActionId;
 
     if ((data as any).assignedTo) {
       payload.assignedUser = { connect: { id: (data as any).assignedTo } };
@@ -91,7 +107,7 @@ export class TaskService {
 
     const createdTask = await this.taskRepository.create(payload);
 
-    const projectId = createdTask.milestone?.projectId || null;
+    const projectId = createdTask.milestone?.projectId || createdTask.riskAction?.risk?.projectId || null;
 
     await this.projectHistoryService.record(
       projectId,
@@ -120,7 +136,7 @@ export class TaskService {
 
     const updatedTask = await this.taskRepository.update(id, payload);
 
-    const projectId = updatedTask.milestone?.projectId || null;
+    const projectId = updatedTask.milestone?.projectId || updatedTask.riskAction?.risk?.projectId || null;
     await this.projectHistoryService.record(
       projectId,
       'Task',
@@ -138,7 +154,7 @@ export class TaskService {
 
     const deletedTask = await this.taskRepository.delete(id);
 
-    const projectId = taskToDelete.milestone?.projectId || null;
+    const projectId = taskToDelete.milestone?.projectId || taskToDelete.riskAction?.risk?.projectId || null;
     await this.projectHistoryService.record(
       projectId,
       'Task',

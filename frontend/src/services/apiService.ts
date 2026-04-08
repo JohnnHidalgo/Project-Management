@@ -90,6 +90,10 @@ class ApiService {
     return this.request(`/tasks/milestone/${milestoneId}`);
   }
 
+  async getTasksByRiskAction(riskActionId: string): Promise<any[]> {
+    return this.request(`/tasks/risk-action/${riskActionId}`);
+  }
+
   async createTask(data: any): Promise<any> {
     return this.request('/tasks', {
       method: 'POST',
@@ -105,9 +109,20 @@ class ApiService {
   }
 
   async deleteTask(id: string): Promise<void> {
-    return this.request(`/tasks/${id}`, {
+    const url = `${API_BASE_URL}/tasks/${id}`;
+    const response = await fetch(url, {
       method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    }
+
+    // No need to parse JSON for 204 No Content response
+    return;
   }
 
   // Risks

@@ -3092,6 +3092,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type RiskActionCountOutputType
+   */
+
+  export type RiskActionCountOutputType = {
+    tasks: number
+  }
+
+  export type RiskActionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tasks?: boolean | RiskActionCountOutputTypeCountTasksArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * RiskActionCountOutputType without action
+   */
+  export type RiskActionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RiskActionCountOutputType
+     */
+    select?: RiskActionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * RiskActionCountOutputType without action
+   */
+  export type RiskActionCountOutputTypeCountTasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -11799,6 +11830,7 @@ export namespace Prisma {
   export type TaskMinAggregateOutputType = {
     id: string | null
     milestoneId: string | null
+    riskActionId: string | null
     name: string | null
     description: string | null
     startDate: Date | null
@@ -11814,6 +11846,7 @@ export namespace Prisma {
   export type TaskMaxAggregateOutputType = {
     id: string | null
     milestoneId: string | null
+    riskActionId: string | null
     name: string | null
     description: string | null
     startDate: Date | null
@@ -11829,6 +11862,7 @@ export namespace Prisma {
   export type TaskCountAggregateOutputType = {
     id: number
     milestoneId: number
+    riskActionId: number
     name: number
     description: number
     startDate: number
@@ -11856,6 +11890,7 @@ export namespace Prisma {
   export type TaskMinAggregateInputType = {
     id?: true
     milestoneId?: true
+    riskActionId?: true
     name?: true
     description?: true
     startDate?: true
@@ -11871,6 +11906,7 @@ export namespace Prisma {
   export type TaskMaxAggregateInputType = {
     id?: true
     milestoneId?: true
+    riskActionId?: true
     name?: true
     description?: true
     startDate?: true
@@ -11886,6 +11922,7 @@ export namespace Prisma {
   export type TaskCountAggregateInputType = {
     id?: true
     milestoneId?: true
+    riskActionId?: true
     name?: true
     description?: true
     startDate?: true
@@ -11987,7 +12024,8 @@ export namespace Prisma {
 
   export type TaskGroupByOutputType = {
     id: string
-    milestoneId: string
+    milestoneId: string | null
+    riskActionId: string | null
     name: string
     description: string | null
     startDate: Date | null
@@ -12022,6 +12060,7 @@ export namespace Prisma {
   export type TaskSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     milestoneId?: boolean
+    riskActionId?: boolean
     name?: boolean
     description?: boolean
     startDate?: boolean
@@ -12032,7 +12071,8 @@ export namespace Prisma {
     priority?: boolean
     weight?: boolean
     predecessorId?: boolean
-    milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
+    milestone?: boolean | Task$milestoneArgs<ExtArgs>
+    riskAction?: boolean | Task$riskActionArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
     predecessor?: boolean | Task$predecessorArgs<ExtArgs>
     successor?: boolean | Task$successorArgs<ExtArgs>
@@ -12045,6 +12085,7 @@ export namespace Prisma {
   export type TaskSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     milestoneId?: boolean
+    riskActionId?: boolean
     name?: boolean
     description?: boolean
     startDate?: boolean
@@ -12055,7 +12096,8 @@ export namespace Prisma {
     priority?: boolean
     weight?: boolean
     predecessorId?: boolean
-    milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
+    milestone?: boolean | Task$milestoneArgs<ExtArgs>
+    riskAction?: boolean | Task$riskActionArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
     predecessor?: boolean | Task$predecessorArgs<ExtArgs>
   }, ExtArgs["result"]["task"]>
@@ -12063,6 +12105,7 @@ export namespace Prisma {
   export type TaskSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     milestoneId?: boolean
+    riskActionId?: boolean
     name?: boolean
     description?: boolean
     startDate?: boolean
@@ -12073,7 +12116,8 @@ export namespace Prisma {
     priority?: boolean
     weight?: boolean
     predecessorId?: boolean
-    milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
+    milestone?: boolean | Task$milestoneArgs<ExtArgs>
+    riskAction?: boolean | Task$riskActionArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
     predecessor?: boolean | Task$predecessorArgs<ExtArgs>
   }, ExtArgs["result"]["task"]>
@@ -12081,6 +12125,7 @@ export namespace Prisma {
   export type TaskSelectScalar = {
     id?: boolean
     milestoneId?: boolean
+    riskActionId?: boolean
     name?: boolean
     description?: boolean
     startDate?: boolean
@@ -12093,9 +12138,10 @@ export namespace Prisma {
     predecessorId?: boolean
   }
 
-  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "milestoneId" | "name" | "description" | "startDate" | "endDate" | "assignedTo" | "progress" | "status" | "priority" | "weight" | "predecessorId", ExtArgs["result"]["task"]>
+  export type TaskOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "milestoneId" | "riskActionId" | "name" | "description" | "startDate" | "endDate" | "assignedTo" | "progress" | "status" | "priority" | "weight" | "predecessorId", ExtArgs["result"]["task"]>
   export type TaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
+    milestone?: boolean | Task$milestoneArgs<ExtArgs>
+    riskAction?: boolean | Task$riskActionArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
     predecessor?: boolean | Task$predecessorArgs<ExtArgs>
     successor?: boolean | Task$successorArgs<ExtArgs>
@@ -12105,12 +12151,14 @@ export namespace Prisma {
     _count?: boolean | TaskCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TaskIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
+    milestone?: boolean | Task$milestoneArgs<ExtArgs>
+    riskAction?: boolean | Task$riskActionArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
     predecessor?: boolean | Task$predecessorArgs<ExtArgs>
   }
   export type TaskIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    milestone?: boolean | MilestoneDefaultArgs<ExtArgs>
+    milestone?: boolean | Task$milestoneArgs<ExtArgs>
+    riskAction?: boolean | Task$riskActionArgs<ExtArgs>
     assignedUser?: boolean | Task$assignedUserArgs<ExtArgs>
     predecessor?: boolean | Task$predecessorArgs<ExtArgs>
   }
@@ -12118,7 +12166,8 @@ export namespace Prisma {
   export type $TaskPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Task"
     objects: {
-      milestone: Prisma.$MilestonePayload<ExtArgs>
+      milestone: Prisma.$MilestonePayload<ExtArgs> | null
+      riskAction: Prisma.$RiskActionPayload<ExtArgs> | null
       assignedUser: Prisma.$UserPayload<ExtArgs> | null
       predecessor: Prisma.$TaskPayload<ExtArgs> | null
       successor: Prisma.$TaskPayload<ExtArgs>[]
@@ -12128,7 +12177,8 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      milestoneId: string
+      milestoneId: string | null
+      riskActionId: string | null
       name: string
       description: string | null
       startDate: Date | null
@@ -12533,7 +12583,8 @@ export namespace Prisma {
    */
   export interface Prisma__TaskClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    milestone<T extends MilestoneDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MilestoneDefaultArgs<ExtArgs>>): Prisma__MilestoneClient<$Result.GetResult<Prisma.$MilestonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    milestone<T extends Task$milestoneArgs<ExtArgs> = {}>(args?: Subset<T, Task$milestoneArgs<ExtArgs>>): Prisma__MilestoneClient<$Result.GetResult<Prisma.$MilestonePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    riskAction<T extends Task$riskActionArgs<ExtArgs> = {}>(args?: Subset<T, Task$riskActionArgs<ExtArgs>>): Prisma__RiskActionClient<$Result.GetResult<Prisma.$RiskActionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     assignedUser<T extends Task$assignedUserArgs<ExtArgs> = {}>(args?: Subset<T, Task$assignedUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     predecessor<T extends Task$predecessorArgs<ExtArgs> = {}>(args?: Subset<T, Task$predecessorArgs<ExtArgs>>): Prisma__TaskClient<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     successor<T extends Task$successorArgs<ExtArgs> = {}>(args?: Subset<T, Task$successorArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -12571,6 +12622,7 @@ export namespace Prisma {
   interface TaskFieldRefs {
     readonly id: FieldRef<"Task", 'String'>
     readonly milestoneId: FieldRef<"Task", 'String'>
+    readonly riskActionId: FieldRef<"Task", 'String'>
     readonly name: FieldRef<"Task", 'String'>
     readonly description: FieldRef<"Task", 'String'>
     readonly startDate: FieldRef<"Task", 'DateTime'>
@@ -12979,6 +13031,44 @@ export namespace Prisma {
      * Limit how many Tasks to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Task.milestone
+   */
+  export type Task$milestoneArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Milestone
+     */
+    select?: MilestoneSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Milestone
+     */
+    omit?: MilestoneOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MilestoneInclude<ExtArgs> | null
+    where?: MilestoneWhereInput
+  }
+
+  /**
+   * Task.riskAction
+   */
+  export type Task$riskActionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RiskAction
+     */
+    select?: RiskActionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the RiskAction
+     */
+    omit?: RiskActionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: RiskActionInclude<ExtArgs> | null
+    where?: RiskActionWhereInput
   }
 
   /**
@@ -16796,6 +16886,8 @@ export namespace Prisma {
     status?: boolean
     risk?: boolean | RiskDefaultArgs<ExtArgs>
     owner?: boolean | RiskAction$ownerArgs<ExtArgs>
+    tasks?: boolean | RiskAction$tasksArgs<ExtArgs>
+    _count?: boolean | RiskActionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["riskAction"]>
 
   export type RiskActionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -16833,6 +16925,8 @@ export namespace Prisma {
   export type RiskActionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     risk?: boolean | RiskDefaultArgs<ExtArgs>
     owner?: boolean | RiskAction$ownerArgs<ExtArgs>
+    tasks?: boolean | RiskAction$tasksArgs<ExtArgs>
+    _count?: boolean | RiskActionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type RiskActionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     risk?: boolean | RiskDefaultArgs<ExtArgs>
@@ -16848,6 +16942,7 @@ export namespace Prisma {
     objects: {
       risk: Prisma.$RiskPayload<ExtArgs>
       owner: Prisma.$UserPayload<ExtArgs> | null
+      tasks: Prisma.$TaskPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -17252,6 +17347,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     risk<T extends RiskDefaultArgs<ExtArgs> = {}>(args?: Subset<T, RiskDefaultArgs<ExtArgs>>): Prisma__RiskClient<$Result.GetResult<Prisma.$RiskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     owner<T extends RiskAction$ownerArgs<ExtArgs> = {}>(args?: Subset<T, RiskAction$ownerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    tasks<T extends RiskAction$tasksArgs<ExtArgs> = {}>(args?: Subset<T, RiskAction$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17704,6 +17800,30 @@ export namespace Prisma {
      */
     include?: UserInclude<ExtArgs> | null
     where?: UserWhereInput
+  }
+
+  /**
+   * RiskAction.tasks
+   */
+  export type RiskAction$tasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Task
+     */
+    omit?: TaskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TaskInclude<ExtArgs> | null
+    where?: TaskWhereInput
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    cursor?: TaskWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskScalarFieldEnum | TaskScalarFieldEnum[]
   }
 
   /**
@@ -24705,6 +24825,7 @@ export namespace Prisma {
   export const TaskScalarFieldEnum: {
     id: 'id',
     milestoneId: 'milestoneId',
+    riskActionId: 'riskActionId',
     name: 'name',
     description: 'description',
     startDate: 'startDate',
@@ -25842,7 +25963,8 @@ export namespace Prisma {
     OR?: TaskWhereInput[]
     NOT?: TaskWhereInput | TaskWhereInput[]
     id?: StringFilter<"Task"> | string
-    milestoneId?: StringFilter<"Task"> | string
+    milestoneId?: StringNullableFilter<"Task"> | string | null
+    riskActionId?: StringNullableFilter<"Task"> | string | null
     name?: StringFilter<"Task"> | string
     description?: StringNullableFilter<"Task"> | string | null
     startDate?: DateTimeNullableFilter<"Task"> | Date | string | null
@@ -25853,7 +25975,8 @@ export namespace Prisma {
     priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority
     weight?: IntFilter<"Task"> | number
     predecessorId?: StringNullableFilter<"Task"> | string | null
-    milestone?: XOR<MilestoneScalarRelationFilter, MilestoneWhereInput>
+    milestone?: XOR<MilestoneNullableScalarRelationFilter, MilestoneWhereInput> | null
+    riskAction?: XOR<RiskActionNullableScalarRelationFilter, RiskActionWhereInput> | null
     assignedUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     predecessor?: XOR<TaskNullableScalarRelationFilter, TaskWhereInput> | null
     successor?: TaskListRelationFilter
@@ -25864,7 +25987,8 @@ export namespace Prisma {
 
   export type TaskOrderByWithRelationInput = {
     id?: SortOrder
-    milestoneId?: SortOrder
+    milestoneId?: SortOrderInput | SortOrder
+    riskActionId?: SortOrderInput | SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     startDate?: SortOrderInput | SortOrder
@@ -25876,6 +26000,7 @@ export namespace Prisma {
     weight?: SortOrder
     predecessorId?: SortOrderInput | SortOrder
     milestone?: MilestoneOrderByWithRelationInput
+    riskAction?: RiskActionOrderByWithRelationInput
     assignedUser?: UserOrderByWithRelationInput
     predecessor?: TaskOrderByWithRelationInput
     successor?: TaskOrderByRelationAggregateInput
@@ -25889,7 +26014,8 @@ export namespace Prisma {
     AND?: TaskWhereInput | TaskWhereInput[]
     OR?: TaskWhereInput[]
     NOT?: TaskWhereInput | TaskWhereInput[]
-    milestoneId?: StringFilter<"Task"> | string
+    milestoneId?: StringNullableFilter<"Task"> | string | null
+    riskActionId?: StringNullableFilter<"Task"> | string | null
     name?: StringFilter<"Task"> | string
     description?: StringNullableFilter<"Task"> | string | null
     startDate?: DateTimeNullableFilter<"Task"> | Date | string | null
@@ -25900,7 +26026,8 @@ export namespace Prisma {
     priority?: EnumTaskPriorityFilter<"Task"> | $Enums.TaskPriority
     weight?: IntFilter<"Task"> | number
     predecessorId?: StringNullableFilter<"Task"> | string | null
-    milestone?: XOR<MilestoneScalarRelationFilter, MilestoneWhereInput>
+    milestone?: XOR<MilestoneNullableScalarRelationFilter, MilestoneWhereInput> | null
+    riskAction?: XOR<RiskActionNullableScalarRelationFilter, RiskActionWhereInput> | null
     assignedUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     predecessor?: XOR<TaskNullableScalarRelationFilter, TaskWhereInput> | null
     successor?: TaskListRelationFilter
@@ -25911,7 +26038,8 @@ export namespace Prisma {
 
   export type TaskOrderByWithAggregationInput = {
     id?: SortOrder
-    milestoneId?: SortOrder
+    milestoneId?: SortOrderInput | SortOrder
+    riskActionId?: SortOrderInput | SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     startDate?: SortOrderInput | SortOrder
@@ -25934,7 +26062,8 @@ export namespace Prisma {
     OR?: TaskScalarWhereWithAggregatesInput[]
     NOT?: TaskScalarWhereWithAggregatesInput | TaskScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Task"> | string
-    milestoneId?: StringWithAggregatesFilter<"Task"> | string
+    milestoneId?: StringNullableWithAggregatesFilter<"Task"> | string | null
+    riskActionId?: StringNullableWithAggregatesFilter<"Task"> | string | null
     name?: StringWithAggregatesFilter<"Task"> | string
     description?: StringNullableWithAggregatesFilter<"Task"> | string | null
     startDate?: DateTimeNullableWithAggregatesFilter<"Task"> | Date | string | null
@@ -26192,6 +26321,7 @@ export namespace Prisma {
     status?: EnumApprovalStatusFilter<"RiskAction"> | $Enums.ApprovalStatus
     risk?: XOR<RiskScalarRelationFilter, RiskWhereInput>
     owner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    tasks?: TaskListRelationFilter
   }
 
   export type RiskActionOrderByWithRelationInput = {
@@ -26203,6 +26333,7 @@ export namespace Prisma {
     status?: SortOrder
     risk?: RiskOrderByWithRelationInput
     owner?: UserOrderByWithRelationInput
+    tasks?: TaskOrderByRelationAggregateInput
   }
 
   export type RiskActionWhereUniqueInput = Prisma.AtLeast<{
@@ -26217,6 +26348,7 @@ export namespace Prisma {
     status?: EnumApprovalStatusFilter<"RiskAction"> | $Enums.ApprovalStatus
     risk?: XOR<RiskScalarRelationFilter, RiskWhereInput>
     owner?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    tasks?: TaskListRelationFilter
   }, "id">
 
   export type RiskActionOrderByWithAggregationInput = {
@@ -27354,7 +27486,8 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
-    milestone: MilestoneCreateNestedOneWithoutTasksInput
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -27365,7 +27498,8 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -27392,7 +27526,8 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
-    milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -27403,7 +27538,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27422,7 +27558,8 @@ export namespace Prisma {
 
   export type TaskCreateManyInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -27449,7 +27586,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27713,6 +27851,7 @@ export namespace Prisma {
     status: $Enums.ApprovalStatus
     risk: RiskCreateNestedOneWithoutActionsInput
     owner?: UserCreateNestedOneWithoutRiskActionsInput
+    tasks?: TaskCreateNestedManyWithoutRiskActionInput
   }
 
   export type RiskActionUncheckedCreateInput = {
@@ -27722,6 +27861,7 @@ export namespace Prisma {
     ownerId?: string | null
     dueDate?: Date | string | null
     status: $Enums.ApprovalStatus
+    tasks?: TaskUncheckedCreateNestedManyWithoutRiskActionInput
   }
 
   export type RiskActionUpdateInput = {
@@ -27731,6 +27871,7 @@ export namespace Prisma {
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     risk?: RiskUpdateOneRequiredWithoutActionsNestedInput
     owner?: UserUpdateOneWithoutRiskActionsNestedInput
+    tasks?: TaskUpdateManyWithoutRiskActionNestedInput
   }
 
   export type RiskActionUncheckedUpdateInput = {
@@ -27740,6 +27881,7 @@ export namespace Prisma {
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
+    tasks?: TaskUncheckedUpdateManyWithoutRiskActionNestedInput
   }
 
   export type RiskActionCreateManyInput = {
@@ -29029,9 +29171,14 @@ export namespace Prisma {
     not?: NestedEnumTaskPriorityFilter<$PrismaModel> | $Enums.TaskPriority
   }
 
-  export type MilestoneScalarRelationFilter = {
-    is?: MilestoneWhereInput
-    isNot?: MilestoneWhereInput
+  export type MilestoneNullableScalarRelationFilter = {
+    is?: MilestoneWhereInput | null
+    isNot?: MilestoneWhereInput | null
+  }
+
+  export type RiskActionNullableScalarRelationFilter = {
+    is?: RiskActionWhereInput | null
+    isNot?: RiskActionWhereInput | null
   }
 
   export type TaskNullableScalarRelationFilter = {
@@ -29042,6 +29189,7 @@ export namespace Prisma {
   export type TaskCountOrderByAggregateInput = {
     id?: SortOrder
     milestoneId?: SortOrder
+    riskActionId?: SortOrder
     name?: SortOrder
     description?: SortOrder
     startDate?: SortOrder
@@ -29062,6 +29210,7 @@ export namespace Prisma {
   export type TaskMaxOrderByAggregateInput = {
     id?: SortOrder
     milestoneId?: SortOrder
+    riskActionId?: SortOrder
     name?: SortOrder
     description?: SortOrder
     startDate?: SortOrder
@@ -29077,6 +29226,7 @@ export namespace Prisma {
   export type TaskMinOrderByAggregateInput = {
     id?: SortOrder
     milestoneId?: SortOrder
+    riskActionId?: SortOrder
     name?: SortOrder
     description?: SortOrder
     startDate?: SortOrder
@@ -31139,6 +31289,12 @@ export namespace Prisma {
     connect?: MilestoneWhereUniqueInput
   }
 
+  export type RiskActionCreateNestedOneWithoutTasksInput = {
+    create?: XOR<RiskActionCreateWithoutTasksInput, RiskActionUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: RiskActionCreateOrConnectWithoutTasksInput
+    connect?: RiskActionWhereUniqueInput
+  }
+
   export type UserCreateNestedOneWithoutTasksInput = {
     create?: XOR<UserCreateWithoutTasksInput, UserUncheckedCreateWithoutTasksInput>
     connectOrCreate?: UserCreateOrConnectWithoutTasksInput
@@ -31215,12 +31371,24 @@ export namespace Prisma {
     set?: $Enums.TaskPriority
   }
 
-  export type MilestoneUpdateOneRequiredWithoutTasksNestedInput = {
+  export type MilestoneUpdateOneWithoutTasksNestedInput = {
     create?: XOR<MilestoneCreateWithoutTasksInput, MilestoneUncheckedCreateWithoutTasksInput>
     connectOrCreate?: MilestoneCreateOrConnectWithoutTasksInput
     upsert?: MilestoneUpsertWithoutTasksInput
+    disconnect?: MilestoneWhereInput | boolean
+    delete?: MilestoneWhereInput | boolean
     connect?: MilestoneWhereUniqueInput
     update?: XOR<XOR<MilestoneUpdateToOneWithWhereWithoutTasksInput, MilestoneUpdateWithoutTasksInput>, MilestoneUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type RiskActionUpdateOneWithoutTasksNestedInput = {
+    create?: XOR<RiskActionCreateWithoutTasksInput, RiskActionUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: RiskActionCreateOrConnectWithoutTasksInput
+    upsert?: RiskActionUpsertWithoutTasksInput
+    disconnect?: RiskActionWhereInput | boolean
+    delete?: RiskActionWhereInput | boolean
+    connect?: RiskActionWhereUniqueInput
+    update?: XOR<XOR<RiskActionUpdateToOneWithWhereWithoutTasksInput, RiskActionUpdateWithoutTasksInput>, RiskActionUncheckedUpdateWithoutTasksInput>
   }
 
   export type UserUpdateOneWithoutTasksNestedInput = {
@@ -31499,6 +31667,20 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type TaskCreateNestedManyWithoutRiskActionInput = {
+    create?: XOR<TaskCreateWithoutRiskActionInput, TaskUncheckedCreateWithoutRiskActionInput> | TaskCreateWithoutRiskActionInput[] | TaskUncheckedCreateWithoutRiskActionInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutRiskActionInput | TaskCreateOrConnectWithoutRiskActionInput[]
+    createMany?: TaskCreateManyRiskActionInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+  }
+
+  export type TaskUncheckedCreateNestedManyWithoutRiskActionInput = {
+    create?: XOR<TaskCreateWithoutRiskActionInput, TaskUncheckedCreateWithoutRiskActionInput> | TaskCreateWithoutRiskActionInput[] | TaskUncheckedCreateWithoutRiskActionInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutRiskActionInput | TaskCreateOrConnectWithoutRiskActionInput[]
+    createMany?: TaskCreateManyRiskActionInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+  }
+
   export type RiskUpdateOneRequiredWithoutActionsNestedInput = {
     create?: XOR<RiskCreateWithoutActionsInput, RiskUncheckedCreateWithoutActionsInput>
     connectOrCreate?: RiskCreateOrConnectWithoutActionsInput
@@ -31515,6 +31697,34 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRiskActionsInput, UserUpdateWithoutRiskActionsInput>, UserUncheckedUpdateWithoutRiskActionsInput>
+  }
+
+  export type TaskUpdateManyWithoutRiskActionNestedInput = {
+    create?: XOR<TaskCreateWithoutRiskActionInput, TaskUncheckedCreateWithoutRiskActionInput> | TaskCreateWithoutRiskActionInput[] | TaskUncheckedCreateWithoutRiskActionInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutRiskActionInput | TaskCreateOrConnectWithoutRiskActionInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutRiskActionInput | TaskUpsertWithWhereUniqueWithoutRiskActionInput[]
+    createMany?: TaskCreateManyRiskActionInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutRiskActionInput | TaskUpdateWithWhereUniqueWithoutRiskActionInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutRiskActionInput | TaskUpdateManyWithWhereWithoutRiskActionInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
+  }
+
+  export type TaskUncheckedUpdateManyWithoutRiskActionNestedInput = {
+    create?: XOR<TaskCreateWithoutRiskActionInput, TaskUncheckedCreateWithoutRiskActionInput> | TaskCreateWithoutRiskActionInput[] | TaskUncheckedCreateWithoutRiskActionInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutRiskActionInput | TaskCreateOrConnectWithoutRiskActionInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutRiskActionInput | TaskUpsertWithWhereUniqueWithoutRiskActionInput[]
+    createMany?: TaskCreateManyRiskActionInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutRiskActionInput | TaskUpdateWithWhereUniqueWithoutRiskActionInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutRiskActionInput | TaskUpdateManyWithWhereWithoutRiskActionInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
   }
 
   export type ProjectCreateNestedOneWithoutIssuesInput = {
@@ -32499,7 +32709,8 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
-    milestone: MilestoneCreateNestedOneWithoutTasksInput
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogCreateNestedManyWithoutTaskInput
@@ -32509,7 +32720,8 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutAssignedUserInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -32607,6 +32819,7 @@ export namespace Prisma {
     dueDate?: Date | string | null
     status: $Enums.ApprovalStatus
     risk: RiskCreateNestedOneWithoutActionsInput
+    tasks?: TaskCreateNestedManyWithoutRiskActionInput
   }
 
   export type RiskActionUncheckedCreateWithoutOwnerInput = {
@@ -32615,6 +32828,7 @@ export namespace Prisma {
     description: string
     dueDate?: Date | string | null
     status: $Enums.ApprovalStatus
+    tasks?: TaskUncheckedCreateNestedManyWithoutRiskActionInput
   }
 
   export type RiskActionCreateOrConnectWithoutOwnerInput = {
@@ -32908,7 +33122,8 @@ export namespace Prisma {
     OR?: TaskScalarWhereInput[]
     NOT?: TaskScalarWhereInput | TaskScalarWhereInput[]
     id?: StringFilter<"Task"> | string
-    milestoneId?: StringFilter<"Task"> | string
+    milestoneId?: StringNullableFilter<"Task"> | string | null
+    riskActionId?: StringNullableFilter<"Task"> | string | null
     name?: StringFilter<"Task"> | string
     description?: StringNullableFilter<"Task"> | string | null
     startDate?: DateTimeNullableFilter<"Task"> | Date | string | null
@@ -35050,6 +35265,7 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -35060,6 +35276,7 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutMilestoneInput = {
     id: string
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -35216,6 +35433,29 @@ export namespace Prisma {
     create: XOR<MilestoneCreateWithoutTasksInput, MilestoneUncheckedCreateWithoutTasksInput>
   }
 
+  export type RiskActionCreateWithoutTasksInput = {
+    id: string
+    description: string
+    dueDate?: Date | string | null
+    status: $Enums.ApprovalStatus
+    risk: RiskCreateNestedOneWithoutActionsInput
+    owner?: UserCreateNestedOneWithoutRiskActionsInput
+  }
+
+  export type RiskActionUncheckedCreateWithoutTasksInput = {
+    id: string
+    riskId: string
+    description: string
+    ownerId?: string | null
+    dueDate?: Date | string | null
+    status: $Enums.ApprovalStatus
+  }
+
+  export type RiskActionCreateOrConnectWithoutTasksInput = {
+    where: RiskActionWhereUniqueInput
+    create: XOR<RiskActionCreateWithoutTasksInput, RiskActionUncheckedCreateWithoutTasksInput>
+  }
+
   export type UserCreateWithoutTasksInput = {
     id: string
     name: string
@@ -35273,7 +35513,8 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
-    milestone: MilestoneCreateNestedOneWithoutTasksInput
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     logs?: TaskLogCreateNestedManyWithoutTaskInput
@@ -35283,7 +35524,8 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutSuccessorInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -35314,7 +35556,8 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
-    milestone: MilestoneCreateNestedOneWithoutTasksInput
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
     logs?: TaskLogCreateNestedManyWithoutTaskInput
@@ -35324,7 +35567,8 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutPredecessorInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -35481,6 +35725,35 @@ export namespace Prisma {
     acceptanceCriteria?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type RiskActionUpsertWithoutTasksInput = {
+    update: XOR<RiskActionUpdateWithoutTasksInput, RiskActionUncheckedUpdateWithoutTasksInput>
+    create: XOR<RiskActionCreateWithoutTasksInput, RiskActionUncheckedCreateWithoutTasksInput>
+    where?: RiskActionWhereInput
+  }
+
+  export type RiskActionUpdateToOneWithWhereWithoutTasksInput = {
+    where?: RiskActionWhereInput
+    data: XOR<RiskActionUpdateWithoutTasksInput, RiskActionUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type RiskActionUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
+    risk?: RiskUpdateOneRequiredWithoutActionsNestedInput
+    owner?: UserUpdateOneWithoutRiskActionsNestedInput
+  }
+
+  export type RiskActionUncheckedUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    riskId?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    ownerId?: NullableStringFieldUpdateOperationsInput | string | null
+    dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
+  }
+
   export type UserUpsertWithoutTasksInput = {
     update: XOR<UserUpdateWithoutTasksInput, UserUncheckedUpdateWithoutTasksInput>
     create: XOR<UserCreateWithoutTasksInput, UserUncheckedCreateWithoutTasksInput>
@@ -35555,7 +35828,8 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
-    milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     logs?: TaskLogUpdateManyWithoutTaskNestedInput
@@ -35565,7 +35839,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutSuccessorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35655,7 +35930,8 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
-    milestone: MilestoneCreateNestedOneWithoutTasksInput
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -35665,7 +35941,8 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutLogsInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -35754,7 +36031,8 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
-    milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -35764,7 +36042,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutLogsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36123,6 +36402,7 @@ export namespace Prisma {
     dueDate?: Date | string | null
     status: $Enums.ApprovalStatus
     owner?: UserCreateNestedOneWithoutRiskActionsInput
+    tasks?: TaskCreateNestedManyWithoutRiskActionInput
   }
 
   export type RiskActionUncheckedCreateWithoutRiskInput = {
@@ -36131,6 +36411,7 @@ export namespace Prisma {
     ownerId?: string | null
     dueDate?: Date | string | null
     status: $Enums.ApprovalStatus
+    tasks?: TaskUncheckedCreateNestedManyWithoutRiskActionInput
   }
 
   export type RiskActionCreateOrConnectWithoutRiskInput = {
@@ -36373,6 +36654,54 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutRiskActionsInput, UserUncheckedCreateWithoutRiskActionsInput>
   }
 
+  export type TaskCreateWithoutRiskActionInput = {
+    id: string
+    name: string
+    description?: string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    progress: number
+    status: $Enums.TaskStatus
+    priority: $Enums.TaskPriority
+    weight?: number
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    assignedUser?: UserCreateNestedOneWithoutTasksInput
+    predecessor?: TaskCreateNestedOneWithoutSuccessorInput
+    successor?: TaskCreateNestedManyWithoutPredecessorInput
+    logs?: TaskLogCreateNestedManyWithoutTaskInput
+    changeRequests?: ChangeRequestCreateNestedManyWithoutTaskInput
+    issues?: IssueCreateNestedManyWithoutTaskInput
+  }
+
+  export type TaskUncheckedCreateWithoutRiskActionInput = {
+    id: string
+    milestoneId?: string | null
+    name: string
+    description?: string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    assignedTo?: string | null
+    progress: number
+    status: $Enums.TaskStatus
+    priority: $Enums.TaskPriority
+    weight?: number
+    predecessorId?: string | null
+    successor?: TaskUncheckedCreateNestedManyWithoutPredecessorInput
+    logs?: TaskLogUncheckedCreateNestedManyWithoutTaskInput
+    changeRequests?: ChangeRequestUncheckedCreateNestedManyWithoutTaskInput
+    issues?: IssueUncheckedCreateNestedManyWithoutTaskInput
+  }
+
+  export type TaskCreateOrConnectWithoutRiskActionInput = {
+    where: TaskWhereUniqueInput
+    create: XOR<TaskCreateWithoutRiskActionInput, TaskUncheckedCreateWithoutRiskActionInput>
+  }
+
+  export type TaskCreateManyRiskActionInputEnvelope = {
+    data: TaskCreateManyRiskActionInput | TaskCreateManyRiskActionInput[]
+    skipDuplicates?: boolean
+  }
+
   export type RiskUpsertWithoutActionsInput = {
     update: XOR<RiskUpdateWithoutActionsInput, RiskUncheckedUpdateWithoutActionsInput>
     create: XOR<RiskCreateWithoutActionsInput, RiskUncheckedCreateWithoutActionsInput>
@@ -36463,6 +36792,22 @@ export namespace Prisma {
     approvedBudgetLines?: BudgetLineUncheckedUpdateManyWithoutApprovedByUserNestedInput
   }
 
+  export type TaskUpsertWithWhereUniqueWithoutRiskActionInput = {
+    where: TaskWhereUniqueInput
+    update: XOR<TaskUpdateWithoutRiskActionInput, TaskUncheckedUpdateWithoutRiskActionInput>
+    create: XOR<TaskCreateWithoutRiskActionInput, TaskUncheckedCreateWithoutRiskActionInput>
+  }
+
+  export type TaskUpdateWithWhereUniqueWithoutRiskActionInput = {
+    where: TaskWhereUniqueInput
+    data: XOR<TaskUpdateWithoutRiskActionInput, TaskUncheckedUpdateWithoutRiskActionInput>
+  }
+
+  export type TaskUpdateManyWithWhereWithoutRiskActionInput = {
+    where: TaskScalarWhereInput
+    data: XOR<TaskUpdateManyMutationInput, TaskUncheckedUpdateManyWithoutRiskActionInput>
+  }
+
   export type ProjectCreateWithoutIssuesInput = {
     id: string
     name: string
@@ -36550,7 +36895,8 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
-    milestone: MilestoneCreateNestedOneWithoutTasksInput
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -36560,7 +36906,8 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutIssuesInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -36732,7 +37079,8 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
-    milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -36742,7 +37090,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutIssuesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -37045,7 +37394,8 @@ export namespace Prisma {
     status: $Enums.TaskStatus
     priority: $Enums.TaskPriority
     weight?: number
-    milestone: MilestoneCreateNestedOneWithoutTasksInput
+    milestone?: MilestoneCreateNestedOneWithoutTasksInput
+    riskAction?: RiskActionCreateNestedOneWithoutTasksInput
     assignedUser?: UserCreateNestedOneWithoutTasksInput
     predecessor?: TaskCreateNestedOneWithoutSuccessorInput
     successor?: TaskCreateNestedManyWithoutPredecessorInput
@@ -37055,7 +37405,8 @@ export namespace Prisma {
 
   export type TaskUncheckedCreateWithoutChangeRequestsInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -37144,7 +37495,8 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
-    milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -37154,7 +37506,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutChangeRequestsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -37961,7 +38314,8 @@ export namespace Prisma {
 
   export type TaskCreateManyAssignedUserInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -38279,7 +38633,8 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
-    milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUpdateManyWithoutTaskNestedInput
@@ -38289,7 +38644,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutAssignedUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -38307,7 +38663,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateManyWithoutAssignedUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -38393,6 +38750,7 @@ export namespace Prisma {
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     risk?: RiskUpdateOneRequiredWithoutActionsNestedInput
+    tasks?: TaskUpdateManyWithoutRiskActionNestedInput
   }
 
   export type RiskActionUncheckedUpdateWithoutOwnerInput = {
@@ -38401,6 +38759,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
+    tasks?: TaskUncheckedUpdateManyWithoutRiskActionNestedInput
   }
 
   export type RiskActionUncheckedUpdateManyWithoutOwnerInput = {
@@ -39059,6 +39418,7 @@ export namespace Prisma {
 
   export type TaskCreateManyMilestoneInput = {
     id: string
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -39081,6 +39441,7 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
@@ -39091,6 +39452,7 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutMilestoneInput = {
     id?: StringFieldUpdateOperationsInput | string
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -39109,6 +39471,7 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateManyWithoutMilestoneInput = {
     id?: StringFieldUpdateOperationsInput | string
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -39123,7 +39486,8 @@ export namespace Prisma {
 
   export type TaskCreateManyPredecessorInput = {
     id: string
-    milestoneId: string
+    milestoneId?: string | null
+    riskActionId?: string | null
     name: string
     description?: string | null
     startDate?: Date | string | null
@@ -39177,7 +39541,8 @@ export namespace Prisma {
     status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
     weight?: IntFieldUpdateOperationsInput | number
-    milestone?: MilestoneUpdateOneRequiredWithoutTasksNestedInput
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    riskAction?: RiskActionUpdateOneWithoutTasksNestedInput
     assignedUser?: UserUpdateOneWithoutTasksNestedInput
     successor?: TaskUpdateManyWithoutPredecessorNestedInput
     logs?: TaskLogUpdateManyWithoutTaskNestedInput
@@ -39187,7 +39552,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateWithoutPredecessorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -39205,7 +39571,8 @@ export namespace Prisma {
 
   export type TaskUncheckedUpdateManyWithoutPredecessorInput = {
     id?: StringFieldUpdateOperationsInput | string
-    milestoneId?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    riskActionId?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -39327,6 +39694,7 @@ export namespace Prisma {
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     owner?: UserUpdateOneWithoutRiskActionsNestedInput
+    tasks?: TaskUpdateManyWithoutRiskActionNestedInput
   }
 
   export type RiskActionUncheckedUpdateWithoutRiskInput = {
@@ -39335,6 +39703,7 @@ export namespace Prisma {
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
+    tasks?: TaskUncheckedUpdateManyWithoutRiskActionNestedInput
   }
 
   export type RiskActionUncheckedUpdateManyWithoutRiskInput = {
@@ -39343,6 +39712,74 @@ export namespace Prisma {
     ownerId?: NullableStringFieldUpdateOperationsInput | string | null
     dueDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
+  }
+
+  export type TaskCreateManyRiskActionInput = {
+    id: string
+    milestoneId?: string | null
+    name: string
+    description?: string | null
+    startDate?: Date | string | null
+    endDate?: Date | string | null
+    assignedTo?: string | null
+    progress: number
+    status: $Enums.TaskStatus
+    priority: $Enums.TaskPriority
+    weight?: number
+    predecessorId?: string | null
+  }
+
+  export type TaskUpdateWithoutRiskActionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    progress?: IntFieldUpdateOperationsInput | number
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
+    milestone?: MilestoneUpdateOneWithoutTasksNestedInput
+    assignedUser?: UserUpdateOneWithoutTasksNestedInput
+    predecessor?: TaskUpdateOneWithoutSuccessorNestedInput
+    successor?: TaskUpdateManyWithoutPredecessorNestedInput
+    logs?: TaskLogUpdateManyWithoutTaskNestedInput
+    changeRequests?: ChangeRequestUpdateManyWithoutTaskNestedInput
+    issues?: IssueUpdateManyWithoutTaskNestedInput
+  }
+
+  export type TaskUncheckedUpdateWithoutRiskActionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    progress?: IntFieldUpdateOperationsInput | number
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
+    predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
+    successor?: TaskUncheckedUpdateManyWithoutPredecessorNestedInput
+    logs?: TaskLogUncheckedUpdateManyWithoutTaskNestedInput
+    changeRequests?: ChangeRequestUncheckedUpdateManyWithoutTaskNestedInput
+    issues?: IssueUncheckedUpdateManyWithoutTaskNestedInput
+  }
+
+  export type TaskUncheckedUpdateManyWithoutRiskActionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    milestoneId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    assignedTo?: NullableStringFieldUpdateOperationsInput | string | null
+    progress?: IntFieldUpdateOperationsInput | number
+    status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
+    priority?: EnumTaskPriorityFieldUpdateOperationsInput | $Enums.TaskPriority
+    weight?: IntFieldUpdateOperationsInput | number
+    predecessorId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
 

@@ -8,6 +8,15 @@ export class TaskRepository {
                         project: true
                     }
                 },
+                riskAction: {
+                    include: {
+                        risk: {
+                            include: {
+                                project: true
+                            }
+                        }
+                    }
+                },
                 assignedUser: true,
                 predecessor: true,
                 successor: true,
@@ -24,6 +33,15 @@ export class TaskRepository {
                 milestone: {
                     include: {
                         project: true
+                    }
+                },
+                riskAction: {
+                    include: {
+                        risk: {
+                            include: {
+                                project: true
+                            }
+                        }
                     }
                 },
                 assignedUser: true,
@@ -48,11 +66,37 @@ export class TaskRepository {
             }
         });
     }
+    async findByRiskAction(riskActionId) {
+        return await prisma.task.findMany({
+            where: { riskActionId },
+            include: {
+                assignedUser: true,
+                predecessor: true,
+                successor: true,
+                logs: true,
+                changeRequests: true,
+                issues: true
+            }
+        });
+    }
     async create(data) {
         return await prisma.task.create({
             data,
             include: {
-                milestone: true,
+                milestone: {
+                    include: {
+                        project: true
+                    }
+                },
+                riskAction: {
+                    include: {
+                        risk: {
+                            include: {
+                                project: true
+                            }
+                        }
+                    }
+                },
                 assignedUser: true,
                 predecessor: true,
                 successor: true
@@ -64,7 +108,20 @@ export class TaskRepository {
             where: { id },
             data,
             include: {
-                milestone: true,
+                milestone: {
+                    include: {
+                        project: true
+                    }
+                },
+                riskAction: {
+                    include: {
+                        risk: {
+                            include: {
+                                project: true
+                            }
+                        }
+                    }
+                },
                 assignedUser: true,
                 predecessor: true,
                 successor: true,

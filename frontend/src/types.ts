@@ -86,7 +86,8 @@ export interface Milestone {
 
 export interface Task {
   id: string;
-  milestoneId: string;
+  milestoneId?: string;
+  riskActionId?: string;
   name: string;
   description: string;
   startDate: string;
@@ -94,7 +95,7 @@ export interface Task {
   assignedTo: string;
   progress: number;
   weight: number;
-  status: 'Pending' | 'In Progress' | 'Blocked' | 'Completed';
+  status: 'Pending' | 'In_Progress' | 'Blocked' | 'Completed';
   priority: 'Low' | 'Medium' | 'High';
   predecessorId?: string; // PMBOK: Sequence Activities (Dependencies)
 }

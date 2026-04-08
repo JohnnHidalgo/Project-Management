@@ -200,6 +200,7 @@ exports.Prisma.MilestoneScalarFieldEnum = {
 exports.Prisma.TaskScalarFieldEnum = {
   id: 'id',
   milestoneId: 'milestoneId',
+  riskActionId: 'riskActionId',
   name: 'name',
   description: 'description',
   startDate: 'startDate',

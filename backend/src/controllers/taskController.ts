@@ -42,6 +42,16 @@ export class TaskController {
     }
   }
 
+  async getTasksByRiskAction(req: Request, res: Response) {
+    try {
+      const { riskActionId } = req.params;
+      const tasks = await this.taskService.getTasksByRiskAction(riskActionId);
+      res.json(tasks);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch tasks by risk action' });
+    }
+  }
+
   async createTask(req: Request, res: Response) {
     try {
       const data = req.body;

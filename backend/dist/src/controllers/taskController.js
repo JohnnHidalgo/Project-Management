@@ -38,6 +38,16 @@ export class TaskController {
             res.status(500).json({ error: 'Failed to fetch tasks by milestone' });
         }
     }
+    async getTasksByRiskAction(req, res) {
+        try {
+            const { riskActionId } = req.params;
+            const tasks = await this.taskService.getTasksByRiskAction(riskActionId);
+            res.json(tasks);
+        }
+        catch (error) {
+            res.status(500).json({ error: 'Failed to fetch tasks by risk action' });
+        }
+    }
     async createTask(req, res) {
         try {
             const data = req.body;

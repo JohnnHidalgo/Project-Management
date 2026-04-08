@@ -841,11 +841,13 @@ const PMBOKHealthDashboard = ({ project, milestones, tasks, expenses }: { projec
   );
 };
 
-const RiskRegistry = ({ risks, onAddRisk, onOpenModal, onOpenActionModal, setSelectedRisk }: { 
+const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRiskDetail, setSelectedRisk }: { 
   risks: Risk[], 
+  actions: RiskAction[],
+  tasks: Task[],
   onAddRisk: (r: Partial<Risk>) => void, 
   onOpenModal: () => void,
-  onOpenActionModal: () => void,
+  onOpenRiskDetail: (riskId: string) => void,
   setSelectedRisk: (r: Risk) => void
 }) => {
   const [filterLevel, setFilterLevel] = useState<string | null>(null);
@@ -1017,30 +1019,116 @@ const RiskRegistry = ({ risks, onAddRisk, onOpenModal, onOpenActionModal, setSel
             {filteredRisks.map(r => {
               const score = calculateRiskScore(r.probability, r.impact);
               const owner = mockUsers.find(u => u.id === r.ownerId);
+              const riskActionsForRisk = actions.filter(a => a.riskId === r.id);
+              const completedActions = riskActionsForRisk.filter(a => a.status === 'Completed').length;
+              const totalActions = riskActionsForRisk.length;
+              const actionProgress = totalActions > 0 ? Math.round((completedActions / totalActions) * 100) : 0;
+              
+              // Calcular tareas de las acciones
+              const allTasksForRisk = tasks.filter(t => 
+                riskActionsForRisk.some(a => a.id === t.riskActionId)
+              );
+              const completedTasks = allTasksForRisk.filter(t => t.status === 'Completed').length;
+              const totalTasks = allTasksForRisk.length;
+              
               return (
-                <tr key={r.id}>
+                <tr key={r.id} className="risk-row" style={{ 
+                  borderLeft: `4px solid ${
+                    score === 'Critical' ? 'var(--error)' : 
+                    score === 'High' ? '#ff6b35' : 
+                    score === 'Medium' ? 'var(--warning)' : 
+                    'var(--success)'
+                  }`,
+                  backgroundColor: 'var(--bg-hover)'
+                }}>
                   <td>
-                    <div style={{ fontWeight: 600 }}>{r.description}</div>
-                    <div className="text-muted" style={{ fontSize: '0.7rem' }}>Cat: {r.category} | Estado: {r.status}</div>
-                  </td>
-                  <td>
-                    <div style={{ fontSize: '0.8rem' }}>
-                      P: {r.probability.toFixed(1)} <br/> I: {r.impact.toFixed(1)}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                      <div className={`dot dot-${score.toLowerCase()}`} style={{ width: '12px', height: '12px', marginTop: '2px' }}></div>
+                      <div>
+                        <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{r.description}</div>
+                        <div className="text-muted" style={{ fontSize: '0.7rem' }}>
+                          Cat: {r.category} | Estado: {r.status}
+                        </div>
+                        {totalActions > 0 && (
+                          <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                              Acciones: {completedActions}/{totalActions}
+                            </div>
+                            <div className="progress-bar-container" style={{ flex: 1, height: '4px', maxWidth: '80px' }}>
+                              <div 
+                                className="progress-bar" 
+                                style={{ 
+                                  width: `${actionProgress}%`,
+                                  backgroundColor: actionProgress === 100 ? 'var(--success)' : 'var(--accent)',
+                                  height: '100%',
+                                  borderRadius: '2px'
+                                }}
+                              ></div>
+                            </div>
+                            <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>{actionProgress}%</span>
+                          </div>
+                        )}
+                        {totalTasks > 0 && (
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                            Tareas: {completedTasks}/{totalTasks}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </td>
-                  <td><span className={`badge badge-${score.toLowerCase()}`}>{score}</span></td>
-                  <td><span className="badge badge-secondary">{r.strategy}</span></td>
-                  <td>{owner?.name}</td>
                   <td>
-                    <button 
-                      className="btn btn-secondary btn-xs" 
-                      onClick={() => {
-                        setSelectedRisk(r);
-                        onOpenActionModal();
-                      }}
-                    >
-                      Plan de Acción
-                    </button>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                        P: <span style={{ color: r.probability > 0.6 ? 'var(--error)' : r.probability >= 0.4 ? 'var(--warning)' : 'var(--success)' }}>
+                          {r.probability.toFixed(1)}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                        I: <span style={{ color: r.impact > 0.6 ? 'var(--error)' : r.impact >= 0.4 ? 'var(--warning)' : 'var(--success)' }}>
+                          {r.impact.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`badge badge-${score.toLowerCase()}`} style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+                      {score}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="badge badge-secondary" style={{ fontSize: '0.7rem' }}>
+                      {r.strategy}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ 
+                        width: '8px', 
+                        height: '8px', 
+                        borderRadius: '50%', 
+                        backgroundColor: owner ? 'var(--success)' : 'var(--error)' 
+                      }}></div>
+                      {owner?.name || 'Sin asignar'}
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '0.25rem' }}>
+                      <button 
+                        className="btn btn-primary btn-xs" 
+                        onClick={() => {
+                          setSelectedRisk(r);
+                          onOpenRiskDetail(r.id);
+                        }}
+                        style={{ fontSize: '0.7rem', padding: '0.25rem 0.5rem' }}
+                      >
+                        Ver Detalles
+                      </button>
+                      {totalActions > 0 && (
+                        <span className="badge badge-info" style={{ fontSize: '0.6rem', padding: '0.2rem 0.4rem' }}>
+                          {totalActions}
+                        </span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -1061,21 +1149,66 @@ const RiskActionModal = ({
   risk, 
   actions, 
   onAddAction,
-  onUpdateActionStatus 
+  onUpdateActionStatus,
+  tasks,
+  onAddTask,
+  onUpdateTask,
+  onAddTaskLog,
+  currentUser,
+  onOpenTaskLog,
+  onEditTaskWeights
 }: { 
   isOpen: boolean, 
   onClose: () => void, 
   risk: Risk | null, 
   actions: RiskAction[], 
   onAddAction: (a: Partial<RiskAction>) => void,
-  onUpdateActionStatus: (id: string, status: RiskAction['status']) => void
+  onUpdateActionStatus: (id: string, status: RiskAction['status']) => void,
+  tasks: Task[],
+  onAddTask: (riskActionId: string, task: Partial<Task>) => void,
+  onUpdateTask: (id: string, updates: Partial<Task>) => void,
+  onAddTaskLog: (log: Partial<TaskLog>) => void,
+  currentUser: User,
+  onOpenTaskLog: (task: Task) => void,
+  onEditTaskWeights: (riskActionId: string) => void
 }) => {
+  const [showTaskForm, setShowTaskForm] = useState<string | null>(null);
+
   if (!risk) return null;
 
   const riskActions = actions.filter(a => a.riskId === risk.id);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Plan de Acción: ${risk.description.substring(0, 30)}...`}>
+    <Modal isOpen={isOpen} onClose={onClose} title={`Plan de Acción: ${risk.description.substring(0, 40)}...`}>
+      {/* Resumen del Riesgo */}
+      <div style={{ 
+        backgroundColor: '#f0f9ff', 
+        border: '1px solid #bae6fd', 
+        borderRadius: '8px', 
+        padding: '1rem', 
+        marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem'
+      }}>
+        <div style={{ flex: 1 }}>
+          <h5 style={{ fontSize: '0.9rem', margin: '0 0 0.5rem 0', color: 'var(--primary)' }}>
+            📊 Información del Riesgo
+          </h5>
+          <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <span>🎯 Probabilidad: <strong>{risk.probability.toFixed(1)}</strong></span>
+            <span>💥 Impacto: <strong>{risk.impact.toFixed(1)}</strong></span>
+            <span>📈 Severidad: <strong style={{ color: calculateRiskScore(risk.probability, risk.impact) === 'Critical' ? 'var(--error)' : calculateRiskScore(risk.probability, risk.impact) === 'High' ? '#ff6b35' : 'var(--warning)' }}>
+              {calculateRiskScore(risk.probability, risk.impact)}
+            </strong></span>
+            <span>🛡️ Estrategia: <strong>{risk.strategy}</strong></span>
+          </div>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Categoría</div>
+          <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{risk.category}</div>
+        </div>
+      </div>
       <form onSubmit={(e) => {
         e.preventDefault();
         const target = e.target as any;
@@ -1108,28 +1241,257 @@ const RiskActionModal = ({
       </form>
 
       <div className="action-list">
-        <h4 style={{ marginBottom: '1rem', fontSize: '0.875rem' }}>Acciones Registradas</h4>
-        {riskActions.length > 0 ? riskActions.map(action => (
-          <div key={action.id} className="card" style={{ padding: '1rem', marginBottom: '0.75rem', borderLeft: `4px solid ${action.status === 'Completed' ? 'var(--success)' : (action.status === 'In Progress' ? 'var(--accent)' : 'var(--warning)')}` }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <p style={{ fontWeight: 600, fontSize: '0.875rem', margin: 0 }}>{action.description}</p>
-                <p className="text-muted" style={{ fontSize: '0.75rem', margin: '0.25rem 0' }}>
-                  Resp: {mockUsers.find(u => u.id === action.ownerId)?.name} | Vence: {action.dueDate}
-                </p>
-              </div>
-              <select 
-                value={action.status} 
-                onChange={(e) => onUpdateActionStatus(action.id, e.target.value as any)}
-                style={{ fontSize: '0.7rem', padding: '2px' }}
-              >
-                <option value="Pending">Pendiente</option>
-                <option value="In Progress">En Curso</option>
-                <option value="Completed">Listo</option>
-              </select>
-            </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h4 style={{ fontSize: '0.875rem', margin: 0 }}>Acciones Registradas ({riskActions.length})</h4>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              Completadas: {riskActions.filter(a => a.status === 'Completed').length}
+            </span>
           </div>
-        )) : <p className="text-muted" style={{ textAlign: 'center', fontSize: '0.875rem' }}>No hay acciones definidas.</p>}
+        </div>
+        
+        {riskActions.length > 0 ? riskActions.map(action => {
+          const actionTasks = tasks.filter(t => t.riskActionId === action.id);
+          const completedTasks = actionTasks.filter(t => t.status === 'Completed').length;
+          const inProgressTasks = actionTasks.filter(t => t.status === 'In_Progress').length;
+          const blockedTasks = actionTasks.filter(t => t.status === 'Blocked').length;
+          const totalTaskWeight = actionTasks.reduce((sum, t) => sum + t.weight, 0);
+          const completedWeight = actionTasks.filter(t => t.status === 'Completed').reduce((sum, t) => sum + t.weight, 0);
+          const progressPercentage = totalTaskWeight > 0 ? Math.round((completedWeight / totalTaskWeight) * 100) : 0;
+          
+          const isOverdue = new Date(action.dueDate) < new Date() && action.status !== 'Completed';
+          
+          return (
+            <div key={action.id} className="action-card" style={{ 
+              border: '1px solid var(--border)', 
+              borderRadius: '8px', 
+              padding: '1rem', 
+              marginBottom: '1rem',
+              backgroundColor: 'var(--bg-card)',
+              borderLeft: `4px solid ${
+                action.status === 'Completed' ? 'var(--success)' : 
+                action.status === 'In Progress' ? 'var(--accent)' : 
+                isOverdue ? 'var(--error)' : 'var(--warning)'
+              }`,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                    <h5 style={{ fontSize: '0.9rem', fontWeight: 600, margin: 0 }}>{action.description}</h5>
+                    {isOverdue && <span className="badge badge-error" style={{ fontSize: '0.6rem' }}>Vencida</span>}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <span>👤 {mockUsers.find(u => u.id === action.ownerId)?.name}</span>
+                    <span>📅 {new Date(action.dueDate).toLocaleDateString('es-ES')}</span>
+                    <span className={`badge badge-${action.status === 'Completed' ? 'success' : action.status === 'In Progress' ? 'accent' : 'warning'}`} 
+                          style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem' }}>
+                      {action.status === 'Completed' ? 'Completada' : action.status === 'In Progress' ? 'En Curso' : 'Pendiente'}
+                    </span>
+                  </div>
+                </div>
+                <select
+                  value={action.status} 
+                  onChange={(e) => onUpdateActionStatus(action.id, e.target.value as any)}
+                  style={{ fontSize: '0.7rem', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border)' }}
+                >
+                  <option value="Pending">Pendiente</option>
+                  <option value="In Progress">En Curso</option>
+                  <option value="Completed">Completada</option>
+                </select>
+              </div>
+
+              {actionTasks.length > 0 && (
+                <div style={{ marginBottom: '0.75rem', padding: '0.75rem', backgroundColor: '#f8fafc', borderRadius: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                      Progreso de Tareas ({completedTasks}/{actionTasks.length})
+                    </span>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{progressPercentage}%</span>
+                  </div>
+                  <div className="progress-bar-container" style={{ height: '6px', marginBottom: '0.5rem' }}>
+                    <div 
+                      className="progress-bar" 
+                      style={{ 
+                        width: `${progressPercentage}%`,
+                        backgroundColor: progressPercentage === 100 ? 'var(--success)' : 'var(--accent)',
+                        height: '100%',
+                        borderRadius: '3px',
+                        transition: 'width 0.3s ease'
+                      }}
+                    ></div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '1rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                    <span>✅ {completedTasks} completadas</span>
+                    <span>🔄 {inProgressTasks} en curso</span>
+                    {blockedTasks > 0 && <span>🚫 {blockedTasks} bloqueadas</span>}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button 
+                  className="btn btn-secondary btn-xs" 
+                  onClick={() => setShowTaskForm(showTaskForm === action.id ? null : action.id)}
+                  style={{ fontSize: '0.7rem' }}
+                >
+                  + Tarea
+                </button>
+                {actionTasks.length > 0 && (
+                  <button 
+                    className="btn btn-outline btn-xs" 
+                    onClick={() => onEditTaskWeights(action.id)}
+                    style={{ fontSize: '0.7rem' }}
+                  >
+                    Editar Pesos
+                  </button>
+                )}
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                  {actionTasks.length} tarea{actionTasks.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+
+              {showTaskForm === action.id && (
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const target = e.target as any;
+                  onAddTask(action.id, {
+                    name: target.name.value,
+                    description: target.description.value,
+                    assignedTo: target.assignedTo.value,
+                    startDate: target.startDate.value,
+                    endDate: target.endDate.value,
+                    priority: target.priority.value,
+                    weight: Number(target.weight.value) || 25,
+                  });
+                  target.reset();
+                  setShowTaskForm(null);
+                }} style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                  <h6 style={{ fontSize: '0.8rem', marginBottom: '0.75rem', fontWeight: 600 }}>Nueva Tarea</h6>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.75rem' }}>Nombre</label>
+                      <input name="name" type="text" required placeholder="Ej: Revisar documentación..." style={{ fontSize: '0.8rem' }} />
+                    </div>
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.75rem' }}>Asignado a</label>
+                      <select name="assignedTo" required style={{ fontSize: '0.8rem' }}>
+                        {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.75rem' }}>Fecha Inicio</label>
+                      <input name="startDate" type="date" style={{ fontSize: '0.8rem' }} />
+                    </div>
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.75rem' }}>Fecha Fin</label>
+                      <input name="endDate" type="date" style={{ fontSize: '0.8rem' }} />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.75rem' }}>Prioridad</label>
+                      <select name="priority" style={{ fontSize: '0.8rem' }}>
+                        <option value="Low">Baja</option>
+                        <option value="Medium">Media</option>
+                        <option value="High">Alta</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.75rem' }}>Peso (%)</label>
+                      <input name="weight" type="number" min="1" max="100" defaultValue="25" placeholder="25" style={{ fontSize: '0.8rem' }} />
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group" style={{ flex: 1 }}>
+                      <label style={{ fontSize: '0.75rem' }}>Descripción</label>
+                      <textarea name="description" placeholder="Detalles de la tarea..." style={{ fontSize: '0.8rem', minHeight: '60px' }} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                    <button type="submit" className="btn btn-primary btn-sm" style={{ fontSize: '0.75rem' }}>Agregar Tarea</button>
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowTaskForm(null)} style={{ fontSize: '0.75rem' }}>Cancelar</button>
+                  </div>
+                </form>
+              )}
+
+              {actionTasks.length > 0 && (
+                <div style={{ marginTop: '1rem' }}>
+                  <h6 style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.5rem', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                    Tareas ({actionTasks.length})
+                  </h6>
+                  <div style={{ display: 'grid', gap: '0.5rem' }}>
+                    {actionTasks.map(task => (
+                      <div key={task.id} className="task-item" style={{ 
+                        padding: '0.75rem', 
+                        backgroundColor: '#f8fafc', 
+                        borderRadius: '6px', 
+                        borderLeft: `3px solid ${
+                          task.status === 'Completed' ? 'var(--success)' : 
+                          task.status === 'In_Progress' ? 'var(--accent)' : 
+                          task.status === 'Blocked' ? 'var(--error)' : 'var(--warning)'
+                        }`,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                            <span style={{ fontWeight: 600, fontSize: '0.8rem' }}>{task.name}</span>
+                            <span className={`badge badge-${task.priority.toLowerCase()}`} style={{ fontSize: '0.6rem', padding: '0.15rem 0.3rem' }}>
+                              {task.priority === 'High' ? '🔴' : task.priority === 'Medium' ? '🟡' : '🟢'}
+                            </span>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                              {task.weight}%
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            <span>👤 {mockUsers.find(u => u.id === task.assignedTo)?.name}</span>
+                            {task.startDate && <span>📅 {new Date(task.startDate).toLocaleDateString('es-ES')}</span>}
+                            <span className={`badge badge-${task.status === 'Completed' ? 'success' : task.status === 'In_Progress' ? 'accent' : task.status === 'Blocked' ? 'error' : 'warning'}`} 
+                                  style={{ fontSize: '0.6rem', padding: '0.15rem 0.3rem' }}>
+                              {task.status === 'Completed' ? '✅' : task.status === 'In_Progress' ? '🔄' : task.status === 'Blocked' ? '🚫' : '⏳'}
+                            </span>
+                          </div>
+                          {task.description && (
+                            <p style={{ fontSize: '0.75rem', margin: '0.25rem 0 0 0', color: 'var(--text-muted)' }}>{task.description}</p>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                          <button 
+                            className="btn btn-secondary btn-xs" 
+                            onClick={() => onOpenTaskLog(task)}
+                            style={{ fontSize: '0.7rem', padding: '0.2rem 0.4rem' }}
+                          >
+                            📝 Log
+                          </button>
+                          <select 
+                            value={task.status} 
+                            onChange={(e) => onUpdateTask(task.id, { status: e.target.value as Task['status'] })}
+                            style={{ fontSize: '0.65rem', padding: '0.2rem', borderRadius: '3px', border: '1px solid var(--border)' }}
+                          >
+                            <option value="Pending">⏳ Pendiente</option>
+                            <option value="In_Progress">🔄 En Curso</option>
+                            <option value="Blocked">🚫 Bloqueada</option>
+                            <option value="Completed">✅ Completada</option>
+                          </select>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }) : (
+          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+            <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📋</div>
+            <p>No hay acciones definidas para este riesgo.</p>
+            <p style={{ fontSize: '0.8rem' }}>Agregue acciones de tratamiento para mitigar el riesgo.</p>
+          </div>
+        )}
       </div>
     </Modal>
   );
@@ -1727,7 +2089,7 @@ const ProjectDetail = ({
   snapshots, onAddSnapshot, risks, onAddRisk, stakeholders, onAddStakeholder,
   taskLogs, onAddTaskLog, changeRequests, onChangeRequest,
   projectHistory,
-  riskActions, onAddRiskAction, onUpdateRiskActionStatus, onProcessCR
+  riskActions, onAddRiskAction, onUpdateRiskActionStatus, onProcessCR, onAddTaskToRiskAction
 }: { 
   projects: Project[], 
   currentUser: User,
@@ -1758,17 +2120,20 @@ const ProjectDetail = ({
   onAddTaskLog: (log: Partial<TaskLog>) => void,
   changeRequests: ChangeRequest[],
   onChangeRequest: (cr: Partial<ChangeRequest>) => void,
-  onProcessCR: (id: string, status: 'Approved' | 'Rejected') => void
+  onProcessCR: (id: string, status: 'Approved' | 'Rejected') => void,
+  onAddTaskToRiskAction: (riskActionId: string, taskData: Partial<Task>) => void
 }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const project = projects.find(p => p.id === id);
   const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'sppm' | 'costs' | 'risks' | 'stakeholders' | 'gantt'>('overview');
   const [scheduleView, setScheduleView] = useState<'gantt' | 'calendar'>('gantt');
-  const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | 'rejection' | 'editWeights' | 'editTaskWeights' | null>(null);
+  const [activeModal, setActiveModal] = useState<'milestone' | 'task' | 'expense' | 'budgetLine' | 'risk' | 'taskHistory' | 'changeRequest' | 'stakeholder' | 'riskAction' | 'rejection' | 'editWeights' | 'editTaskWeights' | 'editRiskActionTaskWeights' | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null);
   const [selectedMilestoneId, setSelectedMilestoneId] = useState<string | null>(null);
   const [editTaskWeightsMilestoneId, setEditTaskWeightsMilestoneId] = useState<string | null>(null);
+  const [editTaskWeightsRiskActionId, setEditTaskWeightsRiskActionId] = useState<string | null>(null);
   const [taskWeightsDraft, setTaskWeightsDraft] = useState<Record<string, number>>({});
   const [rejectionComment, setRejectionComment] = useState('');
   
@@ -1779,6 +2144,12 @@ const ProjectDetail = ({
   const editTaskWeightsMilestone = projectMilestones.find(m => m.id === editTaskWeightsMilestoneId);
   const editTaskWeightsTasks = projectTasks.filter(t => t.milestoneId === editTaskWeightsMilestoneId);
   const editTaskWeightTotal = editTaskWeightsTasks.reduce((sum, t) => sum + (taskWeightsDraft[t.id] ?? t.weight), 0);
+  
+  const riskActionTasks = (tasks || []).filter(t => t.riskActionId);
+  const editTaskWeightsRiskAction = riskActions.find(ra => ra.id === editTaskWeightsRiskActionId);
+  const editTaskWeightsRiskActionTasks = riskActionTasks.filter(t => t.riskActionId === editTaskWeightsRiskActionId);
+  const editRiskActionTaskWeightTotal = editTaskWeightsRiskActionTasks.reduce((sum, t) => sum + (taskWeightsDraft[t.id] ?? t.weight), 0);
+  
   const projectExpenses = (expenses || []).filter(e => e.projectId === id);
   const projectRisks = (risks || []).filter(r => r.projectId === id);
   const projectStakeholders = (stakeholders || []).filter(s => s.projectId === id);
@@ -1831,6 +2202,44 @@ const ProjectDetail = ({
       }
       setActiveModal(null);
       setEditTaskWeightsMilestoneId(null);
+      setTaskWeightsDraft({});
+      alert('Pesos de tareas guardados correctamente.');
+    } catch (error) {
+      console.error('Error al guardar los pesos de tareas:', error);
+      alert('No se pudo guardar los pesos de tareas. Intente de nuevo.');
+    }
+  };
+
+  const handleSaveRiskActionTaskWeights = async () => {
+    if (!editTaskWeightsRiskActionId) return;
+
+    if (editRiskActionTaskWeightTotal !== 100) {
+      alert('La suma de pesos debe ser exactamente 100% antes de guardar.');
+      return;
+    }
+
+    const taskUpdates = editTaskWeightsRiskActionTasks
+      .map(task => {
+        const newWeight = taskWeightsDraft[task.id] ?? task.weight;
+        if (newWeight !== task.weight) return { id: task.id, weight: newWeight };
+        return null;
+      })
+      .filter((x): x is { id: string; weight: number } => x !== null);
+
+    if (taskUpdates.length === 0) {
+      setActiveModal(null);
+      setEditTaskWeightsRiskActionId(null);
+      setTaskWeightsDraft({});
+      alert('No se detectaron cambios en los pesos de las tareas.');
+      return;
+    }
+
+    try {
+      for (const update of taskUpdates) {
+        await onUpdateTask(update.id, { weight: update.weight });
+      }
+      setActiveModal(null);
+      setEditTaskWeightsRiskActionId(null);
       setTaskWeightsDraft({});
       alert('Pesos de tareas guardados correctamente.');
     } catch (error) {
@@ -2493,9 +2902,11 @@ const ProjectDetail = ({
       {activeTab === 'risks' && (
         <RiskRegistry 
           risks={projectRisks} 
+          actions={riskActions}
+          tasks={tasks}
           onAddRisk={(r) => onAddRisk(project.id, r)} 
           onOpenModal={() => setActiveModal('risk')} 
-          onOpenActionModal={() => setActiveModal('riskAction')}
+          onOpenRiskDetail={(riskId) => navigate(`/projects/${project.id}/risks/${riskId}`)}
           setSelectedRisk={setSelectedRisk}
         />
       )}
@@ -2837,14 +3248,7 @@ const ProjectDetail = ({
         </form>
       </Modal>
 
-      <RiskActionModal 
-        isOpen={activeModal === 'riskAction'} 
-        onClose={() => setActiveModal(null)} 
-        risk={selectedRisk} 
-        actions={riskActions} 
-        onAddAction={onAddRiskAction} 
-        onUpdateActionStatus={onUpdateRiskActionStatus} 
-      />
+
 
       <Modal
         isOpen={activeModal === 'editWeights'}
@@ -2920,6 +3324,43 @@ const ProjectDetail = ({
         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
           <button className="btn btn-secondary" onClick={() => { setActiveModal(null); setEditTaskWeightsMilestoneId(null); }}>Cancelar</button>
           <button className="btn btn-primary" disabled={editTaskWeightTotal !== 100} onClick={handleSaveTaskWeights}>Guardar Cambios</button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={activeModal === 'editRiskActionTaskWeights'}
+        onClose={() => { setActiveModal(null); setEditTaskWeightsRiskActionId(null); }}
+        title={`Editar Pesos de Tareas - Acción: ${editTaskWeightsRiskAction?.description || ''}`}
+      >
+        <div style={{ marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Ajuste los pesos de las tareas para que la suma sea exactamente 100%.</p>
+          <div style={{ display: 'grid', gap: '0.75rem', maxHeight: '400px', overflowY: 'auto' }}>
+            {editTaskWeightsRiskActionTasks.map(task => (
+              <div key={task.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+                <div>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>{task.name}</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={taskWeightsDraft[task.id] ?? task.weight}
+                    onChange={(e) => setTaskWeightsDraft(prev => ({ ...prev, [task.id]: Number(e.target.value) }))}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }}
+                  />
+                </div>
+                <div style={{ textAlign: 'right', paddingTop: '1.5rem' }}>
+                  <span style={{ fontWeight: 700 }}>{taskWeightsDraft[task.id] ?? task.weight}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f0fdf4', borderRadius: '4px', border: '1px solid #86efac' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: editRiskActionTaskWeightTotal === 100 ? '#22c55e' : '#ef4444' }}>Total: {editRiskActionTaskWeightTotal}%</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <button className="btn btn-secondary" onClick={() => { setActiveModal(null); setEditTaskWeightsRiskActionId(null); }}>Cancelar</button>
+          <button className="btn btn-primary" disabled={editRiskActionTaskWeightTotal !== 100} onClick={handleSaveRiskActionTaskWeights}>Guardar Cambios</button>
         </div>
       </Modal>
 
@@ -3122,6 +3563,452 @@ const MyTasksView = ({ tasks, milestones, projects, currentUser, onUpdateTask }:
   );
 };
 
+// --- Risk Detail Page Component ---
+
+const RiskDetail = ({ 
+  projects, 
+  risks, 
+  riskActions, 
+  tasks, 
+  currentUser, 
+  onAddRiskAction, 
+  onUpdateRiskActionStatus, 
+  onAddTaskToRiskAction, 
+  onUpdateTask, 
+  onDeleteTask,
+  onAddTaskLog,
+  taskLogs,
+  changeRequests
+}: {
+  projects: Project[];
+  risks: Risk[];
+  riskActions: RiskAction[];
+  tasks: Task[];
+  currentUser: User;
+  onAddRiskAction: (action: Partial<RiskAction>) => void;
+  onUpdateRiskActionStatus: (id: string, status: RiskAction['status']) => void;
+  onAddTaskToRiskAction: (task: Partial<Task>, onWeightExceeds?: (riskActionId: string, tasks: Task[]) => void) => Promise<void>;
+  onUpdateTask: (id: string, updates: Partial<Task>, fromLog?: boolean, onWeightExceeds?: (riskActionId: string, tasks: Task[]) => void) => Promise<void>;
+  onDeleteTask: (id: string) => Promise<void>;
+  onAddTaskLog: (log: Partial<TaskLog>) => void;
+  taskLogs: TaskLog[];
+  changeRequests: ChangeRequest[];
+}) => {
+  const { id: projectId, riskId } = useParams<{ id: string; riskId: string }>();
+  const navigate = useNavigate();
+  
+  const project = projects.find(p => p.id === projectId);
+  const risk = risks.find(r => r.id === riskId);
+  
+  if (!project || !risk) {
+    return <div className="page-container"><h2>Riesgo no encontrado</h2></div>;
+  }
+
+  const actions = riskActions.filter(a => a.riskId === risk.id);
+  const allTasks = tasks.filter(t => actions.some(a => a.id === t.riskActionId));
+  
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [editTaskWeightsRiskActionId, setEditTaskWeightsRiskActionId] = useState<string | null>(null);
+  const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
+  const [editingWeights, setEditingWeights] = useState<Record<string, number>>({});
+
+  const handleUpdateTaskWrapper = async (id: string, updates: Partial<Task>, fromLog: boolean = false) => {
+    await onUpdateTask(id, updates, fromLog, (riskActionId: string, actionTasks: Task[]) => {
+      // Initialize editing weights with current values
+      const weights: Record<string, number> = {};
+      actionTasks.forEach(t => weights[t.id] = t.weight);
+      setEditingWeights(weights);
+      setEditTaskWeightsRiskActionId(riskActionId);
+      setActiveModal('editRiskActionTaskWeights');
+    });
+  };
+
+  const totalWeight = actions.reduce((sum, a) => {
+    const actionTasks = allTasks.filter(t => t.riskActionId === a.id);
+    return sum + actionTasks.reduce((taskSum, t) => taskSum + (editingWeights[t.id] ?? t.weight), 0);
+  }, 0);
+
+  return (
+    <div className="page-container">
+      <div className="page-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button 
+            className="btn btn-secondary" 
+            onClick={() => navigate(`/projects/${projectId}`)}
+            style={{ padding: '0.5rem' }}
+          >
+            ← Volver al Proyecto
+          </button>
+          <div>
+            <h1>Detalles del Riesgo</h1>
+            <p className="text-muted">{project.name} • {risk.description}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: '2rem' }}>
+        <div className="section-header">
+          <h3>Información del Riesgo</h3>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DESCRIPCIÓN</label>
+            <p>{risk.description}</p>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>CATEGORÍA</label>
+            <p>{risk.category}</p>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>ESTRATEGIA</label>
+            <p>{risk.strategy}</p>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>ESTADO</label>
+            <span className={`badge badge-${risk.status === 'Open' ? 'warning' : 'success'}`}>{risk.status}</span>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>PROBABILIDAD</label>
+            <p style={{ fontWeight: 600, color: risk.probability > 0.6 ? 'var(--error)' : risk.probability >= 0.4 ? 'var(--warning)' : 'var(--success)' }}>
+              {risk.probability.toFixed(1)}
+            </p>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>IMPACTO</label>
+            <p style={{ fontWeight: 600, color: risk.impact > 0.6 ? 'var(--error)' : risk.impact >= 0.4 ? 'var(--warning)' : 'var(--success)' }}>
+              {risk.impact.toFixed(1)}
+            </p>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>PUNTAJE</label>
+            <span className={`badge badge-${calculateRiskScore(risk.probability, risk.impact).toLowerCase()}`}>
+              {calculateRiskScore(risk.probability, risk.impact)}
+            </span>
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DUEÑO</label>
+            <p>{mockUsers.find(u => u.id === risk.ownerId)?.name || 'Sin asignar'}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="section-header">
+          <div>
+            <h3>Planes de Acción</h3>
+            <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>Total acciones: {actions.length} • Peso total: {totalWeight}%</p>
+          </div>
+          <button className="btn btn-primary" onClick={() => setActiveModal('addAction')}>
+            + Agregar Plan de Acción
+          </button>
+        </div>
+
+        {actions.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+            <h4>No hay planes de acción</h4>
+            <p>Agregue un plan de acción para mitigar este riesgo.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {actions.map(action => {
+              const actionTasks = allTasks.filter(t => t.riskActionId === action.id);
+              const completedTasks = actionTasks.filter(t => t.status === 'Completed').length;
+              const totalActionWeight = actionTasks.reduce((sum, t) => sum + t.weight, 0);
+              const completedWeight = actionTasks.filter(t => t.status === 'Completed').reduce((sum, t) => sum + t.weight, 0);
+              const progress = totalActionWeight > 0 ? Math.round((completedWeight / totalActionWeight) * 100) : 0;
+
+              return (
+                <div key={action.id} className="card" style={{ border: '1px solid var(--border)', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: '0 0 0.5rem 0' }}>{action.description}</h4>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                        <span>Dueño: {mockUsers.find(u => u.id === action.ownerId)?.name || 'Sin asignar'}</span>
+                        <span>Fecha límite: {new Date(action.dueDate).toLocaleDateString()}</span>
+                        <span className={`badge badge-${action.status === 'Completed' ? 'success' : action.status === 'In Progress' ? 'warning' : 'secondary'}`}>
+                          {action.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ marginBottom: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Progreso: {progress}%</span>
+                      <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                        Tareas: {completedTasks}/{actionTasks.length} • Peso: {totalActionWeight}%
+                      </span>
+                    </div>
+                    <div className="progress-bar-container" style={{ height: '8px' }}>
+                      <div 
+                        className="progress-bar" 
+                        style={{ 
+                          width: `${progress}%`,
+                          backgroundColor: progress === 100 ? 'var(--success)' : 'var(--accent)',
+                          height: '100%',
+                          borderRadius: '4px'
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                      <h5>Tareas del Plan</h5>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        {totalActionWeight > 100 && (
+                          <button 
+                            className="btn btn-warning btn-sm" 
+                            onClick={() => {
+                              // Initialize editing weights with current values
+                              const weights: Record<string, number> = {};
+                              actionTasks.forEach(t => weights[t.id] = t.weight);
+                              setEditingWeights(weights);
+                              setEditTaskWeightsRiskActionId(action.id);
+                              setActiveModal('editRiskActionTaskWeights');
+                            }}
+                            style={{ fontSize: '0.75rem' }}
+                          >
+                            ⚠️ Editar Pesos ({totalActionWeight}%)
+                          </button>
+                        )}
+                        <button 
+                          className="btn btn-primary btn-sm" 
+                          onClick={() => {
+                            setSelectedActionId(action.id);
+                            setActiveModal('addTask');
+                          }}
+                          style={{ fontSize: '0.75rem' }}
+                        >
+                          + Agregar Tarea
+                        </button>
+                      </div>
+                    </div>
+
+                    {actionTasks.length === 0 ? (
+                      <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                        No hay tareas asignadas a este plan de acción.
+                      </p>
+                    ) : (
+                      <div style={{ display: 'grid', gap: '0.75rem' }}>
+                        {actionTasks.map(task => (
+                          <div key={task.id} style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'space-between',
+                            padding: '0.75rem',
+                            border: '1px solid var(--border)',
+                            borderRadius: '6px',
+                            backgroundColor: 'var(--bg-hover)'
+                          }}>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <span style={{ fontWeight: 600, textDecoration: task.status === 'Completed' ? 'line-through' : 'none' }}>
+                                  {task.name}
+                                </span>
+                                <span className={`badge badge-${task.status === 'Completed' ? 'success' : task.status === 'In_Progress' ? 'warning' : 'secondary'}`} style={{ fontSize: '0.7rem' }}>
+                                  {task.status}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                                Peso: {task.weight}% • Dueño: {mockUsers.find(u => u.id === task.assignedTo)?.name || 'Sin asignar'}
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.25rem' }}>
+                              <button 
+                                className="btn btn-danger btn-xs" 
+                                onClick={() => onDeleteTask(task.id)}
+                              >
+                                Eliminar
+                              </button>
+                              <button 
+                                className="btn btn-secondary btn-xs" 
+                                onClick={() => { setSelectedTask(task); setActiveModal('taskHistory'); }}
+                              >
+                                Historial
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
+      <Modal 
+        isOpen={activeModal === 'addAction'} 
+        onClose={() => setActiveModal(null)}
+        title="Agregar Plan de Acción"
+      >
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          const target = e.target as any;
+          onAddRiskAction({
+            riskId: risk.id,
+            description: target.description.value,
+            ownerId: target.ownerId.value,
+            dueDate: target.dueDate.value,
+            status: 'Pending'
+          });
+          setActiveModal(null);
+        }}>
+          <div className="form-group">
+            <label>Descripción del Plan</label>
+            <textarea name="description" required placeholder="Describa el plan de acción para mitigar el riesgo..." />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Dueño</label>
+              <select name="ownerId" required>
+                <option value="">Seleccione...</option>
+                {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Fecha Límite</label>
+              <input name="dueDate" type="date" required />
+            </div>
+          </div>
+          <button type="submit" className="btn btn-primary btn-block">Crear Plan de Acción</button>
+        </form>
+      </Modal>
+
+      <Modal 
+        isOpen={activeModal === 'addTask'} 
+        onClose={() => {
+          setActiveModal(null);
+          setSelectedActionId(null);
+        }}
+        title="Agregar Tarea al Plan de Acción"
+      >
+        <form onSubmit={async (e) => {
+          e.preventDefault();
+          const target = e.target as any;
+          await onAddTaskToRiskAction({
+            riskActionId: selectedActionId!,
+            name: target.name.value,
+            description: target.description.value,
+            assignedTo: target.assignedTo.value,
+            endDate: target.dueDate.value,
+            weight: Number(target.weight.value),
+            status: 'Pending'
+          }, (riskActionId: string, actionTasks: Task[]) => {
+            // Initialize editing weights with current values
+            const weights: Record<string, number> = {};
+            actionTasks.forEach(t => weights[t.id] = t.weight);
+            setEditingWeights(weights);
+            setEditTaskWeightsRiskActionId(riskActionId);
+            setActiveModal('editRiskActionTaskWeights');
+          });
+          setActiveModal(null);
+          setSelectedActionId(null);
+        }}>
+          <div className="form-group">
+            <label>Nombre de la Tarea</label>
+            <input name="name" type="text" required placeholder="Nombre descriptivo de la tarea" />
+          </div>
+          <div className="form-group">
+            <label>Descripción</label>
+            <textarea name="description" required placeholder="Detalles de la tarea..." />
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Asignado a</label>
+              <select name="assignedTo" required>
+                <option value="">Seleccione...</option>
+                {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Fecha Límite</label>
+              <input name="dueDate" type="date" required />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Peso (%)</label>
+            <input name="weight" type="number" min="1" max="100" required defaultValue="10" />
+          </div>
+          <button type="submit" className="btn btn-primary btn-block">Crear Tarea</button>
+        </form>
+      </Modal>
+
+      <TaskHistoryModal 
+        isOpen={activeModal === 'taskHistory'}
+        onClose={() => setActiveModal(null)}
+        task={selectedTask}
+        logs={taskLogs.filter(log => log.taskId === selectedTask?.id)}
+        onAddLog={onAddTaskLog}
+        currentUser={currentUser}
+        changeRequests={changeRequests}
+      />
+
+      <Modal
+        isOpen={activeModal === 'editRiskActionTaskWeights'}
+        onClose={() => {
+          setActiveModal(null);
+          setEditingWeights({});
+        }}
+        title="Editar Pesos de Tareas del Plan de Acción"
+      >
+        <div style={{ marginBottom: '1rem' }}>
+          <p style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>Ajuste los pesos de las tareas para que la suma sea como máximo 100%.</p>
+          <div style={{ display: 'grid', gap: '0.75rem', maxHeight: '400px', overflowY: 'auto' }}>
+            {editTaskWeightsRiskActionId && allTasks.filter(t => t.riskActionId === editTaskWeightsRiskActionId).map(t => (
+              <div key={t.id} style={{ display: 'grid', gridTemplateColumns: '1fr 80px', gap: '0.5rem', alignItems: 'center', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
+                <div>
+                  <label style={{ fontSize: '0.875rem', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>{t.name}</label>
+                  <input 
+                    type="number" 
+                    min="1" 
+                    max="100" 
+                    value={editingWeights[t.id] ?? t.weight}
+                    onChange={(e) => setEditingWeights(prev => ({ ...prev, [t.id]: Number(e.target.value) }))}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border)' }}
+                  />
+                </div>
+                <div style={{ textAlign: 'right', paddingTop: '1.5rem' }}>
+                  <span style={{ fontWeight: 700 }}>{editingWeights[t.id] ?? t.weight}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: '#f0fdf4', borderRadius: '4px', border: '1px solid #86efac' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: totalWeight <= 100 ? '#22c55e' : '#ef4444' }}>Total: {totalWeight}% (máximo 100%)</span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <button className="btn btn-secondary" onClick={() => setActiveModal(null)}>Cancelar</button>
+          <button className="btn btn-primary" disabled={totalWeight > 100} onClick={async () => {
+            try {
+              // Save all weight changes
+              const promises = Object.entries(editingWeights).map(async ([taskId, weight]) => {
+                const task = allTasks.find(t => t.id === taskId);
+                if (task && task.weight !== weight) {
+                  await onUpdateTask(taskId, { weight });
+                }
+              });
+              await Promise.all(promises);
+              alert('Pesos guardados correctamente.');
+              setActiveModal(null);
+              setEditingWeights({});
+            } catch (error) {
+              console.error('Error guardando pesos:', error);
+              alert('Error al guardar los pesos. Intente de nuevo.');
+            }
+          }}>Guardar</button>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
 // --- Main App Implementation ---
 
 export default function App() {
@@ -3316,6 +4203,19 @@ export default function App() {
     setMilestones(milestones.filter(m => m.id !== id));
   };
 
+  const handleDeleteTask = async (id: string) => {
+    if (window.confirm('¿Está seguro de que desea eliminar esta tarea? Esta acción no se puede deshacer.')) {
+      try {
+        await apiService.deleteTask(id);
+        setTasks(tasks.filter(t => t.id !== id));
+        alert('Tarea eliminada correctamente.');
+      } catch (error) {
+        console.error('Error eliminando tarea:', error);
+        alert('No se pudo eliminar la tarea. Intente de nuevo.');
+      }
+    }
+  };
+
   const handleUpdateMilestone = async (id: string, updates: Partial<Milestone>) => {
     const prevMilestones = [...milestones];
     setMilestones(milestones.map(m => m.id === id ? { ...m, ...updates } : m));
@@ -3335,19 +4235,62 @@ export default function App() {
     }
   };
 
+  const handleAddTaskToRiskAction = async (riskActionId: string, taskData: Partial<Task>) => {
+    try {
+      const payload = {
+        riskActionId,
+        name: taskData.name || 'Nueva Tarea',
+        description: taskData.description || '',
+        ...(taskData.startDate && { startDate: taskData.startDate }),
+        ...(taskData.endDate && { endDate: taskData.endDate }),
+        assignedTo: taskData.assignedTo || '',
+        progress: 0,
+        status: 'Pending',
+        priority: taskData.priority || 'Medium',
+        weight: taskData.weight || 25,
+        predecessorId: taskData.predecessorId || undefined,
+      };
+
+      const createdTask = await apiService.createTask(payload);
+      const normalizedTask: Task = {
+        ...createdTask,
+        startDate: createdTask.startDate?.split?.('T')[0] || createdTask.startDate || '',
+        endDate: createdTask.endDate?.split?.('T')[0] || createdTask.endDate || '',
+      };
+
+      setTasks([...tasks, normalizedTask]);
+
+      // Verificar si la suma excede 100% después de agregar la tarea
+      const updatedTasks = [...tasks, normalizedTask];
+      const actionTasks = updatedTasks.filter(t => t.riskActionId === riskActionId);
+      const totalWeight = actionTasks.reduce((sum, t) => sum + t.weight, 0);
+
+      if (totalWeight > 100) {
+        return riskActionId; // Devolver el riskActionId para que se abra el modal de edición
+      }
+
+      alert('Tarea creada y guardada en la base de datos.');
+      return null;
+    } catch (error) {
+      console.error('Error al crear tarea:', error);
+      alert('No se pudo guardar la tarea. Intente de nuevo.');
+      return null;
+    }
+  };
+
   const handleAddTask = async (milestoneId: string, taskData: Partial<Task>) => {
     try {
       const payload = {
         milestoneId,
         name: taskData.name || 'Nueva Tarea',
         description: taskData.description || '',
-        startDate: taskData.startDate || '',
-        endDate: taskData.endDate || '',
+        ...(taskData.startDate && { startDate: taskData.startDate }),
+        ...(taskData.endDate && { endDate: taskData.endDate }),
         assignedTo: taskData.assignedTo || '',
         progress: 0,
         status: 'Pending',
         priority: taskData.priority || 'Medium',
-        weight: taskData.weight || 0,
+        weight: taskData.weight || 25,
         predecessorId: taskData.predecessorId || undefined,
       };
 
@@ -3381,6 +4324,16 @@ export default function App() {
     try {
       await apiService.updateTask(id, safeUpdates);
 
+      // Verificar si la suma excede 100% después de la actualización y devolver el riskActionId si es así
+      if (taskBefore && updates.weight !== undefined && taskBefore.riskActionId) {
+        const updatedTasks = tasks.map(t => t.id === id ? { ...t, ...safeUpdates } : t);
+        const actionTasks = updatedTasks.filter(t => t.riskActionId === taskBefore.riskActionId);
+        const totalWeight = actionTasks.reduce((sum, t) => sum + t.weight, 0);
+        if (totalWeight > 100) {
+          return taskBefore.riskActionId;
+        }
+      }
+
       // Si hubo cambio de peso, crear registro en taskLog
       if (taskBefore && updates.weight !== undefined && updates.weight !== taskBefore.weight) {
         await handleAddTaskLog({
@@ -3398,6 +4351,31 @@ export default function App() {
       if (taskBefore) {
         setTasks(prev => prev.map(t => t.id === id ? taskBefore : t));
       }
+    }
+
+    return null;
+  };
+
+  // Wrapper functions for enhanced UX with weight validation
+  const handleAddTaskToRiskActionWrapper = async (taskData: Partial<Task>, onWeightExceeds?: (riskActionId: string, tasks: Task[]) => void) => {
+    const riskActionId = taskData.riskActionId!;
+    const resultRiskActionId = await handleAddTaskToRiskAction(riskActionId, taskData);
+
+    if (resultRiskActionId && onWeightExceeds) {
+      // Get current tasks for the action
+      const actionTasks = tasks.filter(t => t.riskActionId === resultRiskActionId);
+      onWeightExceeds(resultRiskActionId, actionTasks);
+    } else if (!resultRiskActionId) {
+      alert('Tarea creada y guardada en la base de datos.');
+    }
+  };
+
+  const handleUpdateTaskWrapper = async (id: string, updates: Partial<Task>, fromLog: boolean = false, onWeightExceeds?: (riskActionId: string, tasks: Task[]) => void) => {
+    const riskActionId = await handleUpdateTask(id, updates, fromLog);
+    if (riskActionId && onWeightExceeds) {
+      // Get current tasks for the action
+      const actionTasks = tasks.filter(t => t.riskActionId === riskActionId);
+      onWeightExceeds(riskActionId, actionTasks);
     }
   };
 
@@ -3546,7 +4524,7 @@ export default function App() {
         // Aseguramos persistencia en DB y estado local
         await handleUpdateTask(normalizedLog.taskId, {
           progress: normalizedLog.newProgress,
-          status: normalizedLog.newProgress >= 100 ? 'Completed' : 'In Progress'
+          status: normalizedLog.newProgress >= 100 ? 'Completed' : 'In_Progress'
         }, true);
       }
 
@@ -3681,10 +4659,27 @@ export default function App() {
                 onUpdateRiskActionStatus={handleUpdateRiskActionStatus}
                 onProcessCR={handleProcessChangeRequest}
                 projectHistory={projectHistory}
+                onAddTaskToRiskAction={handleAddTaskToRiskAction}
               />
             } />
             <Route path="/new-project" element={<ProjectForm onSave={handleSaveProject} />} />
-            <Route path="/tasks" element={<MyTasksView tasks={tasks} milestones={milestones} projects={projects} currentUser={currentUser} onUpdateTask={handleUpdateTask} />} />
+            <Route path="/projects/:id/risks/:riskId" element={
+              <RiskDetail 
+                projects={projects} 
+                risks={risks}
+                riskActions={riskActions}
+                tasks={tasks}
+                currentUser={currentUser}
+                onAddRiskAction={handleAddRiskAction}
+                onUpdateRiskActionStatus={handleUpdateRiskActionStatus}
+                onAddTaskToRiskAction={handleAddTaskToRiskActionWrapper}
+                onUpdateTask={handleUpdateTaskWrapper}
+                onDeleteTask={handleDeleteTask}
+                onAddTaskLog={handleAddTaskLog}
+                taskLogs={taskLogs}
+                changeRequests={changeRequests}
+              />
+            } />
           </Routes>
         </main>
       </div>
