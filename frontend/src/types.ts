@@ -66,6 +66,7 @@ export interface BudgetLine {
   budgetType: 'CAPEX' | 'OPEX';
   description: string;
   plannedAmount: number;
+  executionDate: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   approvedBy?: string;
   approvalDate?: string;

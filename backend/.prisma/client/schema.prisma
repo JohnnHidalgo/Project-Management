@@ -238,6 +238,7 @@ model BudgetLine {
   budgetType    BudgetType
   description   String
   plannedAmount Float
+  executionDate DateTime
   status        ApprovalStatus
   approvedBy    String?
   approvalDate  DateTime?

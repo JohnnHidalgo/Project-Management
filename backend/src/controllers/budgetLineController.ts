@@ -44,6 +44,7 @@ export class BudgetLineController {
         id: `bl${Date.now()}`,
         description: req.body.description,
         plannedAmount: req.body.plannedAmount,
+        executionDate: req.body.executionDate,
         category: req.body.category,
         budgetType: req.body.budgetType,
         status: req.body.status || 'Pending',

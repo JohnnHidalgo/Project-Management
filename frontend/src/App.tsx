@@ -17,6 +17,7 @@ import { apiService } from './services/apiService';
 import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue, ProjectHistory } from './types';
 import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbokUtils';
 import { mockUsers, mockProjects, mockMilestones, mockTasks, mockRisks, mockIssues, mockExpenses, mockStakeholders, mockTaskLogs, mockChangeRequests, mockRiskActions } from './mockData';
+import CashFlowChart from './components/CashFlowChart';
 import './globals.css';
 
 const getProjectSponsorIds = (project: any): string[] => project?.sponsorIds ?? project?.sponsors?.map((s: any) => s.sponsorId) ?? [];
@@ -2437,7 +2438,7 @@ const ProjectDetail = ({
               </div>
               <table className="data-table">
                 <thead>
-                  <tr><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Monto Planeado</th><th>Estado</th></tr>
+                  <tr><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Fecha Ejecución</th><th>Monto Planeado</th><th>Estado</th></tr>
                 </thead>
                 <tbody>
                   {project.budgetLines?.map(bl => (
@@ -2445,6 +2446,7 @@ const ProjectDetail = ({
                       <td><span className={`badge ${bl.budgetType === 'CAPEX' ? 'badge-primary' : 'badge-secondary'}`}>{bl.budgetType}</span></td>
                       <td><span className="badge badge-secondary">{bl.category}</span></td>
                       <td>{bl.description}</td>
+                      <td>{bl.executionDate}</td>
                       <td>${bl.plannedAmount.toLocaleString()}</td>
                       <td><span className={`badge badge-${bl.status.toLowerCase()}`}>{bl.status}</span></td>
                     </tr>
@@ -2524,6 +2526,12 @@ const ProjectDetail = ({
             )}
 
             <PMBOKHealthDashboard project={project} milestones={projectMilestones} tasks={projectTasks} expenses={projectExpenses} />
+            
+            <CashFlowChart 
+              budgetLines={project.budgetLines} 
+              expenses={projectExpenses}
+              title="Flujo de Caja - Avance Planificado vs Ejecutado"
+            />
             
             <div className="card" style={{ marginBottom: '2rem' }}>
               <div className="section-header">
@@ -3053,6 +3061,7 @@ const ProjectDetail = ({
           onAddExpense(project.id, { 
             description: target.description.value, 
             amount: Number(target.amount.value), 
+            date: target.date.value,
             category: selectedBudgetLine?.category || 'Others',
             budgetLineId: target.budgetLineId.value
           });
@@ -3074,6 +3083,10 @@ const ProjectDetail = ({
             <input name="description" type="text" required placeholder="Ej: Pago factura AWS Enero" />
           </div>
           <div className="form-group">
+            <label>Fecha del Gasto</label>
+            <input name="date" type="date" required />
+          </div>
+          <div className="form-group">
             <label>Monto Ejecutado ($)</label>
             <input name="amount" type="number" required />
           </div>
@@ -3092,6 +3105,7 @@ const ProjectDetail = ({
           onAddBudgetLine(project.id, { 
             description: target.description.value, 
             plannedAmount: Number(target.amount.value), 
+            executionDate: target.executionDate.value,
             category: target.category.value,
             budgetType: target.budgetType.value
           });
@@ -3123,6 +3137,10 @@ const ProjectDetail = ({
           <div className="form-group">
             <label>Monto Planeado ($)</label>
             <input name="amount" type="number" required />
+          </div>
+          <div className="form-group">
+            <label>Fecha de Ejecución</label>
+            <input name="executionDate" type="date" required />
           </div>
           <button type="submit" className="btn btn-primary btn-block">Guardar Línea</button>
         </form>
@@ -4416,6 +4434,7 @@ export default function App() {
         budgetType: (line.budgetType as 'CAPEX' | 'OPEX') || 'OPEX',
         description: line.description || '',
         plannedAmount: line.plannedAmount || 0,
+        executionDate: line.executionDate || new Date().toISOString().split('T')[0],
         status: 'Pending'
       };
 

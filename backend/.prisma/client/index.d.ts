@@ -9430,6 +9430,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType | null
     description: string | null
     plannedAmount: number | null
+    executionDate: Date | null
     status: $Enums.ApprovalStatus | null
     approvedBy: string | null
     approvalDate: Date | null
@@ -9442,6 +9443,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType | null
     description: string | null
     plannedAmount: number | null
+    executionDate: Date | null
     status: $Enums.ApprovalStatus | null
     approvedBy: string | null
     approvalDate: Date | null
@@ -9454,6 +9456,7 @@ export namespace Prisma {
     budgetType: number
     description: number
     plannedAmount: number
+    executionDate: number
     status: number
     approvedBy: number
     approvalDate: number
@@ -9476,6 +9479,7 @@ export namespace Prisma {
     budgetType?: true
     description?: true
     plannedAmount?: true
+    executionDate?: true
     status?: true
     approvedBy?: true
     approvalDate?: true
@@ -9488,6 +9492,7 @@ export namespace Prisma {
     budgetType?: true
     description?: true
     plannedAmount?: true
+    executionDate?: true
     status?: true
     approvedBy?: true
     approvalDate?: true
@@ -9500,6 +9505,7 @@ export namespace Prisma {
     budgetType?: true
     description?: true
     plannedAmount?: true
+    executionDate?: true
     status?: true
     approvedBy?: true
     approvalDate?: true
@@ -9599,6 +9605,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date
     status: $Enums.ApprovalStatus
     approvedBy: string | null
     approvalDate: Date | null
@@ -9630,6 +9637,7 @@ export namespace Prisma {
     budgetType?: boolean
     description?: boolean
     plannedAmount?: boolean
+    executionDate?: boolean
     status?: boolean
     approvedBy?: boolean
     approvalDate?: boolean
@@ -9646,6 +9654,7 @@ export namespace Prisma {
     budgetType?: boolean
     description?: boolean
     plannedAmount?: boolean
+    executionDate?: boolean
     status?: boolean
     approvedBy?: boolean
     approvalDate?: boolean
@@ -9660,6 +9669,7 @@ export namespace Prisma {
     budgetType?: boolean
     description?: boolean
     plannedAmount?: boolean
+    executionDate?: boolean
     status?: boolean
     approvedBy?: boolean
     approvalDate?: boolean
@@ -9674,12 +9684,13 @@ export namespace Prisma {
     budgetType?: boolean
     description?: boolean
     plannedAmount?: boolean
+    executionDate?: boolean
     status?: boolean
     approvedBy?: boolean
     approvalDate?: boolean
   }
 
-  export type BudgetLineOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "category" | "budgetType" | "description" | "plannedAmount" | "status" | "approvedBy" | "approvalDate", ExtArgs["result"]["budgetLine"]>
+  export type BudgetLineOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "category" | "budgetType" | "description" | "plannedAmount" | "executionDate" | "status" | "approvedBy" | "approvalDate", ExtArgs["result"]["budgetLine"]>
   export type BudgetLineInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     approvedByUser?: boolean | BudgetLine$approvedByUserArgs<ExtArgs>
@@ -9709,6 +9720,7 @@ export namespace Prisma {
       budgetType: $Enums.BudgetType
       description: string
       plannedAmount: number
+      executionDate: Date
       status: $Enums.ApprovalStatus
       approvedBy: string | null
       approvalDate: Date | null
@@ -10144,6 +10156,7 @@ export namespace Prisma {
     readonly budgetType: FieldRef<"BudgetLine", 'BudgetType'>
     readonly description: FieldRef<"BudgetLine", 'String'>
     readonly plannedAmount: FieldRef<"BudgetLine", 'Float'>
+    readonly executionDate: FieldRef<"BudgetLine", 'DateTime'>
     readonly status: FieldRef<"BudgetLine", 'ApprovalStatus'>
     readonly approvedBy: FieldRef<"BudgetLine", 'String'>
     readonly approvalDate: FieldRef<"BudgetLine", 'DateTime'>
@@ -24798,6 +24811,7 @@ export namespace Prisma {
     budgetType: 'budgetType',
     description: 'description',
     plannedAmount: 'plannedAmount',
+    executionDate: 'executionDate',
     status: 'status',
     approvedBy: 'approvedBy',
     approvalDate: 'approvalDate'
@@ -25800,6 +25814,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFilter<"BudgetLine"> | $Enums.BudgetType
     description?: StringFilter<"BudgetLine"> | string
     plannedAmount?: FloatFilter<"BudgetLine"> | number
+    executionDate?: DateTimeFilter<"BudgetLine"> | Date | string
     status?: EnumApprovalStatusFilter<"BudgetLine"> | $Enums.ApprovalStatus
     approvedBy?: StringNullableFilter<"BudgetLine"> | string | null
     approvalDate?: DateTimeNullableFilter<"BudgetLine"> | Date | string | null
@@ -25815,6 +25830,7 @@ export namespace Prisma {
     budgetType?: SortOrder
     description?: SortOrder
     plannedAmount?: SortOrder
+    executionDate?: SortOrder
     status?: SortOrder
     approvedBy?: SortOrderInput | SortOrder
     approvalDate?: SortOrderInput | SortOrder
@@ -25833,6 +25849,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFilter<"BudgetLine"> | $Enums.BudgetType
     description?: StringFilter<"BudgetLine"> | string
     plannedAmount?: FloatFilter<"BudgetLine"> | number
+    executionDate?: DateTimeFilter<"BudgetLine"> | Date | string
     status?: EnumApprovalStatusFilter<"BudgetLine"> | $Enums.ApprovalStatus
     approvedBy?: StringNullableFilter<"BudgetLine"> | string | null
     approvalDate?: DateTimeNullableFilter<"BudgetLine"> | Date | string | null
@@ -25848,6 +25865,7 @@ export namespace Prisma {
     budgetType?: SortOrder
     description?: SortOrder
     plannedAmount?: SortOrder
+    executionDate?: SortOrder
     status?: SortOrder
     approvedBy?: SortOrderInput | SortOrder
     approvalDate?: SortOrderInput | SortOrder
@@ -25868,6 +25886,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeWithAggregatesFilter<"BudgetLine"> | $Enums.BudgetType
     description?: StringWithAggregatesFilter<"BudgetLine"> | string
     plannedAmount?: FloatWithAggregatesFilter<"BudgetLine"> | number
+    executionDate?: DateTimeWithAggregatesFilter<"BudgetLine"> | Date | string
     status?: EnumApprovalStatusWithAggregatesFilter<"BudgetLine"> | $Enums.ApprovalStatus
     approvedBy?: StringNullableWithAggregatesFilter<"BudgetLine"> | string | null
     approvalDate?: DateTimeNullableWithAggregatesFilter<"BudgetLine"> | Date | string | null
@@ -27302,6 +27321,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvalDate?: Date | string | null
     project: ProjectCreateNestedOneWithoutBudgetLinesInput
@@ -27316,6 +27336,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvedBy?: string | null
     approvalDate?: Date | string | null
@@ -27328,6 +27349,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     project?: ProjectUpdateOneRequiredWithoutBudgetLinesNestedInput
@@ -27342,6 +27364,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27355,6 +27378,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvedBy?: string | null
     approvalDate?: Date | string | null
@@ -27366,6 +27390,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -27377,6 +27402,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28983,6 +29009,17 @@ export namespace Prisma {
     not?: NestedEnumBudgetTypeFilter<$PrismaModel> | $Enums.BudgetType
   }
 
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type EnumApprovalStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ApprovalStatus | EnumApprovalStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ApprovalStatus[] | ListEnumApprovalStatusFieldRefInput<$PrismaModel>
@@ -28997,6 +29034,7 @@ export namespace Prisma {
     budgetType?: SortOrder
     description?: SortOrder
     plannedAmount?: SortOrder
+    executionDate?: SortOrder
     status?: SortOrder
     approvedBy?: SortOrder
     approvalDate?: SortOrder
@@ -29013,6 +29051,7 @@ export namespace Prisma {
     budgetType?: SortOrder
     description?: SortOrder
     plannedAmount?: SortOrder
+    executionDate?: SortOrder
     status?: SortOrder
     approvedBy?: SortOrder
     approvalDate?: SortOrder
@@ -29025,6 +29064,7 @@ export namespace Prisma {
     budgetType?: SortOrder
     description?: SortOrder
     plannedAmount?: SortOrder
+    executionDate?: SortOrder
     status?: SortOrder
     approvedBy?: SortOrder
     approvalDate?: SortOrder
@@ -29052,6 +29092,20 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBudgetTypeFilter<$PrismaModel>
     _max?: NestedEnumBudgetTypeFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type EnumApprovalStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -29264,17 +29318,6 @@ export namespace Prisma {
     _max?: NestedEnumTaskPriorityFilter<$PrismaModel>
   }
 
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
   export type TaskScalarRelationFilter = {
     is?: TaskWhereInput
     isNot?: TaskWhereInput
@@ -29321,20 +29364,6 @@ export namespace Prisma {
   export type TaskLogSumOrderByAggregateInput = {
     previousProgress?: SortOrder
     newProgress?: SortOrder
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -31165,6 +31194,10 @@ export namespace Prisma {
     set?: $Enums.BudgetType
   }
 
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
   export type EnumApprovalStatusFieldUpdateOperationsInput = {
     set?: $Enums.ApprovalStatus
   }
@@ -31533,10 +31566,6 @@ export namespace Prisma {
     create?: XOR<UserCreateWithoutTaskLogsInput, UserUncheckedCreateWithoutTaskLogsInput>
     connectOrCreate?: UserCreateOrConnectWithoutTaskLogsInput
     connect?: UserWhereUniqueInput
-  }
-
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
   }
 
   export type TaskUpdateOneRequiredWithoutLogsNestedInput = {
@@ -32160,6 +32189,17 @@ export namespace Prisma {
     not?: NestedEnumBudgetTypeFilter<$PrismaModel> | $Enums.BudgetType
   }
 
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
   export type NestedEnumApprovalStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ApprovalStatus | EnumApprovalStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ApprovalStatus[] | ListEnumApprovalStatusFieldRefInput<$PrismaModel>
@@ -32185,6 +32225,20 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumBudgetTypeFilter<$PrismaModel>
     _max?: NestedEnumBudgetTypeFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type NestedEnumApprovalStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -32262,31 +32316,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTaskPriorityFilter<$PrismaModel>
     _max?: NestedEnumTaskPriorityFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -32965,6 +32994,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvalDate?: Date | string | null
     project: ProjectCreateNestedOneWithoutBudgetLinesInput
@@ -32978,6 +33008,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvalDate?: Date | string | null
     expenses?: ExpenseUncheckedCreateNestedManyWithoutBudgetLineInput
@@ -33371,6 +33402,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFilter<"BudgetLine"> | $Enums.BudgetType
     description?: StringFilter<"BudgetLine"> | string
     plannedAmount?: FloatFilter<"BudgetLine"> | number
+    executionDate?: DateTimeFilter<"BudgetLine"> | Date | string
     status?: EnumApprovalStatusFilter<"BudgetLine"> | $Enums.ApprovalStatus
     approvedBy?: StringNullableFilter<"BudgetLine"> | string | null
     approvalDate?: DateTimeNullableFilter<"BudgetLine"> | Date | string | null
@@ -33536,6 +33568,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvalDate?: Date | string | null
     approvedByUser?: UserCreateNestedOneWithoutApprovedBudgetLinesInput
@@ -33548,6 +33581,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvedBy?: string | null
     approvalDate?: Date | string | null
@@ -37243,6 +37277,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvalDate?: Date | string | null
     project: ProjectCreateNestedOneWithoutBudgetLinesInput
@@ -37256,6 +37291,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvedBy?: string | null
     approvalDate?: Date | string | null
@@ -37366,6 +37402,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     project?: ProjectUpdateOneRequiredWithoutBudgetLinesNestedInput
@@ -37379,6 +37416,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -38403,6 +38441,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvalDate?: Date | string | null
   }
@@ -38893,6 +38932,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     project?: ProjectUpdateOneRequiredWithoutBudgetLinesNestedInput
@@ -38906,6 +38946,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     expenses?: ExpenseUncheckedUpdateManyWithoutBudgetLineNestedInput
@@ -38918,6 +38959,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
@@ -38943,6 +38985,7 @@ export namespace Prisma {
     budgetType: $Enums.BudgetType
     description: string
     plannedAmount: number
+    executionDate: Date | string
     status: $Enums.ApprovalStatus
     approvedBy?: string | null
     approvalDate?: Date | string | null
@@ -39085,6 +39128,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     approvedByUser?: UserUpdateOneWithoutApprovedBudgetLinesNestedInput
@@ -39097,6 +39141,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -39109,6 +39154,7 @@ export namespace Prisma {
     budgetType?: EnumBudgetTypeFieldUpdateOperationsInput | $Enums.BudgetType
     description?: StringFieldUpdateOperationsInput | string
     plannedAmount?: FloatFieldUpdateOperationsInput | number
+    executionDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumApprovalStatusFieldUpdateOperationsInput | $Enums.ApprovalStatus
     approvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     approvalDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

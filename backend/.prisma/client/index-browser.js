@@ -179,6 +179,7 @@ exports.Prisma.BudgetLineScalarFieldEnum = {
   budgetType: 'budgetType',
   description: 'description',
   plannedAmount: 'plannedAmount',
+  executionDate: 'executionDate',
   status: 'status',
   approvedBy: 'approvedBy',
   approvalDate: 'approvalDate'

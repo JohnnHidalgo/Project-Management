@@ -33,9 +33,9 @@ export const mockProjects: Project[] = [
     constraints: 'Debe terminarse antes del vencimiento del contrato del datacenter actual.',
     progress: 45,
     budgetLines: [
-      { id: 'bl1', category: 'Services', budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, status: 'Approved' },
-      { id: 'bl2', category: 'Labor', budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, status: 'Approved' },
-      { id: 'bl3', category: 'Hardware', budgetType: 'CAPEX', description: 'Servidores de Respaldo Local', plannedAmount: 20000, status: 'Approved' }
+      { id: 'bl1', category: 'Services', budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, executionDate: '2026-01-05', status: 'Approved' },
+      { id: 'bl2', category: 'Labor', budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, executionDate: '2026-02-01', status: 'Approved' },
+      { id: 'bl3', category: 'Hardware', budgetType: 'CAPEX', description: 'Servidores de Respaldo Local', plannedAmount: 20000, executionDate: '2026-03-15', status: 'Approved' }
     ]
   },
   {
@@ -59,8 +59,8 @@ export const mockProjects: Project[] = [
     businessCase: 'Actualmente perdemos el 30% de leads por falta de seguimiento centralizado.',
     progress: 10,
     budgetLines: [
-      { id: 'bl2_1', category: 'Software', budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, status: 'Pending' },
-      { id: 'bl2_2', category: 'Services', budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, status: 'Pending' }
+      { id: 'bl2_1', category: 'Software', budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, executionDate: '2026-03-05', status: 'Pending' },
+      { id: 'bl2_2', category: 'Services', budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, executionDate: '2026-04-01', status: 'Pending' }
     ]
   },
   {
@@ -104,8 +104,8 @@ export const mockProjects: Project[] = [
     businessCase: 'La competencia ha reducido costos en un 15% mediante automatización. Necesitamos igualar la eficiencia para mantener margen.',
     progress: 25,
     budgetLines: [
-      { id: 'bl4_1', category: 'Hardware', budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, status: 'Approved' },
-      { id: 'bl4_2', category: 'Services', budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, status: 'Approved' }
+      { id: 'bl4_1', category: 'Hardware', budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, executionDate: '2026-02-20', status: 'Approved' },
+      { id: 'bl4_2', category: 'Services', budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, executionDate: '2026-03-10', status: 'Approved' }
     ]
   },
   {
@@ -148,8 +148,8 @@ export const mockProjects: Project[] = [
     strategicAlignment: 'Gestión de Riesgos Corporativos',
     progress: 60,
     budgetLines: [
-      { id: 'bl6_1', category: 'Services', budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, status: 'Approved' },
-      { id: 'bl6_2', category: 'Labor', budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, status: 'Approved' }
+      { id: 'bl6_1', category: 'Services', budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, executionDate: '2026-02-10', status: 'Approved' },
+      { id: 'bl6_2', category: 'Labor', budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, executionDate: '2026-03-01', status: 'Approved' }
     ]
   },
   {
