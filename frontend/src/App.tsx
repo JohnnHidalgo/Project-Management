@@ -1590,6 +1590,12 @@ const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Tas
   const projectEnd = new Date(Math.max(...milestones.map(m => new Date(m.endDate).getTime()))).getTime();
   const today = new Date().toISOString().split('T')[0];
   
+  const isDelayed = (task: Task) => {
+    const currentDate = new Date();
+    const endDate = new Date(task.endDate);
+    return currentDate > endDate && task.status !== 'Completed';
+  };
+  
   const getPosition = (dateStr: string) => {
     const date = new Date(dateStr).getTime();
     const pos = ((date - projectStart) / (projectEnd - projectStart)) * 100;
@@ -1641,11 +1647,13 @@ const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Tas
             </div>
             {tasks.filter(t => t.milestoneId === m.id).map(t => {
               const assignee = mockUsers.find(u => u.id === t.assignedTo);
+              const delayed = isDelayed(t);
               return (
                 <div key={t.id} className="gantt-row task-row">
                   <div className="gantt-label">
                     <span style={{ marginLeft: '1rem', color: 'var(--text-muted)' }}>↳</span> {t.name}
                     {t.predecessorId && <span title="Dependencia crítica" style={{ marginLeft: '0.5rem', fontSize: '0.7rem' }}>⚠️</span>}
+                    {delayed && <span title="Tarea retrasada" style={{ marginLeft: '0.5rem', fontSize: '0.7rem', color: '#ef4444' }}>⏰</span>}
                   </div>
                   <div className="gantt-bar-container">
                     <div 
@@ -1653,13 +1661,14 @@ const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Tas
                       style={{ 
                         left: `${getPosition(t.startDate)}%`, 
                         width: `${Math.max(getPosition(t.endDate) - getPosition(t.startDate), 1)}%`,
-                        backgroundColor: t.status === 'Completed' ? 'var(--success)' : (t.status === 'Blocked' ? 'var(--error)' : '#94a3b8')
+                        backgroundColor: delayed ? '#ef4444' : (t.status === 'Completed' ? 'var(--success)' : (t.status === 'Blocked' ? 'var(--error)' : '#94a3b8'))
                       }}
                     >
                       <div className="gantt-bar-progress" style={{ width: `${t.progress}%` }}></div>
                       <div className="bar-label">
                         <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{assignee?.name.split(' ')[0]}</span>
                         <span>{t.progress}%</span>
+                        {delayed && <span style={{ color: '#ef4444', marginLeft: '0.5rem', fontSize: '0.8rem' }}>Retrasada</span>}
                       </div>
                     </div>
                   </div>
