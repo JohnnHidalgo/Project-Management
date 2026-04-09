@@ -1,4 +1,4 @@
-import { Project, Milestone, Task, Expense } from '../types';
+import { Project, Milestone, Task, Expense, Risk } from '../types';
 
 /**
  * PMBOK Utility: Earned Value Management (EVM) Calculations
@@ -72,7 +72,8 @@ export const generateSnapshot = (
   milestones: Milestone[],
   tasks: Task[],
   expenses: Expense[],
-  highlights: string
+  highlights: string,
+  risks: Risk[]
 ) => {
   const evm = calculateEVM(project, milestones, tasks, expenses);
   const milestonesProgress = (milestones || []).reduce((acc, m) => {
@@ -80,12 +81,55 @@ export const generateSnapshot = (
     return acc;
   }, {} as Record<string, number>);
 
+  const projectRisks = (risks || []).filter(r => r.projectId === project.id);
+  const riskSummary: Array<{
+    id: string;
+    description: string;
+    severity: 'Low' | 'Medium' | 'High' | 'Critical';
+    status: string;
+    category: string;
+  }> = projectRisks.map(r => ({
+    id: r.id,
+    description: r.description,
+    severity: calculateRiskScore(r.probability, r.impact),
+    status: r.status,
+    category: r.category
+  }));
+
+  const totalWeight = (milestones || []).reduce((sum, m) => sum + (m.weight || 0), 0);
+  const projectProgress = totalWeight > 0
+    ? Math.round((milestones || []).reduce((sum, m) => sum + ((m.progress || 0) * (m.weight || 0) / 100), 0))
+    : 0;
+
+  const overviewBudgetLines = (project.budgetLines || []).map(bl => {
+    const executedAmount = (expenses || [])
+      .filter(e => e.budgetLineId === bl.id && (e.status === 'Paid' || e.status === 'Approved'))
+      .reduce((sum, e) => sum + (e.amount || 0), 0);
+    const variance = bl.plannedAmount - executedAmount;
+    return {
+      id: bl.id,
+      description: bl.description,
+      category: bl.category,
+      plannedAmount: bl.plannedAmount,
+      executedAmount,
+      variance,
+      executionPct: bl.plannedAmount > 0 ? (executedAmount / bl.plannedAmount) * 100 : 0,
+      status: bl.status || 'Pending'
+    };
+  });
+
+  const objectives = (project.specificObjectives || []).map(so => ({
+    description: so.description,
+    kpi: so.kpi,
+    successCriteria: so.successCriteria
+  }));
+
   return {
     id: `snap-${Date.now()}`,
     projectId: project?.id || '',
     date: new Date().toISOString().split('T')[0],
     highlights: highlights || '',
-    risksIds: [],
+    risksIds: projectRisks.map(r => r.id),
     issuesIds: [],
     milestonesProgress,
     totalBudget: evm.bac,
@@ -97,14 +141,55 @@ export const generateSnapshot = (
     cv: evm.cv,
     sv: evm.sv,
     eac: evm.cpi > 0 ? evm.bac / evm.cpi : evm.bac,
-    status: 'Open' as 'Open' | 'Closed'
+    status: 'Open' as 'Open' | 'Closed',
+    overviewData: {
+      status: project.status,
+      budget: project.budget,
+      progressPercent: projectProgress,
+      businessCase: project.businessCase || '',
+      generalObjective: project.generalObjective || '',
+      strategicAlignment: project.strategicAlignment || '',
+      assumptions: project.assumptions || '',
+      constraints: project.constraints || '',
+      objectives,
+      budgetLines: overviewBudgetLines,
+      milestones: (milestones || []).map(m => ({
+        id: m.id,
+        name: m.name,
+        status: m.status,
+        progress: m.progress || 0,
+        weight: m.weight || 0,
+        startDate: m.startDate,
+        endDate: m.endDate
+      }))
+    },
+    reportData: {
+      evm: {
+        bac: evm.bac,
+        pv: evm.pv,
+        ev: evm.ev,
+        ac: evm.ac,
+        cpi: evm.cpi,
+        spi: evm.spi,
+        cv: evm.cv,
+        sv: evm.sv,
+        eac: evm.cpi > 0 ? evm.bac / evm.cpi : evm.bac,
+        status: evm.status
+      },
+      milestonesProgress: milestonesProgress,
+      risks: riskSummary,
+      highlights: highlights || '',
+      projectProgress
+    },
+    savedBudgetLines: project.budgetLines ? project.budgetLines.map(bl => ({ ...bl })) : [],
+    savedExpenses: expenses ? expenses.map(e => ({ ...e })) : []
   };
 };
 
 /**
  * PMBOK Utility: Risk Severity Matrix
  */
-export const calculateRiskScore = (probability: number, impact: number) => {
+export const calculateRiskScore = (probability: number, impact: number): 'Critical' | 'High' | 'Medium' | 'Low' => {
   const score = (probability || 0) * (impact || 0);
   if (score > 0.6) return 'Critical';
   if (score > 0.4) return 'High';

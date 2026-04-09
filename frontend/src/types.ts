@@ -186,6 +186,59 @@ export interface ChangeRequest {
   requestedDate: string;
 }
 
+export interface SnapshotOverviewData {
+  status: Project['status'] | string;
+  budget: number;
+  progressPercent: number;
+  businessCase: string;
+  generalObjective: string;
+  strategicAlignment: string;
+  assumptions: string;
+  constraints: string;
+  objectives: Array<{ description: string; kpi: string; successCriteria: string }>;
+  budgetLines: Array<{
+    id: string;
+    description: string;
+    category: string;
+    plannedAmount: number;
+    executedAmount: number;
+    variance: number;
+    executionPct: number;
+    status: string;
+  }>;
+  milestones: Array<{
+    id: string;
+    name: string;
+    status: string;
+    progress: number;
+    weight: number;
+    startDate: string;
+    endDate: string;
+  }>;
+}
+
+export interface SnapshotReportData {
+  evm: {
+    bac: number;
+    pv: number;
+    ev: number;
+    ac: number;
+    cpi: number;
+    spi: number;
+    cv: number;
+    sv: number;
+    eac: number;
+    status: {
+      cost: string;
+      schedule: string;
+    };
+  };
+  milestonesProgress: Record<string, number>;
+  risks: Array<{ id: string; description: string; severity: 'Low' | 'Medium' | 'High' | 'Critical'; status: string; category: string }>;
+  highlights: string;
+  projectProgress: number;
+}
+
 export interface ProjectSnapshot {
   id: string;
   projectId: string;
@@ -206,6 +259,10 @@ export interface ProjectSnapshot {
   eac: number;           // Estimate At Completion (BAC / CPI)
   
   status: 'Open' | 'Closed';
+  overviewData?: SnapshotOverviewData;
+  reportData?: SnapshotReportData;
+  savedBudgetLines?: BudgetLine[];
+  savedExpenses?: Expense[];
 }
 
 export interface LessonLearned {

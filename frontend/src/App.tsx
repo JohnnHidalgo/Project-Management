@@ -578,12 +578,13 @@ const SPPMReport = ({
   tasks: Task[], 
   expenses: Expense[],
   snapshots: ProjectSnapshot[],
-  onAddSnapshot: (s: ProjectSnapshot) => void,
+  onAddSnapshot: (s: ProjectSnapshot) => Promise<void>,
   risks: Risk[],
   stakeholders: Stakeholder[]
 }) => {
   const [highlights, setHighlights] = useState('');
   const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+  const [selectedSnapshot, setSelectedSnapshot] = useState<ProjectSnapshot | null>(null);
   const projectExpenses = (expenses || []).filter(e => e.projectId === project.id);
   const projectMilestones = (milestones || []).filter(m => m.projectId === project.id);
   const projectTasks = (tasks || []).filter(t => projectMilestones.some(m => m.id === t.milestoneId));
@@ -591,16 +592,20 @@ const SPPMReport = ({
   
   const evm = calculateEVM(project, projectMilestones, projectTasks, projectExpenses);
   
-  const handleGenerateSnapshot = () => {
+  const handleGenerateSnapshot = async () => {
     if (!highlights) {
       alert("Por favor ingrese los highlights del mes.");
       return;
     }
-    // @ts-ignore
-    const snapshot = generateSnapshot(project, projectMilestones, projectTasks, projectExpenses, highlights);
-    onAddSnapshot(snapshot);
-    alert("Snapshot Mensual generado y archivado exitosamente.");
-    setHighlights('');
+    const snapshot = generateSnapshot(project, projectMilestones, projectTasks, projectExpenses, highlights, risks);
+    try {
+      await onAddSnapshot(snapshot);
+      alert("Snapshot Mensual generado y archivado exitosamente.");
+      setHighlights('');
+    } catch (error) {
+      console.error('Error guardando snapshot:', error);
+      alert('No se pudo guardar el snapshot. Revisa la consola para más detalles.');
+    }
   };
   
   const projectSnapshots = snapshots.filter(s => s.projectId === project.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -798,6 +803,7 @@ const SPPMReport = ({
                 <th>SPI</th>
                 <th>EV ($)</th>
                 <th>AC ($)</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -809,6 +815,11 @@ const SPPMReport = ({
                   <td className={s.spi >= 1 ? 'text-success' : 'text-error'} style={{ fontWeight: 700 }}>{s.spi.toFixed(2)}</td>
                   <td>${s.earnedValue.toLocaleString()}</td>
                   <td>${s.actualSpent.toLocaleString()}</td>
+                  <td>
+                    <button className="btn btn-secondary btn-sm" onClick={() => setSelectedSnapshot(s)}>
+                      Ver contenido
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -817,6 +828,163 @@ const SPPMReport = ({
           <div className="empty-state">No hay snapshots generados aún para este proyecto.</div>
         )}
       </div>
+
+      <Modal
+        isOpen={!!selectedSnapshot}
+        onClose={() => setSelectedSnapshot(null)}
+        title={selectedSnapshot ? `Contenido del Snapshot - ${selectedSnapshot.date}` : 'Snapshot'}
+        className="modal-large"
+      >
+        {selectedSnapshot ? (
+          <div className="sppm-container snapshot-modal">
+            <div className="sppm-header card" style={{ background: 'var(--primary)', color: 'white' }}>
+              <div className="sppm-title">
+                <PieChart size={32} className="icon-primary" />
+                <div>
+                  <h2 style={{ margin: 0 }}>Snapshot SPPM</h2>
+                  <p style={{ margin: 0, opacity: 0.8, fontSize: '0.875rem' }}>Estado registrado al {selectedSnapshot.date}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="sppm-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))' }}>
+              <div className="card sppm-card">
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Target size={18} /> Alineación Estratégica
+                </h3>
+                {selectedSnapshot.overviewData ? (
+                  <div style={{ fontSize: '0.875rem', display: 'grid', gap: '0.75rem' }}>
+                    <p><strong>Estado:</strong> {selectedSnapshot.overviewData.status}</p>
+                    <p><strong>Presupuesto total:</strong> ${selectedSnapshot.overviewData.budget.toLocaleString()}</p>
+                    <p><strong>Progreso del proyecto:</strong> {selectedSnapshot.overviewData.progressPercent}%</p>
+                    <p><strong>Caso de Negocio:</strong> {selectedSnapshot.overviewData.businessCase}</p>
+                    <p><strong>Objetivo General:</strong> {selectedSnapshot.overviewData.generalObjective}</p>
+                    <p><strong>Alineación Estratégica:</strong> {selectedSnapshot.overviewData.strategicAlignment}</p>
+                    <p><strong>Supuestos:</strong> {selectedSnapshot.overviewData.assumptions}</p>
+                    <p><strong>Restricciones:</strong> {selectedSnapshot.overviewData.constraints}</p>
+                  </div>
+                ) : (
+                  <p className="text-muted">No hay datos de Vista General disponibles.</p>
+                )}
+              </div>
+
+              <div className="card sppm-card">
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <CheckSquare size={18} /> Cronograma de Hitos
+                </h3>
+                {selectedSnapshot.overviewData && selectedSnapshot.overviewData.milestones.length > 0 ? (
+                  <div style={{ display: 'grid', gap: '0.5rem' }}>
+                    {selectedSnapshot.overviewData.milestones.map(m => (
+                      <div key={m.id} style={{ fontSize: '0.8125rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px' }}>
+                          <span>{m.name}</span>
+                          <span style={{ fontWeight: 600 }}>{m.progress}%</span>
+                        </div>
+                        <div className="progress-bar-container" style={{ margin: 0, height: '6px' }}>
+                          <div className={`progress-bar ${m.status === 'Completed' ? 'bg-success' : 'bg-accent'}`} style={{ width: `${m.progress}%` }}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted">No hay hitos archivados en el snapshot.</p>
+                )}
+              </div>
+
+              <div className="card sppm-card">
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <PieChart size={18} /> Desempeño de Costos (EVM)
+                </h3>
+                {selectedSnapshot.reportData ? (
+                  <div className="financial-stats">
+                    <div className="stat">
+                      <span className="label">Presupuesto Base (BAC)</span>
+                      <span className="value">${selectedSnapshot.reportData.evm.bac.toLocaleString()}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Valor Ganado (EV)</span>
+                      <span className="value text-accent">${selectedSnapshot.reportData.evm.ev.toLocaleString()}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Costo Actual (AC)</span>
+                      <span className={`value ${selectedSnapshot.reportData.evm.ac > selectedSnapshot.reportData.evm.ev ? 'text-error' : 'text-success'}`}>
+                        ${selectedSnapshot.reportData.evm.ac.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="stat" style={{ borderTop: '1px solid var(--border)', paddingTop: '0.5rem' }}>
+                      <span className="label">Varianza de Costo (CV)</span>
+                      <span className={`value ${selectedSnapshot.reportData.evm.cv < 0 ? 'text-error' : 'text-success'}`}>
+                        {selectedSnapshot.reportData.evm.cv < 0 ? '-' : '+'}${Math.abs(selectedSnapshot.reportData.evm.cv).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Variación de Cronograma (SV)</span>
+                      <span className={`value ${selectedSnapshot.reportData.evm.sv < 0 ? 'text-error' : 'text-success'}`}>
+                        {selectedSnapshot.reportData.evm.sv < 0 ? '-' : '+'}${Math.abs(selectedSnapshot.reportData.evm.sv).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">CPI</span>
+                      <span className="value">{selectedSnapshot.reportData.evm.cpi.toFixed(2)}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">SPI</span>
+                      <span className="value">{selectedSnapshot.reportData.evm.spi.toFixed(2)}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">EAC</span>
+                      <span className="value">${selectedSnapshot.reportData.evm.eac.toLocaleString()}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Condición de Costo</span>
+                      <span className="value">{selectedSnapshot.reportData.evm.status.cost}</span>
+                    </div>
+                    <div className="stat">
+                      <span className="label">Condición de Cronograma</span>
+                      <span className="value">{selectedSnapshot.reportData.evm.status.schedule}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-muted">No hay datos financieros disponibles para este snapshot.</p>
+                )}
+              </div>
+
+              <div className="card sppm-card">
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <AlertTriangle size={18} /> Gestión de Riesgos
+                </h3>
+                {selectedSnapshot.reportData && selectedSnapshot.reportData.risks.length > 0 ? (
+                  <ul className="sppm-list">
+                    {selectedSnapshot.reportData.risks.map(r => (
+                      <li key={r.id} style={{ fontSize: '0.8125rem' }}>
+                        <span className={`badge badge-${r.severity.toLowerCase()}`} style={{ fontSize: '0.6rem' }}>{r.severity}</span>
+                        <span style={{ fontWeight: 500 }}>{r.description}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted">No hay riesgos críticos identificados en este snapshot.</p>
+                )}
+              </div>
+
+              <div className="card sppm-card" style={{ gridColumn: '1 / -1' }}>
+              <CashFlowChart
+                budgetLines={selectedSnapshot.savedBudgetLines || []}
+                expenses={selectedSnapshot.savedExpenses || []}
+                title="Flujo de Caja - Avance Acumulado Planificado vs Ejecutado"
+              />
+            </div>
+
+            <div className="card sppm-card highlights" style={{ gridColumn: '1 / -1' }}>
+                <h3>Highlights y Logros Mensuales</h3>
+                <div style={{ minHeight: '80px', whiteSpace: 'pre-wrap', lineHeight: 1.5, fontSize: '0.9rem' }}>
+                  {selectedSnapshot.highlights || 'Sin comentarios registrados.'}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </Modal>
 
       {/* Custom Tooltip */}
       {tooltip && (
@@ -1633,11 +1801,11 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal }: { stakeholders: Stakeh
 
 // --- Sub-components (UX Helpers) ---
 
-const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean, onClose: () => void, title: string, children: React.ReactNode }) => {
+const Modal = ({ isOpen, onClose, title, children, className }: { isOpen: boolean, onClose: () => void, title: string, children: React.ReactNode, className?: string }) => {
   if (!isOpen) return null;
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
+      <div className={`modal-content ${className ?? ''}`} onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h3>{title}</h3>
           <button className="close-btn" onClick={onClose}>&times;</button>
@@ -2184,7 +2352,7 @@ const ProjectDetail = ({
   onAddBudgetLine: (projectId: string, line: Partial<BudgetLine>) => void,
   onApproveBudgetLine: (projectId: string, projectIdLine: string, approved: boolean) => void,
   snapshots: ProjectSnapshot[],
-  onAddSnapshot: (s: ProjectSnapshot) => void,
+  onAddSnapshot: (s: ProjectSnapshot) => Promise<void>,
   risks: Risk[],
   onAddRisk: (projectId: string, risk: Partial<Risk>) => void,
   stakeholders: Stakeholder[],
@@ -3197,49 +3365,83 @@ const ProjectDetail = ({
         onClose={() => setActiveModal(null)}
         title="Nueva Tarea"
       >
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          const target = e.target as any;
+        {(() => {
           const milestoneId = selectedMilestoneId || projectMilestones[0]?.id;
-          if (!milestoneId) {
-            alert('No se encontró un hito válido para asociar la tarea.');
-            return;
-          }
-          onAddTask(milestoneId, { 
-            name: target.name.value, 
-            assignedTo: target.assignedTo.value, 
-            priority: target.priority.value,
-            startDate: target.startDate.value,
-            endDate: target.endDate.value,
-            weight: parseInt(target.weight.value) || 0,
-            predecessorId: target.predecessorId.value || undefined
-          });
-          setActiveModal(null);
-          setSelectedMilestoneId(null);
-        }}>
-          <input type="hidden" name="milestoneId" value={selectedMilestoneId || projectMilestones[0]?.id || ''} />
-          <div className="form-group">
-            <label>Hito</label>
-            <input type="text" value={projectMilestones.find(m => m.id === (selectedMilestoneId || projectMilestones[0]?.id))?.name || 'Sin hito'} readOnly />
-          </div>
-          <div className="form-group">
-            <label>Nombre de la Tarea</label>
-            <input name="name" type="text" required />
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Peso en Hito (%)</label>
-              <input name="weight" type="number" min="1" max="100" required placeholder="Ej: 20" />
-            </div>
-          </div>
-          <div className="form-row">
+          const selectedMilestone = projectMilestones.find(m => m.id === milestoneId);
+          return (
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const target = e.target as any;
+              if (!milestoneId) {
+                alert('No se encontró un hito válido para asociar la tarea.');
+                return;
+              }
+              const startDate = target.startDate.value;
+              const endDate = target.endDate.value;
+              if (!startDate || !endDate) {
+                alert('Debe ingresar fecha de inicio y fecha de fin.');
+                return;
+              }
+              if (startDate > endDate) {
+                alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
+                return;
+              }
+              if (selectedMilestone && (startDate < selectedMilestone.startDate || endDate > selectedMilestone.endDate)) {
+                alert(`Las fechas de la tarea deben estar dentro del hito: ${new Date(selectedMilestone.startDate).toLocaleDateString('es-ES')} - ${new Date(selectedMilestone.endDate).toLocaleDateString('es-ES')}.`);
+                return;
+              }
+              onAddTask(milestoneId, { 
+                name: target.name.value, 
+                assignedTo: target.assignedTo.value, 
+                priority: target.priority.value,
+                startDate,
+                endDate,
+                weight: parseInt(target.weight.value) || 0,
+                predecessorId: target.predecessorId.value || undefined
+              });
+              setActiveModal(null);
+              setSelectedMilestoneId(null);
+            }}>
+              <input type="hidden" name="milestoneId" value={milestoneId || ''} />
+              <div className="form-group">
+                <label>Hito</label>
+                <input type="text" value={selectedMilestone?.name || 'Sin hito'} readOnly />
+              </div>
+              {selectedMilestone && (
+                <div style={{ marginBottom: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                  Rango del hito: {new Date(selectedMilestone.startDate).toLocaleDateString('es-ES')} - {new Date(selectedMilestone.endDate).toLocaleDateString('es-ES')}
+                </div>
+              )}
+              <div className="form-group">
+                <label>Nombre de la Tarea</label>
+                <input name="name" type="text" required />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Peso en Hito (%)</label>
+                  <input name="weight" type="number" min="1" max="100" required placeholder="Ej: 20" />
+                </div>
+              </div>
+              <div className="form-row">
             <div className="form-group">
               <label>Fecha Inicio</label>
-              <input name="startDate" type="date" required />
+              <input 
+                name="startDate" 
+                type="date" 
+                required 
+                min={selectedMilestone?.startDate} 
+                max={selectedMilestone?.endDate}
+              />
             </div>
             <div className="form-group">
               <label>Fecha Fin</label>
-              <input name="endDate" type="date" required />
+              <input 
+                name="endDate" 
+                type="date" 
+                required 
+                min={selectedMilestone?.startDate} 
+                max={selectedMilestone?.endDate}
+              />
             </div>
           </div>
           <div className="form-group">
@@ -3265,6 +3467,8 @@ const ProjectDetail = ({
           </div>
           <button type="submit" className="btn btn-primary btn-block">Añadir Tarea</button>
         </form>
+      );
+    })()}
       </Modal>
 
       <Modal 
@@ -4278,7 +4482,8 @@ export default function App() {
           taskLogsData,
           changeRequestsData,
           riskActionsData,
-          projectHistoryData
+          projectHistoryData,
+          snapshotsData
         ] = await Promise.all([
           apiService.getProjects().catch(() => mockProjects),
           apiService.getUsers().catch(() => mockUsers),
@@ -4291,7 +4496,8 @@ export default function App() {
           apiService.getTaskLogs().catch(() => mockTaskLogs),
           apiService.getChangeRequests().catch(() => mockChangeRequests),
           apiService.getRiskActions().catch(() => mockRiskActions),
-          apiService.getProjectHistory().catch(() => [])
+          apiService.getProjectHistory().catch(() => []),
+          apiService.getSnapshots().catch(() => [])
         ]);
 
         const normalizeProject = (project: any): Project => ({
@@ -4317,6 +4523,7 @@ export default function App() {
         setChangeRequests(Array.isArray(changeRequestsData) ? changeRequestsData : mockChangeRequests);
         setRiskActions(Array.isArray(riskActionsData) ? riskActionsData.map((ra: any) => ({ ...ra, dueDate: ra.dueDate?.split?.('T')[0] ?? ra.dueDate ?? '' })) : mockRiskActions);
         setProjectHistory(Array.isArray(projectHistoryData) ? projectHistoryData.map((h: any) => ({ ...h, createdAt: h.createdAt?.split?.('T')[0] ?? h.createdAt ?? '' })) : []);
+        setSnapshots(Array.isArray(snapshotsData) ? snapshotsData.map((s: any) => ({ ...s, date: s.date?.split?.('T')[0] ?? s.date ?? '' })) : []);
 
         console.log('Loaded taskLogsData:', taskLogsData);
         console.log('Final taskLogs state:', Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
@@ -4692,8 +4899,42 @@ export default function App() {
     alert(`Línea de presupuesto ${approved ? 'Aprobada' : 'Rechazada'}.`);
   };
 
-  const handleAddSnapshot = (snapshot: ProjectSnapshot) => {
-    setSnapshots([snapshot, ...snapshots]);
+  const handleAddSnapshot = async (snapshot: ProjectSnapshot) => {
+    try {
+      const saved = await apiService.createSnapshot({
+        id: snapshot.id,
+        projectId: snapshot.projectId,
+        date: snapshot.date,
+        highlights: snapshot.highlights,
+        risksIds: snapshot.risksIds,
+        issuesIds: snapshot.issuesIds,
+        milestonesProgress: snapshot.milestonesProgress,
+        overviewData: snapshot.overviewData,
+        reportData: snapshot.reportData,
+        savedBudgetLines: snapshot.savedBudgetLines,
+        savedExpenses: snapshot.savedExpenses,
+        plannedValue: snapshot.plannedValue,
+        earnedValue: snapshot.earnedValue,
+        actualSpent: snapshot.actualSpent,
+        cv: snapshot.cv,
+        sv: snapshot.sv,
+        cpi: snapshot.cpi,
+        spi: snapshot.spi,
+        eac: snapshot.eac,
+        status: snapshot.status
+      });
+
+      const normalizedSnapshot: ProjectSnapshot = {
+        ...snapshot,
+        id: saved.id,
+        date: saved.date?.split?.('T')[0] ?? saved.date ?? snapshot.date
+      };
+
+      setSnapshots([normalizedSnapshot, ...snapshots]);
+    } catch (error) {
+      console.error('Error guardando snapshot en backend:', error);
+      throw error;
+    }
   };
 
   const handleAddRisk = async (projectId: string, riskData: Partial<Risk>) => {

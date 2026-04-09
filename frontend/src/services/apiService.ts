@@ -326,6 +326,21 @@ class ApiService {
     return this.request('/taskLogs');
   }
 
+  async getSnapshots(): Promise<any[]> {
+    return this.request('/snapshots');
+  }
+
+  async getSnapshotsByProject(projectId: string): Promise<any[]> {
+    return this.request(`/snapshots/project/${projectId}`);
+  }
+
+  async createSnapshot(data: any): Promise<any> {
+    return this.request('/snapshots', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   async getProjectHistory(): Promise<any[]> {
     return this.request('/projectHistory');
   }
