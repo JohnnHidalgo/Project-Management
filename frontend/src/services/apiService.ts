@@ -2,13 +2,38 @@
 const API_BASE_URL = 'http://localhost:3001/api';
 
 class ApiService {
+  private token: string | null = null;
+
+  setToken(token: string) {
+    this.token = token;
+    localStorage.setItem('authToken', token);
+  }
+
+  getToken(): string | null {
+    if (!this.token) {
+      this.token = localStorage.getItem('authToken');
+    }
+    return this.token;
+  }
+
+  logout() {
+    this.token = null;
+    localStorage.removeItem('authToken');
+  }
+
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
+    const headers: any = {
+      'Content-Type': 'application/json',
+      ...options?.headers,
+    };
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
     const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers,
       ...options,
     });
 
@@ -17,6 +42,20 @@ class ApiService {
     }
 
     return response.json();
+  }
+
+  // Auth
+  async login(email: string, password: string): Promise<{ token: string; user: any }> {
+    const response = await this.request<{ token: string; user: any }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+    this.setToken(response.token);
+    return response;
+  }
+
+  async getProfile(): Promise<any> {
+    return this.request('/auth/profile');
   }
 
   // Projects

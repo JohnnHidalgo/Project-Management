@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '../.prisma/client/index.js';
 import { PrismaPg } from '@prisma/adapter-pg';
+import authRouter from './routes/auth.js';
 import projectsRouter from './routes/projects.js';
 import usersRouter from './routes/users.js';
 import tasksRouter from './routes/tasks.js';
@@ -38,6 +39,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API routes
+app.use('/api/auth', authRouter);
 app.use('/api/projects', projectsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/tasks', tasksRouter);

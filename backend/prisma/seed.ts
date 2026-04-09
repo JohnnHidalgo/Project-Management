@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { PrismaClient } from '../.prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from 'bcrypt';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set in env');
@@ -10,18 +11,33 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 
+async function hashPassword(password: string): Promise<string> {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+}
+
 async function main() {
-  // Usuarios
-  await prisma.user.createMany({
-    data: [
-      { id: '1', name: 'Rafael Sponsor', role: 'Sponsor', department: 'Executive', phone: '123456', position: 'Director General' },
-      { id: '2', name: 'Ana PMO', role: 'PMO', department: 'PMO Office', phone: '789012', position: 'Gerente de Portafolio' },
-      { id: '3', name: 'Juan PM', role: 'PM', department: 'TI', phone: '345678', position: 'Project Manager Senior' },
-      { id: '4', name: 'Elena Dev', role: 'Team_Member', department: 'Desarrollo', phone: '901234', position: 'Lead Engineer' },
-      { id: '5', name: 'Carlos Tech', role: 'Team_Member', department: 'Sistemas', phone: '567890', position: 'SysAdmin' },
-      { id: '6', name: 'Maria Marketing', role: 'Stakeholder', department: 'Marketing', position: 'Directora de Marca' }
-    ],
-  });
+  // Usuarios - Update existing users with email and password
+  const hashedPassword = await hashPassword('password123');
+  const users = [
+    { id: '1', name: 'Rafael Sponsor', email: 'rafael.sponsor@inti.com', password: hashedPassword, role: 'Sponsor', department: 'Executive', phone: '123456', position: 'Director General' },
+    { id: '2', name: 'Ana PMO', email: 'ana.pmo@inti.com', password: hashedPassword, role: 'PMO', department: 'PMO Office', phone: '789012', position: 'Gerente de Portafolio' },
+    { id: '3', name: 'Juan PM', email: 'juan.pm@inti.com', password: hashedPassword, role: 'PM', department: 'TI', phone: '345678', position: 'Project Manager Senior' },
+    { id: '4', name: 'Elena Dev', email: 'elena.dev@inti.com', password: hashedPassword, role: 'Team_Member', department: 'Desarrollo', phone: '901234', position: 'Lead Engineer' },
+    { id: '5', name: 'Carlos Tech', email: 'carlos.tech@inti.com', password: hashedPassword, role: 'Team_Member', department: 'Sistemas', phone: '567890', position: 'SysAdmin' },
+    { id: '6', name: 'Maria Marketing', email: 'maria.marketing@inti.com', password: hashedPassword, role: 'Stakeholder', department: 'Marketing', position: 'Directora de Marca' }
+  ];
+
+  for (const user of users) {
+    await prisma.user.upsert({
+      where: { id: user.id },
+      update: {
+        email: user.email,
+        password: user.password
+      },
+      create: user
+    });
+  }
 
   // Proyectos
   await prisma.project.createMany({

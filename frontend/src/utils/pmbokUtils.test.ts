@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { calculateEVM, generateSnapshot } from './pmbokUtils';
-import { Project, Milestone, Task, Expense } from '../types';
+import { Project, Milestone, Task, Expense, Risk } from '../types';
+import { mockRisks } from '../mockData';
 
 describe('PMBOK EVM Calculations', () => {
   const mockProject: Project = {
@@ -47,7 +48,7 @@ describe('PMBOK EVM Calculations', () => {
   });
 
   it('should generate a valid snapshot structure', () => {
-    const snapshot = generateSnapshot(mockProject, mockMilestones, mockTasks, mockExpenses, 'Monthly Report');
+    const snapshot = generateSnapshot(mockProject, mockMilestones, mockTasks, mockExpenses, 'Monthly Report', mockRisks);
     
     expect(snapshot.projectId).toBe('p1');
     expect(snapshot.highlights).toBe('Monthly Report');

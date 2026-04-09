@@ -1,5 +1,6 @@
 import { UserRepository } from '../repositories/userRepository.js';
 import { Prisma } from '../../.prisma/client';
+import bcrypt from 'bcrypt';
 
 export class UserService {
   private userRepository: UserRepository;
@@ -25,9 +26,19 @@ export class UserService {
     if (!data.name || data.name.trim().length === 0) {
       throw new Error('User name is required');
     }
+    if (!data.email || data.email.trim().length === 0) {
+      throw new Error('User email is required');
+    }
+    if (!data.password || data.password.trim().length === 0) {
+      throw new Error('User password is required');
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const payload = {
       ...data,
+      password: hashedPassword,
       id: (data as any).id || `u${Date.now()}`,
     };
 
@@ -38,6 +49,11 @@ export class UserService {
     // Validate the user exists
     await this.getUserById(id);
 
+    // Hash password if provided
+    if (data.password) {
+      data.password = await bcrypt.hash(data.password as string, 10);
+    }
+
     return await this.userRepository.update(id, data);
   }
 
@@ -46,5 +62,21 @@ export class UserService {
     await this.getUserById(id);
 
     return await this.userRepository.delete(id);
+  }
+
+  async authenticateUser(email: string, password: string) {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      throw new Error('Invalid credentials');
+    }
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      throw new Error('Invalid credentials');
+    }
+
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   }
 }

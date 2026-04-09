@@ -4,7 +4,14 @@ import { prisma } from '../index.js';
 export class UserRepository {
   async findAll() {
     return await prisma.user.findMany({
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        department: true,
+        phone: true,
+        position: true,
         projectsAsPM: true,
         projectsAsPMO: true,
         sponsorLinks: {
@@ -33,7 +40,14 @@ export class UserRepository {
   async findById(id: string) {
     return await prisma.user.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        department: true,
+        phone: true,
+        position: true,
         projectsAsPM: true,
         projectsAsPMO: true,
         sponsorLinks: {
@@ -62,7 +76,14 @@ export class UserRepository {
   async create(data: Prisma.UserCreateInput) {
     return await prisma.user.create({
       data,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        department: true,
+        phone: true,
+        position: true,
         projectsAsPM: true,
         projectsAsPMO: true
       }
@@ -73,7 +94,14 @@ export class UserRepository {
     return await prisma.user.update({
       where: { id },
       data,
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        department: true,
+        phone: true,
+        position: true,
         projectsAsPM: true,
         projectsAsPMO: true,
         sponsorLinks: {
@@ -90,9 +118,9 @@ export class UserRepository {
     });
   }
 
-  async delete(id: string) {
-    return await prisma.user.delete({
-      where: { id }
+  async findByEmail(email: string) {
+    return await prisma.user.findUnique({
+      where: { email }
     });
   }
 }

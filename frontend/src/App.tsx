@@ -11,13 +11,15 @@ import {
   Target,
   FileText,
   UserCircle,
-  RefreshCw
+  RefreshCw,
+  LogOut
 } from 'lucide-react';
 import { apiService } from './services/apiService';
 import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue, ProjectHistory, CriticalPathResult } from './types';
 import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbokUtils';
 import { mockUsers, mockProjects, mockMilestones, mockTasks, mockRisks, mockIssues, mockExpenses, mockStakeholders, mockTaskLogs, mockChangeRequests, mockRiskActions } from './mockData';
 import CashFlowChart from './components/CashFlowChart';
+import Login from './components/Login';
 import './globals.css';
 
 const getProjectSponsorIds = (project: any): string[] => project?.sponsorIds ?? project?.sponsors?.map((s: any) => s.sponsorId) ?? [];
@@ -25,7 +27,7 @@ const getProjectTeamMemberIds = (project: any): string[] => project?.teamMemberI
 
 // --- Sub-components (Layout) ---
 
-const Sidebar = ({ currentUser, onRoleChange }: { currentUser: User, onRoleChange: (role: UserRole) => void }) => {
+const Sidebar = ({ currentUser, onLogout }: { currentUser: User, onLogout: () => void }) => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -68,20 +70,6 @@ const Sidebar = ({ currentUser, onRoleChange }: { currentUser: User, onRoleChang
       </nav>
 
       <div className="sidebar-footer">
-        <div className="role-switcher">
-          <p className="label">Actuando como:</p>
-          <select 
-            value={currentUser.role} 
-            onChange={(e) => onRoleChange(e.target.value as UserRole)}
-            className="role-select"
-          >
-            <option value="PM">Project Manager</option>
-            <option value="PMO">PMO</option>
-            <option value="Sponsor">Sponsor</option>
-            <option value="Team Member">Team Member</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
         <div className="user-profile">
           <UserCircle size={24} />
           <div className="user-info">
@@ -89,6 +77,14 @@ const Sidebar = ({ currentUser, onRoleChange }: { currentUser: User, onRoleChang
             <p className="user-role">{currentUser.role}</p>
           </div>
         </div>
+        <button 
+          onClick={onLogout}
+          className="btn btn-secondary btn-sm"
+          style={{ marginTop: '1rem', width: '100%' }}
+        >
+          <LogOut size={16} style={{ marginRight: '0.5rem' }} />
+          Cerrar Sesión
+        </button>
       </div>
     </aside>
   );
@@ -4452,7 +4448,8 @@ const RiskDetail = ({
 // --- Main App Implementation ---
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState<User>(mockUsers[1]); // Default Ana PMO
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>(mockProjects);
   const [milestones, setMilestones] = useState<Milestone[]>(mockMilestones);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
@@ -4465,6 +4462,33 @@ export default function App() {
   const [riskActions, setRiskActions] = useState<RiskAction[]>([]);
   const [issues, setIssues] = useState<Issue[]>(mockIssues);
   const [projectHistory, setProjectHistory] = useState<ProjectHistory[]>([]);
+
+  // Check for existing authentication on mount
+  useEffect(() => {
+    const token = apiService.getToken();
+    if (token) {
+      // Try to get user profile
+      apiService.getProfile().then(user => {
+        setCurrentUser(user);
+        setIsAuthenticated(true);
+      }).catch(() => {
+        // Token invalid, logout
+        apiService.logout();
+      });
+    }
+  }, []);
+
+  const handleLogin = (user: User, token: string) => {
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+    apiService.setToken(token);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsAuthenticated(false);
+    apiService.logout();
+  };
 
   // Load data from APIs on component mount
   useEffect(() => {
@@ -4553,11 +4577,6 @@ export default function App() {
     }
   };
 
-  const handleRoleChange = (role: UserRole) => {
-    const user = mockUsers.find(u => u.role === role) || mockUsers[0];
-    setCurrentUser(user);
-  };
-
   const handleSaveProject = async (projectData: Partial<Project> & { sponsorId?: string }) => {
     try {
       const toSave: any = {
@@ -4567,8 +4586,8 @@ export default function App() {
         budget: projectData.budget ?? 0,
         startDate: projectData.startDate ? projectData.startDate : undefined,
         endDate: projectData.endDate ? projectData.endDate : undefined,
-        pmId: projectData.pmId || currentUser.id,
-        pmoId: projectData.pmoId || (currentUser.role === 'PMO' ? currentUser.id : undefined),
+        pmId: projectData.pmId || currentUser!.id,
+        pmoId: projectData.pmoId || (currentUser!.role === 'PMO' ? currentUser!.id : undefined),
         sponsorIds: projectData.sponsorId ? [projectData.sponsorId] : undefined,
         teamMemberIds: projectData.teamMemberIds && projectData.teamMemberIds.length ? projectData.teamMemberIds : undefined,
         generalObjective: projectData.generalObjective || undefined,
@@ -4781,7 +4800,7 @@ export default function App() {
       if (taskBefore && updates.weight !== undefined && updates.weight !== taskBefore.weight) {
         await handleAddTaskLog({
           taskId: id,
-          userId: currentUser.id,
+          userId: currentUser!.id,
           comment: `Cambio de peso de tarea: ${taskBefore.weight}% → ${updates.weight}%`,
           previousProgress: taskBefore.progress,
           newProgress: taskBefore.progress,
@@ -4887,7 +4906,7 @@ export default function App() {
               ? { 
                   ...bl, 
                   status: approved ? 'Approved' : 'Rejected', 
-                  approvedBy: currentUser.id, 
+                  approvedBy: currentUser!.id, 
                   approvalDate: new Date().toISOString().split('T')[0] 
                 } 
               : bl
@@ -4947,7 +4966,7 @@ export default function App() {
         status: 'Open',
         category: riskData.category || 'Scope',
         strategy: riskData.strategy || 'Mitigate',
-        ownerId: currentUser.id
+        ownerId: currentUser!.id
       };
 
       const createdRisk = await apiService.createRisk(payload);
@@ -4982,7 +5001,7 @@ export default function App() {
     try {
       const payload = {
         taskId: logData.taskId || '',
-        userId: logData.userId || currentUser.id,
+        userId: logData.userId || currentUser!.id,
         comment: logData.comment || '',
         previousProgress: logData.previousProgress || 0,
         newProgress: logData.newProgress || 0,
@@ -5023,7 +5042,7 @@ export default function App() {
         newStartDate: crData.newStartDate,
         newEndDate: crData.newEndDate,
         justification: crData.justification,
-        requestedBy: currentUser.id,
+        requestedBy: currentUser!.id,
         status: crData.status || 'Pending'
       });
       setChangeRequests([newCR, ...changeRequests]);
@@ -5096,20 +5115,23 @@ export default function App() {
 
   return (
     <Router>
-      <div className="app-container">
-        <Sidebar currentUser={currentUser} onRoleChange={handleRoleChange} />
-        <main className="main-layout">
-          <Routes>
-            <Route path="/" element={<Dashboard projects={projects} currentUser={currentUser} milestones={milestones} tasks={tasks} expenses={expenses} />} />
-            <Route path="/projects" element={<ProjectListView projects={projects} currentUser={currentUser} milestones={milestones} tasks={tasks} expenses={expenses} />} />
-            <Route path="/global-risks" element={<GlobalRisks risks={risks} projects={projects} />} />
-            <Route path="/global-issues" element={<GlobalIssues issues={issues} projects={projects} onResolveIssue={handleResolveIssue} />} />
-            <Route path="/change-control" element={<ChangeControlBoard changeRequests={changeRequests} projects={projects} tasks={tasks} milestones={milestones} onProcessCR={handleProcessChangeRequest} />} />
-            <Route path="/projects/:id" element={
-              <ProjectDetail 
-                projects={projects} 
-                currentUser={currentUser} 
-                milestones={milestones}
+      {!isAuthenticated ? (
+        <Login onLogin={handleLogin} />
+      ) : (
+        <div className="app-container">
+          <Sidebar currentUser={currentUser!} onLogout={handleLogout} />
+          <main className="main-layout">
+            <Routes>
+              <Route path="/" element={<Dashboard projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
+              <Route path="/projects" element={<ProjectListView projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
+              <Route path="/global-risks" element={<GlobalRisks risks={risks} projects={projects} />} />
+              <Route path="/global-issues" element={<GlobalIssues issues={issues} projects={projects} onResolveIssue={handleResolveIssue} />} />
+              <Route path="/change-control" element={<ChangeControlBoard changeRequests={changeRequests} projects={projects} tasks={tasks} milestones={milestones} onProcessCR={handleProcessChangeRequest} />} />
+              <Route path="/projects/:id" element={
+                <ProjectDetail 
+                  projects={projects} 
+                  currentUser={currentUser!} 
+                  milestones={milestones}
                 tasks={tasks}
                 expenses={expenses}
                 snapshots={snapshots}
@@ -5147,7 +5169,7 @@ export default function App() {
                 risks={risks}
                 riskActions={riskActions}
                 tasks={tasks}
-                currentUser={currentUser}
+                currentUser={currentUser!}
                 onAddRiskAction={handleAddRiskAction}
                 onUpdateRiskActionStatus={handleUpdateRiskActionStatus}
                 onAddTaskToRiskAction={handleAddTaskToRiskActionWrapper}
@@ -5161,6 +5183,7 @@ export default function App() {
           </Routes>
         </main>
       </div>
+      )}
     </Router>
   );
 }
