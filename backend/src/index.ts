@@ -16,6 +16,7 @@ import taskLogsRouter from './routes/taskLogs.js';
 import changeRequestsRouter from './routes/changeRequests.js';
 import projectHistoryRouter from './routes/projectHistory.js';
 import budgetLinesRouter from './routes/budgetLines.js';
+import projectSnapshotsRouter from './routes/projectSnapshots.js';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL not set in .env');
@@ -50,8 +51,7 @@ app.use('/api/taskLogs', taskLogsRouter);
 app.use('/api/changeRequests', changeRequestsRouter);
 app.use('/api/projectHistory', projectHistoryRouter);
 app.use('/api/budgetLines', budgetLinesRouter);
-
-// TODO: Add routes for snapshots, lessons learned, etc.
+app.use('/api/snapshots', projectSnapshotsRouter);
 
 app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);

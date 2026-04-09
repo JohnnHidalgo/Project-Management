@@ -404,19 +404,26 @@ model Stakeholder {
 }
 
 model ProjectSnapshot {
-  id           String         @id
-  projectId    String
-  date         DateTime
-  highlights   String
-  plannedValue Float
-  earnedValue  Float
-  actualSpent  Float
-  cv           Float
-  sv           Float
-  cpi          Float
-  spi          Float
-  eac          Float
-  status       SnapshotStatus
+  id                 String         @id
+  projectId          String
+  date               DateTime
+  highlights         String
+  risksIds           Json?
+  issuesIds          Json?
+  milestonesProgress Json?
+  overviewData       Json?
+  reportData         Json?
+  savedBudgetLines   Json?
+  savedExpenses      Json?
+  plannedValue       Float
+  earnedValue        Float
+  actualSpent        Float
+  cv                 Float
+  sv                 Float
+  cpi                Float
+  spi                Float
+  eac                Float
+  status             SnapshotStatus
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }

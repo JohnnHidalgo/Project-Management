@@ -22468,6 +22468,13 @@ export namespace Prisma {
     projectId: number
     date: number
     highlights: number
+    risksIds: number
+    issuesIds: number
+    milestonesProgress: number
+    overviewData: number
+    reportData: number
+    savedBudgetLines: number
+    savedExpenses: number
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -22540,6 +22547,13 @@ export namespace Prisma {
     projectId?: true
     date?: true
     highlights?: true
+    risksIds?: true
+    issuesIds?: true
+    milestonesProgress?: true
+    overviewData?: true
+    reportData?: true
+    savedBudgetLines?: true
+    savedExpenses?: true
     plannedValue?: true
     earnedValue?: true
     actualSpent?: true
@@ -22643,6 +22657,13 @@ export namespace Prisma {
     projectId: string
     date: Date
     highlights: string
+    risksIds: JsonValue | null
+    issuesIds: JsonValue | null
+    milestonesProgress: JsonValue | null
+    overviewData: JsonValue | null
+    reportData: JsonValue | null
+    savedBudgetLines: JsonValue | null
+    savedExpenses: JsonValue | null
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -22678,6 +22699,13 @@ export namespace Prisma {
     projectId?: boolean
     date?: boolean
     highlights?: boolean
+    risksIds?: boolean
+    issuesIds?: boolean
+    milestonesProgress?: boolean
+    overviewData?: boolean
+    reportData?: boolean
+    savedBudgetLines?: boolean
+    savedExpenses?: boolean
     plannedValue?: boolean
     earnedValue?: boolean
     actualSpent?: boolean
@@ -22695,6 +22723,13 @@ export namespace Prisma {
     projectId?: boolean
     date?: boolean
     highlights?: boolean
+    risksIds?: boolean
+    issuesIds?: boolean
+    milestonesProgress?: boolean
+    overviewData?: boolean
+    reportData?: boolean
+    savedBudgetLines?: boolean
+    savedExpenses?: boolean
     plannedValue?: boolean
     earnedValue?: boolean
     actualSpent?: boolean
@@ -22712,6 +22747,13 @@ export namespace Prisma {
     projectId?: boolean
     date?: boolean
     highlights?: boolean
+    risksIds?: boolean
+    issuesIds?: boolean
+    milestonesProgress?: boolean
+    overviewData?: boolean
+    reportData?: boolean
+    savedBudgetLines?: boolean
+    savedExpenses?: boolean
     plannedValue?: boolean
     earnedValue?: boolean
     actualSpent?: boolean
@@ -22729,6 +22771,13 @@ export namespace Prisma {
     projectId?: boolean
     date?: boolean
     highlights?: boolean
+    risksIds?: boolean
+    issuesIds?: boolean
+    milestonesProgress?: boolean
+    overviewData?: boolean
+    reportData?: boolean
+    savedBudgetLines?: boolean
+    savedExpenses?: boolean
     plannedValue?: boolean
     earnedValue?: boolean
     actualSpent?: boolean
@@ -22740,7 +22789,7 @@ export namespace Prisma {
     status?: boolean
   }
 
-  export type ProjectSnapshotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "date" | "highlights" | "plannedValue" | "earnedValue" | "actualSpent" | "cv" | "sv" | "cpi" | "spi" | "eac" | "status", ExtArgs["result"]["projectSnapshot"]>
+  export type ProjectSnapshotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "date" | "highlights" | "risksIds" | "issuesIds" | "milestonesProgress" | "overviewData" | "reportData" | "savedBudgetLines" | "savedExpenses" | "plannedValue" | "earnedValue" | "actualSpent" | "cv" | "sv" | "cpi" | "spi" | "eac" | "status", ExtArgs["result"]["projectSnapshot"]>
   export type ProjectSnapshotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
   }
@@ -22761,6 +22810,13 @@ export namespace Prisma {
       projectId: string
       date: Date
       highlights: string
+      risksIds: Prisma.JsonValue | null
+      issuesIds: Prisma.JsonValue | null
+      milestonesProgress: Prisma.JsonValue | null
+      overviewData: Prisma.JsonValue | null
+      reportData: Prisma.JsonValue | null
+      savedBudgetLines: Prisma.JsonValue | null
+      savedExpenses: Prisma.JsonValue | null
       plannedValue: number
       earnedValue: number
       actualSpent: number
@@ -23198,6 +23254,13 @@ export namespace Prisma {
     readonly projectId: FieldRef<"ProjectSnapshot", 'String'>
     readonly date: FieldRef<"ProjectSnapshot", 'DateTime'>
     readonly highlights: FieldRef<"ProjectSnapshot", 'String'>
+    readonly risksIds: FieldRef<"ProjectSnapshot", 'Json'>
+    readonly issuesIds: FieldRef<"ProjectSnapshot", 'Json'>
+    readonly milestonesProgress: FieldRef<"ProjectSnapshot", 'Json'>
+    readonly overviewData: FieldRef<"ProjectSnapshot", 'Json'>
+    readonly reportData: FieldRef<"ProjectSnapshot", 'Json'>
+    readonly savedBudgetLines: FieldRef<"ProjectSnapshot", 'Json'>
+    readonly savedExpenses: FieldRef<"ProjectSnapshot", 'Json'>
     readonly plannedValue: FieldRef<"ProjectSnapshot", 'Float'>
     readonly earnedValue: FieldRef<"ProjectSnapshot", 'Float'>
     readonly actualSpent: FieldRef<"ProjectSnapshot", 'Float'>
@@ -24972,6 +25035,13 @@ export namespace Prisma {
     projectId: 'projectId',
     date: 'date',
     highlights: 'highlights',
+    risksIds: 'risksIds',
+    issuesIds: 'issuesIds',
+    milestonesProgress: 'milestonesProgress',
+    overviewData: 'overviewData',
+    reportData: 'reportData',
+    savedBudgetLines: 'savedBudgetLines',
+    savedExpenses: 'savedExpenses',
     plannedValue: 'plannedValue',
     earnedValue: 'earnedValue',
     actualSpent: 'actualSpent',
@@ -26699,6 +26769,13 @@ export namespace Prisma {
     projectId?: StringFilter<"ProjectSnapshot"> | string
     date?: DateTimeFilter<"ProjectSnapshot"> | Date | string
     highlights?: StringFilter<"ProjectSnapshot"> | string
+    risksIds?: JsonNullableFilter<"ProjectSnapshot">
+    issuesIds?: JsonNullableFilter<"ProjectSnapshot">
+    milestonesProgress?: JsonNullableFilter<"ProjectSnapshot">
+    overviewData?: JsonNullableFilter<"ProjectSnapshot">
+    reportData?: JsonNullableFilter<"ProjectSnapshot">
+    savedBudgetLines?: JsonNullableFilter<"ProjectSnapshot">
+    savedExpenses?: JsonNullableFilter<"ProjectSnapshot">
     plannedValue?: FloatFilter<"ProjectSnapshot"> | number
     earnedValue?: FloatFilter<"ProjectSnapshot"> | number
     actualSpent?: FloatFilter<"ProjectSnapshot"> | number
@@ -26716,6 +26793,13 @@ export namespace Prisma {
     projectId?: SortOrder
     date?: SortOrder
     highlights?: SortOrder
+    risksIds?: SortOrderInput | SortOrder
+    issuesIds?: SortOrderInput | SortOrder
+    milestonesProgress?: SortOrderInput | SortOrder
+    overviewData?: SortOrderInput | SortOrder
+    reportData?: SortOrderInput | SortOrder
+    savedBudgetLines?: SortOrderInput | SortOrder
+    savedExpenses?: SortOrderInput | SortOrder
     plannedValue?: SortOrder
     earnedValue?: SortOrder
     actualSpent?: SortOrder
@@ -26736,6 +26820,13 @@ export namespace Prisma {
     projectId?: StringFilter<"ProjectSnapshot"> | string
     date?: DateTimeFilter<"ProjectSnapshot"> | Date | string
     highlights?: StringFilter<"ProjectSnapshot"> | string
+    risksIds?: JsonNullableFilter<"ProjectSnapshot">
+    issuesIds?: JsonNullableFilter<"ProjectSnapshot">
+    milestonesProgress?: JsonNullableFilter<"ProjectSnapshot">
+    overviewData?: JsonNullableFilter<"ProjectSnapshot">
+    reportData?: JsonNullableFilter<"ProjectSnapshot">
+    savedBudgetLines?: JsonNullableFilter<"ProjectSnapshot">
+    savedExpenses?: JsonNullableFilter<"ProjectSnapshot">
     plannedValue?: FloatFilter<"ProjectSnapshot"> | number
     earnedValue?: FloatFilter<"ProjectSnapshot"> | number
     actualSpent?: FloatFilter<"ProjectSnapshot"> | number
@@ -26753,6 +26844,13 @@ export namespace Prisma {
     projectId?: SortOrder
     date?: SortOrder
     highlights?: SortOrder
+    risksIds?: SortOrderInput | SortOrder
+    issuesIds?: SortOrderInput | SortOrder
+    milestonesProgress?: SortOrderInput | SortOrder
+    overviewData?: SortOrderInput | SortOrder
+    reportData?: SortOrderInput | SortOrder
+    savedBudgetLines?: SortOrderInput | SortOrder
+    savedExpenses?: SortOrderInput | SortOrder
     plannedValue?: SortOrder
     earnedValue?: SortOrder
     actualSpent?: SortOrder
@@ -26777,6 +26875,13 @@ export namespace Prisma {
     projectId?: StringWithAggregatesFilter<"ProjectSnapshot"> | string
     date?: DateTimeWithAggregatesFilter<"ProjectSnapshot"> | Date | string
     highlights?: StringWithAggregatesFilter<"ProjectSnapshot"> | string
+    risksIds?: JsonNullableWithAggregatesFilter<"ProjectSnapshot">
+    issuesIds?: JsonNullableWithAggregatesFilter<"ProjectSnapshot">
+    milestonesProgress?: JsonNullableWithAggregatesFilter<"ProjectSnapshot">
+    overviewData?: JsonNullableWithAggregatesFilter<"ProjectSnapshot">
+    reportData?: JsonNullableWithAggregatesFilter<"ProjectSnapshot">
+    savedBudgetLines?: JsonNullableWithAggregatesFilter<"ProjectSnapshot">
+    savedExpenses?: JsonNullableWithAggregatesFilter<"ProjectSnapshot">
     plannedValue?: FloatWithAggregatesFilter<"ProjectSnapshot"> | number
     earnedValue?: FloatWithAggregatesFilter<"ProjectSnapshot"> | number
     actualSpent?: FloatWithAggregatesFilter<"ProjectSnapshot"> | number
@@ -28238,6 +28343,13 @@ export namespace Prisma {
     id: string
     date: Date | string
     highlights: string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -28255,6 +28367,13 @@ export namespace Prisma {
     projectId: string
     date: Date | string
     highlights: string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -28270,6 +28389,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     highlights?: StringFieldUpdateOperationsInput | string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue?: FloatFieldUpdateOperationsInput | number
     earnedValue?: FloatFieldUpdateOperationsInput | number
     actualSpent?: FloatFieldUpdateOperationsInput | number
@@ -28287,6 +28413,13 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     highlights?: StringFieldUpdateOperationsInput | string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue?: FloatFieldUpdateOperationsInput | number
     earnedValue?: FloatFieldUpdateOperationsInput | number
     actualSpent?: FloatFieldUpdateOperationsInput | number
@@ -28303,6 +28436,13 @@ export namespace Prisma {
     projectId: string
     date: Date | string
     highlights: string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -28318,6 +28458,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     highlights?: StringFieldUpdateOperationsInput | string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue?: FloatFieldUpdateOperationsInput | number
     earnedValue?: FloatFieldUpdateOperationsInput | number
     actualSpent?: FloatFieldUpdateOperationsInput | number
@@ -28334,6 +28481,13 @@ export namespace Prisma {
     projectId?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     highlights?: StringFieldUpdateOperationsInput | string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue?: FloatFieldUpdateOperationsInput | number
     earnedValue?: FloatFieldUpdateOperationsInput | number
     actualSpent?: FloatFieldUpdateOperationsInput | number
@@ -29842,6 +29996,13 @@ export namespace Prisma {
     projectId?: SortOrder
     date?: SortOrder
     highlights?: SortOrder
+    risksIds?: SortOrder
+    issuesIds?: SortOrder
+    milestonesProgress?: SortOrder
+    overviewData?: SortOrder
+    reportData?: SortOrder
+    savedBudgetLines?: SortOrder
+    savedExpenses?: SortOrder
     plannedValue?: SortOrder
     earnedValue?: SortOrder
     actualSpent?: SortOrder
@@ -33760,6 +33921,13 @@ export namespace Prisma {
     id: string
     date: Date | string
     highlights: string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -33775,6 +33943,13 @@ export namespace Prisma {
     id: string
     date: Date | string
     highlights: string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -34169,6 +34344,13 @@ export namespace Prisma {
     projectId?: StringFilter<"ProjectSnapshot"> | string
     date?: DateTimeFilter<"ProjectSnapshot"> | Date | string
     highlights?: StringFilter<"ProjectSnapshot"> | string
+    risksIds?: JsonNullableFilter<"ProjectSnapshot">
+    issuesIds?: JsonNullableFilter<"ProjectSnapshot">
+    milestonesProgress?: JsonNullableFilter<"ProjectSnapshot">
+    overviewData?: JsonNullableFilter<"ProjectSnapshot">
+    reportData?: JsonNullableFilter<"ProjectSnapshot">
+    savedBudgetLines?: JsonNullableFilter<"ProjectSnapshot">
+    savedExpenses?: JsonNullableFilter<"ProjectSnapshot">
     plannedValue?: FloatFilter<"ProjectSnapshot"> | number
     earnedValue?: FloatFilter<"ProjectSnapshot"> | number
     actualSpent?: FloatFilter<"ProjectSnapshot"> | number
@@ -39047,6 +39229,13 @@ export namespace Prisma {
     id: string
     date: Date | string
     highlights: string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue: number
     earnedValue: number
     actualSpent: number
@@ -39324,6 +39513,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     highlights?: StringFieldUpdateOperationsInput | string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue?: FloatFieldUpdateOperationsInput | number
     earnedValue?: FloatFieldUpdateOperationsInput | number
     actualSpent?: FloatFieldUpdateOperationsInput | number
@@ -39339,6 +39535,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     highlights?: StringFieldUpdateOperationsInput | string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue?: FloatFieldUpdateOperationsInput | number
     earnedValue?: FloatFieldUpdateOperationsInput | number
     actualSpent?: FloatFieldUpdateOperationsInput | number
@@ -39354,6 +39557,13 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     date?: DateTimeFieldUpdateOperationsInput | Date | string
     highlights?: StringFieldUpdateOperationsInput | string
+    risksIds?: NullableJsonNullValueInput | InputJsonValue
+    issuesIds?: NullableJsonNullValueInput | InputJsonValue
+    milestonesProgress?: NullableJsonNullValueInput | InputJsonValue
+    overviewData?: NullableJsonNullValueInput | InputJsonValue
+    reportData?: NullableJsonNullValueInput | InputJsonValue
+    savedBudgetLines?: NullableJsonNullValueInput | InputJsonValue
+    savedExpenses?: NullableJsonNullValueInput | InputJsonValue
     plannedValue?: FloatFieldUpdateOperationsInput | number
     earnedValue?: FloatFieldUpdateOperationsInput | number
     actualSpent?: FloatFieldUpdateOperationsInput | number
