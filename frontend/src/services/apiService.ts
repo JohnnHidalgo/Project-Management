@@ -81,6 +81,13 @@ class ApiService {
     });
   }
 
+  async togglePmCanEdit(id: string, pmCanEdit: boolean): Promise<any> {
+    return this.request(`/projects/${id}/toggle-edit`, {
+      method: 'PUT',
+      body: JSON.stringify({ pmCanEdit }),
+    });
+  }
+
   async deleteProject(id: string): Promise<void> {
     return this.request(`/projects/${id}`, {
       method: 'DELETE',

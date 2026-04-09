@@ -44,6 +44,13 @@ export class StakeholderController {
 
   async createStakeholder(req: Request, res: Response) {
     try {
+      const userRole = (req as any).user?.role;
+      
+      // Sponsors cannot create stakeholders
+      if (userRole === 'Sponsor') {
+        return res.status(403).json({ error: 'Sponsors cannot create stakeholders' });
+      }
+      
       const data = req.body;
       const stakeholder = await this.stakeholderService.createStakeholder(data);
       res.status(201).json(stakeholder);

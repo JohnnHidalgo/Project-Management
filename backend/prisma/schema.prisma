@@ -185,6 +185,7 @@ model Project {
   actualCost     Float?
   cpi            Float?
   spi            Float?
+  pmCanEdit      Boolean @default(false) // Controla si el PM puede editar la información del proyecto
 
   pm    User? @relation("ProjectPM", fields: [pmId], references: [id], onDelete: Cascade)
   pmo   User? @relation("ProjectPMO", fields: [pmoId], references: [id], onDelete: Cascade)

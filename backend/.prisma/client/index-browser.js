@@ -153,7 +153,8 @@ exports.Prisma.ProjectScalarFieldEnum = {
   earnedValue: 'earnedValue',
   actualCost: 'actualCost',
   cpi: 'cpi',
-  spi: 'spi'
+  spi: 'spi',
+  pmCanEdit: 'pmCanEdit'
 };
 
 exports.Prisma.ProjectSponsorScalarFieldEnum = {

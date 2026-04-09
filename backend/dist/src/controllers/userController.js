@@ -7,6 +7,7 @@ export class UserController {
     async getAllUsers(req, res) {
         try {
             const users = await this.userService.getAllUsers();
+            // Passwords are not included in the service response for security
             res.json(users);
         }
         catch (error) {
@@ -17,6 +18,7 @@ export class UserController {
         try {
             const { id } = req.params;
             const user = await this.userService.getUserById(id);
+            // Password is not included in the service response for security
             res.json(user);
         }
         catch (error) {
@@ -32,6 +34,7 @@ export class UserController {
         try {
             const data = req.body;
             const user = await this.userService.createUser(data);
+            // Password is not included in the service response for security
             res.status(201).json(user);
         }
         catch (error) {
@@ -48,6 +51,7 @@ export class UserController {
             const { id } = req.params;
             const data = req.body;
             const user = await this.userService.updateUser(id, data);
+            // Password is not included in the service response for security
             res.json(user);
         }
         catch (error) {

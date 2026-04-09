@@ -13,7 +13,7 @@ export type ProjectStatus =
   | 'Draft' 
   | 'Pending Initial Approval' 
   | 'Planning' 
-  | 'Charter Approval' 
+  | 'Charter_Approval' 
   | 'Active' 
   | 'Completed' 
   | 'Cancelled';
@@ -49,6 +49,7 @@ export interface Project {
   rejectionComments?: string;
   
   progress: number;
+  pmCanEdit: boolean; // Controla si el PM puede editar la información del proyecto
   
   // PMBOK EVM Metrics (Current Status)
   plannedValue?: number;  // PV

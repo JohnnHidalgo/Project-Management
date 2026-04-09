@@ -35,11 +35,11 @@ async function main() {
         email: user.email,
         password: user.password
       },
-      create: user
+      create: user as any
     });
   }
 
-  // Proyectos
+  // Proyectos - Create all projects with pmCanEdit field
   await prisma.project.createMany({
     data: [
       {
@@ -58,6 +58,7 @@ async function main() {
         assumptions: 'AWS mantiene precios competitivos; El equipo interno tiene tiempo para capacitación.',
         constraints: 'Debe terminarse antes del vencimiento del contrato del datacenter actual.',
         progress: 45,
+        pmCanEdit: true,
       },
       {
         id: 'p2',
@@ -73,6 +74,7 @@ async function main() {
         strategicAlignment: 'Excelencia en el Cliente',
         generalObjective: 'Centralizar la información de clientes para aumentar la tasa de conversión en un 15%.',
         progress: 10,
+        pmCanEdit: false,
       },
       {
         id: 'p3',
@@ -87,6 +89,7 @@ async function main() {
         strategicAlignment: 'Crecimiento Logístico',
         generalObjective: 'Aumentar la capacidad de almacenamiento en un 50% y reducir tiempos de despacho.',
         progress: 0,
+        pmCanEdit: false,
       },
       {
         id: 'p4',
@@ -102,6 +105,7 @@ async function main() {
         strategicAlignment: 'Excelencia Operacional',
         generalObjective: 'Aumentar la eficiencia de producción en un 25% y reducir el desperdicio de materia prima.',
         progress: 25,
+        pmCanEdit: true,
       },
       {
         id: 'p5',
@@ -116,6 +120,7 @@ async function main() {
         strategicAlignment: 'Digitalización del Cliente',
         generalObjective: 'Reducir el volumen de llamadas a soporte en un 40% proporcionando herramientas digitales.',
         progress: 5,
+        pmCanEdit: false,
       },
       {
         id: 'p6',
@@ -130,6 +135,7 @@ async function main() {
         strategicAlignment: 'Gestión de Riesgos Corporativos',
         generalObjective: 'Obtener la certificación ISO 27001 para mitigar riesgos de ciberseguridad y cumplir con regulaciones.',
         progress: 60,
+        pmCanEdit: false,
       },
       {
         id: 'p7',
@@ -144,8 +150,10 @@ async function main() {
         strategicAlignment: 'Infraestructura Tecnológica',
         generalObjective: 'Modernizar la red core para soportar tráfico de 10Gbps en toda la planta.',
         progress: 100,
+        pmCanEdit: false,
       }
     ],
+    skipDuplicates: true,
   });
 
   // Project relations: sponsors + team members

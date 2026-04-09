@@ -1,25 +1,39 @@
 import 'dotenv/config';
 import { PrismaClient } from '../.prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from 'bcrypt';
 if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL is not set in env');
 }
 const prisma = new PrismaClient({
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
+async function hashPassword(password) {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+}
 async function main() {
-    // Usuarios
-    await prisma.user.createMany({
-        data: [
-            { id: '1', name: 'Rafael Sponsor', role: 'Sponsor', department: 'Executive', phone: '123456', position: 'Director General' },
-            { id: '2', name: 'Ana PMO', role: 'PMO', department: 'PMO Office', phone: '789012', position: 'Gerente de Portafolio' },
-            { id: '3', name: 'Juan PM', role: 'PM', department: 'TI', phone: '345678', position: 'Project Manager Senior' },
-            { id: '4', name: 'Elena Dev', role: 'Team_Member', department: 'Desarrollo', phone: '901234', position: 'Lead Engineer' },
-            { id: '5', name: 'Carlos Tech', role: 'Team_Member', department: 'Sistemas', phone: '567890', position: 'SysAdmin' },
-            { id: '6', name: 'Maria Marketing', role: 'Stakeholder', department: 'Marketing', position: 'Directora de Marca' }
-        ],
-    });
-    // Proyectos
+    // Usuarios - Update existing users with email and password
+    const hashedPassword = await hashPassword('password123');
+    const users = [
+        { id: '1', name: 'Rafael Sponsor', email: 'rafael.sponsor@inti.com', password: hashedPassword, role: 'Sponsor', department: 'Executive', phone: '123456', position: 'Director General' },
+        { id: '2', name: 'Ana PMO', email: 'ana.pmo@inti.com', password: hashedPassword, role: 'PMO', department: 'PMO Office', phone: '789012', position: 'Gerente de Portafolio' },
+        { id: '3', name: 'Juan PM', email: 'juan.pm@inti.com', password: hashedPassword, role: 'PM', department: 'TI', phone: '345678', position: 'Project Manager Senior' },
+        { id: '4', name: 'Elena Dev', email: 'elena.dev@inti.com', password: hashedPassword, role: 'Team_Member', department: 'Desarrollo', phone: '901234', position: 'Lead Engineer' },
+        { id: '5', name: 'Carlos Tech', email: 'carlos.tech@inti.com', password: hashedPassword, role: 'Team_Member', department: 'Sistemas', phone: '567890', position: 'SysAdmin' },
+        { id: '6', name: 'Maria Marketing', email: 'maria.marketing@inti.com', password: hashedPassword, role: 'Stakeholder', department: 'Marketing', position: 'Directora de Marca' }
+    ];
+    for (const user of users) {
+        await prisma.user.upsert({
+            where: { id: user.id },
+            update: {
+                email: user.email,
+                password: user.password
+            },
+            create: user
+        });
+    }
+    // Proyectos - Create all projects with pmCanEdit field
     await prisma.project.createMany({
         data: [
             {
@@ -38,6 +52,7 @@ async function main() {
                 assumptions: 'AWS mantiene precios competitivos; El equipo interno tiene tiempo para capacitación.',
                 constraints: 'Debe terminarse antes del vencimiento del contrato del datacenter actual.',
                 progress: 45,
+                pmCanEdit: true,
             },
             {
                 id: 'p2',
@@ -53,6 +68,7 @@ async function main() {
                 strategicAlignment: 'Excelencia en el Cliente',
                 generalObjective: 'Centralizar la información de clientes para aumentar la tasa de conversión en un 15%.',
                 progress: 10,
+                pmCanEdit: false,
             },
             {
                 id: 'p3',
@@ -67,6 +83,7 @@ async function main() {
                 strategicAlignment: 'Crecimiento Logístico',
                 generalObjective: 'Aumentar la capacidad de almacenamiento en un 50% y reducir tiempos de despacho.',
                 progress: 0,
+                pmCanEdit: false,
             },
             {
                 id: 'p4',
@@ -82,6 +99,7 @@ async function main() {
                 strategicAlignment: 'Excelencia Operacional',
                 generalObjective: 'Aumentar la eficiencia de producción en un 25% y reducir el desperdicio de materia prima.',
                 progress: 25,
+                pmCanEdit: true,
             },
             {
                 id: 'p5',
@@ -96,6 +114,7 @@ async function main() {
                 strategicAlignment: 'Digitalización del Cliente',
                 generalObjective: 'Reducir el volumen de llamadas a soporte en un 40% proporcionando herramientas digitales.',
                 progress: 5,
+                pmCanEdit: false,
             },
             {
                 id: 'p6',
@@ -110,6 +129,7 @@ async function main() {
                 strategicAlignment: 'Gestión de Riesgos Corporativos',
                 generalObjective: 'Obtener la certificación ISO 27001 para mitigar riesgos de ciberseguridad y cumplir con regulaciones.',
                 progress: 60,
+                pmCanEdit: false,
             },
             {
                 id: 'p7',
@@ -124,8 +144,10 @@ async function main() {
                 strategicAlignment: 'Infraestructura Tecnológica',
                 generalObjective: 'Modernizar la red core para soportar tráfico de 10Gbps en toda la planta.',
                 progress: 100,
+                pmCanEdit: false,
             }
         ],
+        skipDuplicates: true,
     });
     // Project relations: sponsors + team members
     await prisma.projectSponsor.createMany({
@@ -190,9 +212,9 @@ async function main() {
     await prisma.task.createMany({
         data: [
             { id: 't1', milestoneId: 'm1', name: 'Diseño de VPC', description: 'Definir subredes y seguridad', startDate: new Date('2026-01-05'), endDate: new Date('2026-01-15'), assignedTo: '4', progress: 100, status: 'Completed', priority: 'High' },
-            { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: new Date('2026-01-16'), endDate: new Date('2026-01-30'), assignedTo: '5', progress: 100, status: 'Completed', priority: 'High' },
+            { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: new Date('2026-01-16'), endDate: new Date('2026-01-30'), assignedTo: '5', progress: 100, status: 'Completed', priority: 'High', predecessorId: 't1' },
             { id: 't3', milestoneId: 'm2', name: 'Limpieza de Datos', description: 'Eliminar registros obsoletos', startDate: new Date('2026-02-20'), endDate: new Date('2026-03-30'), assignedTo: '4', progress: 80, status: 'In_Progress', priority: 'Medium' },
-            { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: new Date('2026-04-01'), endDate: new Date('2026-05-15'), assignedTo: '5', progress: 10, status: 'Pending', priority: 'High' },
+            { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: new Date('2026-04-01'), endDate: new Date('2026-05-15'), assignedTo: '5', progress: 10, status: 'Pending', priority: 'High', predecessorId: 't3' },
             { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: new Date('2026-03-05'), endDate: new Date('2026-03-25'), assignedTo: '6', progress: 40, status: 'In_Progress', priority: 'High' }
         ]
     });

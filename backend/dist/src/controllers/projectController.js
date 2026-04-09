@@ -47,7 +47,9 @@ export class ProjectController {
         try {
             const { id } = req.params;
             const data = req.body;
-            const project = await this.projectService.updateProject(id, data);
+            const userId = req.user?.id;
+            const userRole = req.user?.role;
+            const project = await this.projectService.updateProject(id, data, userId, userRole);
             res.json(project);
         }
         catch (error) {
@@ -59,6 +61,30 @@ export class ProjectController {
             }
             else {
                 res.status(500).json({ error: 'Failed to update project' });
+            }
+        }
+    }
+    async togglePmCanEdit(req, res) {
+        try {
+            const { id } = req.params;
+            const { pmCanEdit } = req.body;
+            const userRole = req.user?.role;
+            // Only PMO can change pmCanEdit
+            if (userRole !== 'PMO') {
+                return res.status(403).json({ error: 'Only PMO can change project edit permissions' });
+            }
+            const project = await this.projectService.togglePmCanEdit(id, pmCanEdit);
+            res.json(project);
+        }
+        catch (error) {
+            if (error instanceof Error && error.message === 'Project not found') {
+                res.status(404).json({ error: error.message });
+            }
+            else if (error instanceof Error) {
+                res.status(400).json({ error: error.message });
+            }
+            else {
+                res.status(500).json({ error: 'Failed to update project permissions' });
             }
         }
     }

@@ -95,9 +95,40 @@ export class ProjectService {
     return createdProject;
   }
 
-  async updateProject(id: string, data: Partial<Project>) {
+  async updateProject(id: string, data: Partial<Project>, userId?: string, userRole?: string) {
     // Validate the project exists
-    await this.getProjectById(id);
+    const existingProject = await this.getProjectById(id);
+
+    // Get all sponsor IDs for this project
+    const sponsorIds = existingProject.sponsors?.map((s: any) => s.sponsorId) || [];
+    const isProjectSponsor = sponsorIds.includes(userId);
+
+    // Authorization logic:
+    // 1. PM can only edit when pmCanEdit is true (not during Charter_Approval)
+    // 2. Sponsors can edit when project is in Charter_Approval status
+    // 3. PMO and Admin can always edit
+    
+    if (userRole === 'PM') {
+      if (existingProject.pmId !== userId) {
+        throw new Error('Only the assigned PM can edit this project');
+      }
+      if (existingProject.status === 'Charter_Approval') {
+        throw new Error('PM cannot edit project during Charter_Approval');
+      }
+      if (!existingProject.pmCanEdit) {
+        throw new Error('PM cannot edit project until PMO grants permission');
+      }
+    } else if (userRole === 'Sponsor') {
+      if (!isProjectSponsor) {
+        throw new Error('You are not a sponsor for this project');
+      }
+      // Sponsors can only change status during Charter_Approval
+      if (existingProject.status !== 'Charter_Approval' && data.status !== undefined) {
+        throw new Error('Sponsors can only approve or reject projects in Charter_Approval status');
+      }
+    } else if (userRole !== 'PMO' && userRole !== 'Admin') {
+      throw new Error('You do not have permission to edit this project');
+    }
 
     // Business logic validation
     if (data.budget !== undefined && data.budget < 0) {
@@ -116,6 +147,24 @@ export class ProjectService {
       updatedProject.id,
       'Updated',
       { updates: data, project: updatedProject },
+      userId
+    );
+
+    return updatedProject;
+  }
+
+  async togglePmCanEdit(id: string, pmCanEdit: boolean) {
+    // Validate the project exists
+    await this.getProjectById(id);
+
+    const updatedProject = await this.projectRepository.update(id, { pmCanEdit });
+
+    await this.projectHistoryService.record(
+      updatedProject.id,
+      'Project',
+      updatedProject.id,
+      pmCanEdit ? 'PM Edit Enabled' : 'PM Edit Disabled',
+      { pmCanEdit },
       undefined
     );
 

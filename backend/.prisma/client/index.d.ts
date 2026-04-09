@@ -4631,6 +4631,7 @@ export namespace Prisma {
     actualCost: number | null
     cpi: number | null
     spi: number | null
+    pmCanEdit: boolean | null
   }
 
   export type ProjectMaxAggregateOutputType = {
@@ -4656,6 +4657,7 @@ export namespace Prisma {
     actualCost: number | null
     cpi: number | null
     spi: number | null
+    pmCanEdit: boolean | null
   }
 
   export type ProjectCountAggregateOutputType = {
@@ -4681,6 +4683,7 @@ export namespace Prisma {
     actualCost: number
     cpi: number
     spi: number
+    pmCanEdit: number
     _all: number
   }
 
@@ -4728,6 +4731,7 @@ export namespace Prisma {
     actualCost?: true
     cpi?: true
     spi?: true
+    pmCanEdit?: true
   }
 
   export type ProjectMaxAggregateInputType = {
@@ -4753,6 +4757,7 @@ export namespace Prisma {
     actualCost?: true
     cpi?: true
     spi?: true
+    pmCanEdit?: true
   }
 
   export type ProjectCountAggregateInputType = {
@@ -4778,6 +4783,7 @@ export namespace Prisma {
     actualCost?: true
     cpi?: true
     spi?: true
+    pmCanEdit?: true
     _all?: true
   }
 
@@ -4890,6 +4896,7 @@ export namespace Prisma {
     actualCost: number | null
     cpi: number | null
     spi: number | null
+    pmCanEdit: boolean
     _count: ProjectCountAggregateOutputType | null
     _avg: ProjectAvgAggregateOutputType | null
     _sum: ProjectSumAggregateOutputType | null
@@ -4934,6 +4941,7 @@ export namespace Prisma {
     actualCost?: boolean
     cpi?: boolean
     spi?: boolean
+    pmCanEdit?: boolean
     pm?: boolean | Project$pmArgs<ExtArgs>
     pmo?: boolean | Project$pmoArgs<ExtArgs>
     sponsors?: boolean | Project$sponsorsArgs<ExtArgs>
@@ -4974,6 +4982,7 @@ export namespace Prisma {
     actualCost?: boolean
     cpi?: boolean
     spi?: boolean
+    pmCanEdit?: boolean
     pm?: boolean | Project$pmArgs<ExtArgs>
     pmo?: boolean | Project$pmoArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
@@ -5001,6 +5010,7 @@ export namespace Prisma {
     actualCost?: boolean
     cpi?: boolean
     spi?: boolean
+    pmCanEdit?: boolean
     pm?: boolean | Project$pmArgs<ExtArgs>
     pmo?: boolean | Project$pmoArgs<ExtArgs>
   }, ExtArgs["result"]["project"]>
@@ -5028,9 +5038,10 @@ export namespace Prisma {
     actualCost?: boolean
     cpi?: boolean
     spi?: boolean
+    pmCanEdit?: boolean
   }
 
-  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "status" | "budget" | "startDate" | "endDate" | "pmId" | "pmoId" | "businessCase" | "strategicAlignment" | "generalObjective" | "benefits" | "assumptions" | "constraints" | "rejectionComments" | "progress" | "plannedValue" | "earnedValue" | "actualCost" | "cpi" | "spi", ExtArgs["result"]["project"]>
+  export type ProjectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "status" | "budget" | "startDate" | "endDate" | "pmId" | "pmoId" | "businessCase" | "strategicAlignment" | "generalObjective" | "benefits" | "assumptions" | "constraints" | "rejectionComments" | "progress" | "plannedValue" | "earnedValue" | "actualCost" | "cpi" | "spi" | "pmCanEdit", ExtArgs["result"]["project"]>
   export type ProjectInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     pm?: boolean | Project$pmArgs<ExtArgs>
     pmo?: boolean | Project$pmoArgs<ExtArgs>
@@ -5098,6 +5109,7 @@ export namespace Prisma {
       actualCost: number | null
       cpi: number | null
       spi: number | null
+      pmCanEdit: boolean
     }, ExtArgs["result"]["project"]>
     composites: {}
   }
@@ -5557,6 +5569,7 @@ export namespace Prisma {
     readonly actualCost: FieldRef<"Project", 'Float'>
     readonly cpi: FieldRef<"Project", 'Float'>
     readonly spi: FieldRef<"Project", 'Float'>
+    readonly pmCanEdit: FieldRef<"Project", 'Boolean'>
   }
     
 
@@ -24862,7 +24875,8 @@ export namespace Prisma {
     earnedValue: 'earnedValue',
     actualCost: 'actualCost',
     cpi: 'cpi',
-    spi: 'spi'
+    spi: 'spi',
+    pmCanEdit: 'pmCanEdit'
   };
 
   export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
@@ -25224,6 +25238,13 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -25614,6 +25635,7 @@ export namespace Prisma {
     actualCost?: FloatNullableFilter<"Project"> | number | null
     cpi?: FloatNullableFilter<"Project"> | number | null
     spi?: FloatNullableFilter<"Project"> | number | null
+    pmCanEdit?: BoolFilter<"Project"> | boolean
     pm?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     pmo?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     sponsors?: ProjectSponsorListRelationFilter
@@ -25653,6 +25675,7 @@ export namespace Prisma {
     actualCost?: SortOrderInput | SortOrder
     cpi?: SortOrderInput | SortOrder
     spi?: SortOrderInput | SortOrder
+    pmCanEdit?: SortOrder
     pm?: UserOrderByWithRelationInput
     pmo?: UserOrderByWithRelationInput
     sponsors?: ProjectSponsorOrderByRelationAggregateInput
@@ -25695,6 +25718,7 @@ export namespace Prisma {
     actualCost?: FloatNullableFilter<"Project"> | number | null
     cpi?: FloatNullableFilter<"Project"> | number | null
     spi?: FloatNullableFilter<"Project"> | number | null
+    pmCanEdit?: BoolFilter<"Project"> | boolean
     pm?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     pmo?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     sponsors?: ProjectSponsorListRelationFilter
@@ -25734,6 +25758,7 @@ export namespace Prisma {
     actualCost?: SortOrderInput | SortOrder
     cpi?: SortOrderInput | SortOrder
     spi?: SortOrderInput | SortOrder
+    pmCanEdit?: SortOrder
     _count?: ProjectCountOrderByAggregateInput
     _avg?: ProjectAvgOrderByAggregateInput
     _max?: ProjectMaxOrderByAggregateInput
@@ -25767,6 +25792,7 @@ export namespace Prisma {
     actualCost?: FloatNullableWithAggregatesFilter<"Project"> | number | null
     cpi?: FloatNullableWithAggregatesFilter<"Project"> | number | null
     spi?: FloatNullableWithAggregatesFilter<"Project"> | number | null
+    pmCanEdit?: BoolWithAggregatesFilter<"Project"> | boolean
   }
 
   export type ProjectSponsorWhereInput = {
@@ -27149,6 +27175,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -27188,6 +27215,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -27223,6 +27251,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -27262,6 +27291,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -27299,6 +27329,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
   }
 
   export type ProjectUpdateManyMutationInput = {
@@ -27322,6 +27353,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProjectUncheckedUpdateManyInput = {
@@ -27347,6 +27379,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProjectSponsorCreateInput = {
@@ -28911,6 +28944,11 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
@@ -28989,6 +29027,7 @@ export namespace Prisma {
     actualCost?: SortOrder
     cpi?: SortOrder
     spi?: SortOrder
+    pmCanEdit?: SortOrder
   }
 
   export type ProjectAvgOrderByAggregateInput = {
@@ -29024,6 +29063,7 @@ export namespace Prisma {
     actualCost?: SortOrder
     cpi?: SortOrder
     spi?: SortOrder
+    pmCanEdit?: SortOrder
   }
 
   export type ProjectMinOrderByAggregateInput = {
@@ -29049,6 +29089,7 @@ export namespace Prisma {
     actualCost?: SortOrder
     cpi?: SortOrder
     spi?: SortOrder
+    pmCanEdit?: SortOrder
   }
 
   export type ProjectSumOrderByAggregateInput = {
@@ -29131,6 +29172,14 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type ProjectScalarRelationFilter = {
@@ -30953,6 +31002,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type UserUpdateOneWithoutProjectsAsPMNestedInput = {
     create?: XOR<UserCreateWithoutProjectsAsPMInput, UserUncheckedCreateWithoutProjectsAsPMInput>
     connectOrCreate?: UserCreateOrConnectWithoutProjectsAsPMInput
@@ -32322,6 +32375,11 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedEnumProjectStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ProjectStatus | EnumProjectStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ProjectStatus[] | ListEnumProjectStatusFieldRefInput<$PrismaModel>
@@ -32392,6 +32450,14 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumBudgetCategoryFilter<$PrismaModel = never> = {
@@ -32768,6 +32834,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberCreateNestedManyWithoutProjectInput
@@ -32805,6 +32872,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -32850,6 +32918,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberCreateNestedManyWithoutProjectInput
@@ -32887,6 +32956,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -33285,6 +33355,7 @@ export namespace Prisma {
     actualCost?: FloatNullableFilter<"Project"> | number | null
     cpi?: FloatNullableFilter<"Project"> | number | null
     spi?: FloatNullableFilter<"Project"> | number | null
+    pmCanEdit?: BoolFilter<"Project"> | boolean
   }
 
   export type ProjectUpsertWithWhereUniqueWithoutPmoInput = {
@@ -34503,6 +34574,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     teamMembers?: ProjectTeamMemberCreateNestedManyWithoutProjectInput
@@ -34541,6 +34613,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
     budgetLines?: BudgetLineUncheckedCreateNestedManyWithoutProjectInput
@@ -34642,6 +34715,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     teamMembers?: ProjectTeamMemberUpdateManyWithoutProjectNestedInput
@@ -34680,6 +34754,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
     budgetLines?: BudgetLineUncheckedUpdateManyWithoutProjectNestedInput
@@ -34771,6 +34846,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -34809,6 +34885,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
     budgetLines?: BudgetLineUncheckedCreateNestedManyWithoutProjectInput
@@ -34910,6 +34987,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -34948,6 +35026,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
     budgetLines?: BudgetLineUncheckedUpdateManyWithoutProjectNestedInput
@@ -35039,6 +35118,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -35077,6 +35157,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     budgetLines?: BudgetLineUncheckedCreateNestedManyWithoutProjectInput
@@ -35127,6 +35208,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -35165,6 +35247,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     budgetLines?: BudgetLineUncheckedUpdateManyWithoutProjectNestedInput
@@ -35199,6 +35282,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -35237,6 +35321,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -35368,6 +35453,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -35406,6 +35492,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -35513,6 +35600,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -35551,6 +35639,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -35649,6 +35738,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -35687,6 +35777,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -36463,6 +36554,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -36501,6 +36593,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -36551,6 +36644,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -36589,6 +36683,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -36623,6 +36718,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -36661,6 +36757,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -36790,6 +36887,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -36828,6 +36926,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -37175,6 +37274,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -37213,6 +37313,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -37357,6 +37458,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -37395,6 +37497,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -37535,6 +37638,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -37573,6 +37677,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -37654,6 +37759,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -37692,6 +37798,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -37963,6 +38070,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -38001,6 +38109,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -38102,6 +38211,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -38140,6 +38250,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -38231,6 +38342,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -38269,6 +38381,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -38319,6 +38432,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -38357,6 +38471,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -38391,6 +38506,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     pm?: UserCreateNestedOneWithoutProjectsAsPMInput
     pmo?: UserCreateNestedOneWithoutProjectsAsPMOInput
     sponsors?: ProjectSponsorCreateNestedManyWithoutProjectInput
@@ -38429,6 +38545,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
     sponsors?: ProjectSponsorUncheckedCreateNestedManyWithoutProjectInput
     teamMembers?: ProjectTeamMemberUncheckedCreateNestedManyWithoutProjectInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedCreateNestedManyWithoutProjectInput
@@ -38530,6 +38647,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
@@ -38568,6 +38686,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -38660,6 +38779,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
   }
 
   export type ProjectCreateManyPmoInput = {
@@ -38684,6 +38804,7 @@ export namespace Prisma {
     actualCost?: number | null
     cpi?: number | null
     spi?: number | null
+    pmCanEdit?: boolean
   }
 
   export type ProjectSponsorCreateManySponsorInput = {
@@ -38811,6 +38932,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pmo?: UserUpdateOneWithoutProjectsAsPMONestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUpdateManyWithoutProjectNestedInput
@@ -38848,6 +38970,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -38884,6 +39007,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProjectUpdateWithoutPmoInput = {
@@ -38907,6 +39031,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     pm?: UserUpdateOneWithoutProjectsAsPMNestedInput
     sponsors?: ProjectSponsorUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUpdateManyWithoutProjectNestedInput
@@ -38944,6 +39069,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
     sponsors?: ProjectSponsorUncheckedUpdateManyWithoutProjectNestedInput
     teamMembers?: ProjectTeamMemberUncheckedUpdateManyWithoutProjectNestedInput
     specificObjectives?: ProjectSpecificObjectiveUncheckedUpdateManyWithoutProjectNestedInput
@@ -38980,6 +39106,7 @@ export namespace Prisma {
     actualCost?: NullableFloatFieldUpdateOperationsInput | number | null
     cpi?: NullableFloatFieldUpdateOperationsInput | number | null
     spi?: NullableFloatFieldUpdateOperationsInput | number | null
+    pmCanEdit?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ProjectSponsorUpdateWithoutSponsorInput = {

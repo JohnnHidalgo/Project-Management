@@ -123,4 +123,10 @@ export class UserRepository {
       where: { email }
     });
   }
+
+  async delete(id: string) {
+    return await prisma.user.delete({
+      where: { id }
+    });
+  }
 }

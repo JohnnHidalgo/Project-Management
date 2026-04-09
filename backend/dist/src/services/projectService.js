@@ -71,9 +71,20 @@ export class ProjectService {
         await this.projectHistoryService.record(createdProject.id, 'Project', createdProject.id, 'Created', { project: createdProject }, undefined);
         return createdProject;
     }
-    async updateProject(id, data) {
+    async updateProject(id, data, userId, userRole) {
         // Validate the project exists
-        await this.getProjectById(id);
+        const existingProject = await this.getProjectById(id);
+        // Check permissions based on pmCanEdit and user role
+        if (userRole === 'PM' && !existingProject.pmCanEdit) {
+            throw new Error('PM cannot edit project until PMO grants permission');
+        }
+        // PMO and Admin can always edit
+        if (userRole !== 'PMO' && userRole !== 'Admin') {
+            // Check if user is the assigned PM for this project
+            if (existingProject.pmId !== userId) {
+                throw new Error('Only assigned PM, PMO, or Admin can edit this project');
+            }
+        }
         // Business logic validation
         if (data.budget !== undefined && data.budget < 0) {
             throw new Error('Budget cannot be negative');
@@ -82,7 +93,14 @@ export class ProjectService {
             throw new Error('Start date cannot be after end date');
         }
         const updatedProject = await this.projectRepository.update(id, data);
-        await this.projectHistoryService.record(updatedProject.id, 'Project', updatedProject.id, 'Updated', { updates: data, project: updatedProject }, undefined);
+        await this.projectHistoryService.record(updatedProject.id, 'Project', updatedProject.id, 'Updated', { updates: data, project: updatedProject }, userId);
+        return updatedProject;
+    }
+    async togglePmCanEdit(id, pmCanEdit) {
+        // Validate the project exists
+        await this.getProjectById(id);
+        const updatedProject = await this.projectRepository.update(id, { pmCanEdit });
+        await this.projectHistoryService.record(updatedProject.id, 'Project', updatedProject.id, pmCanEdit ? 'PM Edit Enabled' : 'PM Edit Disabled', { pmCanEdit }, undefined);
         return updatedProject;
     }
     async deleteProject(id) {

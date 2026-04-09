@@ -44,6 +44,13 @@ export class RiskController {
 
   async createRisk(req: Request, res: Response) {
     try {
+      const userRole = (req as any).user?.role;
+      
+      // Sponsors cannot create risks
+      if (userRole === 'Sponsor') {
+        return res.status(403).json({ error: 'Sponsors cannot create risks' });
+      }
+      
       const data = req.body;
       const risk = await this.riskService.createRisk(data);
       res.status(201).json(risk);

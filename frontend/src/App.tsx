@@ -384,7 +384,7 @@ const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses }:
             >
               <option value="All">Todos los Estados</option>
               <option value="Draft">Draft</option>
-              <option value="Charter Approval">Charter Approval</option>
+              <option value="Charter_Approval">Charter Approval</option>
               <option value="Active">Active</option>
               <option value="Completed">Completed</option>
               <option value="Cancelled">Cancelled</option>
@@ -1073,14 +1073,15 @@ const PMBOKHealthDashboard = ({ project, milestones, tasks, expenses }: { projec
   );
 };
 
-const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRiskDetail, setSelectedRisk }: { 
+const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRiskDetail, setSelectedRisk, canAddRisks }: { 
   risks: Risk[], 
   actions: RiskAction[],
   tasks: Task[],
   onAddRisk: (r: Partial<Risk>) => void, 
   onOpenModal: () => void,
   onOpenRiskDetail: (riskId: string) => void,
-  setSelectedRisk: (r: Risk) => void
+  setSelectedRisk: (r: Risk) => void,
+  canAddRisks: boolean
 }) => {
   const [filterLevel, setFilterLevel] = useState<string | null>(null);
 
@@ -1127,7 +1128,9 @@ const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRis
             {filterLevel && (
               <button className="btn btn-secondary btn-sm" onClick={() => setFilterLevel(null)}>Ver Todos</button>
             )}
-            <button className="btn btn-primary btn-sm" onClick={onOpenModal}>+ Identificar Riesgo</button>
+            {canAddRisks && (
+              <button className="btn btn-primary btn-sm" onClick={onOpenModal}>+ Identificar Riesgo</button>
+            )}
           </div>
         </div>
         
@@ -1729,13 +1732,15 @@ const RiskActionModal = ({
   );
 };
 
-const StakeholderMatrix = ({ stakeholders, onOpenModal }: { stakeholders: Stakeholder[], onOpenModal: () => void }) => {
+const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders }: { stakeholders: Stakeholder[], onOpenModal: () => void, canAddStakeholders: boolean }) => {
   return (
     <div className="stakeholder-view">
       <div className="card" style={{ marginBottom: '2rem' }}>
         <div className="section-header">
           <h3>Matriz de Poder / Interés</h3>
-          <button className="btn btn-secondary btn-sm" onClick={onOpenModal}>+ Agregar Interesado</button>
+          {canAddStakeholders && (
+            <button className="btn btn-secondary btn-sm" onClick={onOpenModal}>+ Agregar Interesado</button>
+          )}
         </div>
         <div className="stakeholder-matrix">
           <div className="matrix-quadrant">
@@ -2337,7 +2342,7 @@ const ProjectDetail = ({
   milestones: Milestone[],
   tasks: Task[],
   expenses: Expense[],
-  onUpdateProject: (id: string, updates: Partial<Project>) => void,
+  onUpdateProject: (id: string, updates: Partial<Project>) => Promise<void>,
   onAddMilestone: (projectId: string, name: string, weight: number, startDate: string, endDate: string) => void,
   onDeleteMilestone: (id: string) => void,
   onUpdateMilestone: (id: string, updates: Partial<Milestone>) => void,
@@ -2379,6 +2384,14 @@ const ProjectDetail = ({
   const [rejectionComment, setRejectionComment] = useState('');
   const [criticalPathData, setCriticalPathData] = useState<CriticalPathResult | null>(null);
   const [loadingCriticalPath, setLoadingCriticalPath] = useState(false);
+  
+  // Check if user can edit this project
+  const canEditProject = currentUser.role === 'PMO' || currentUser.role === 'Admin' || 
+    (currentUser.role === 'PM' && project?.pmId === currentUser.id && project?.pmCanEdit && project?.status !== 'Charter_Approval');
+  const canAddRisks = canEditProject && currentUser.role !== 'Sponsor';
+  
+  // Check if user can add stakeholders (Sponsors cannot)
+  const canAddStakeholders = canEditProject && currentUser.role !== 'Sponsor';
   
   const projectMilestones = (milestones || []).filter(m => m.projectId === id);
   const totalWeight = projectMilestones.reduce((sum, m) => sum + m.weight, 0);
@@ -2608,17 +2621,29 @@ const ProjectDetail = ({
   const handleApproveProject = () => {
     let nextStatus: ProjectStatus = project.status;
     if (project.status === 'Pending Initial Approval') nextStatus = 'Planning';
-    if (project.status === 'Charter Approval') nextStatus = 'Active';
+    if (project.status === 'Charter_Approval') nextStatus = 'Active';
     
     onUpdateProject(project.id, { status: nextStatus });
   };
 
-  const handleSendToCharter = () => {
+  const handleSendToCharter = async () => {
     if (totalWeight !== 100) {
       alert("La suma de pesos debe ser exactamente 100%");
       return;
     }
-    onUpdateProject(project.id, { status: 'Charter Approval' });
+    await onUpdateProject(project.id, { status: 'Charter_Approval' });
+    alert('Charter enviado al Sponsor para aprobación');
+  };
+
+  const handleTogglePmEdit = async () => {
+    try {
+      await apiService.togglePmCanEdit(project.id, !project.pmCanEdit);
+      onUpdateProject(project.id, { pmCanEdit: !project.pmCanEdit });
+      alert(project.pmCanEdit ? 'Se ha bloqueado la edición para el PM' : 'Se ha habilitado la edición para el PM');
+    } catch (error) {
+      console.error('Error toggling PM edit permission:', error);
+      alert('Error al cambiar permisos de edición');
+    }
   };
 
   return (
@@ -2629,21 +2654,24 @@ const ProjectDetail = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <h1>{project.name}</h1>
             <span className={`badge badge-${project.status.toLowerCase().replace(/ /g, '-')}`}>{project.status}</span>
+            {!canEditProject && (
+              <span className="badge badge-warning">Solo lectura</span>
+            )}
           </div>
         </div>
         <div className="actions">
           {currentUser.role === 'PMO' && project.status === 'Draft' && (
             <button
-              className="btn btn-primary"
-              onClick={() => alert('Solicitud enviada: por favor, el Project Manager debe completar la información y enviar el charter al sponsor.')}
+              className="btn btn-secondary"
+              onClick={handleTogglePmEdit}
             >
-              Solicitar al PM registro de información
+              {project.pmCanEdit ? 'Bloquear edición PM' : 'Permitir edición PM'}
             </button>
           )}
-          {currentUser.id === project.pmId && (project.status === 'Draft' || project.status === 'Planning') && (
+          {currentUser.id === project.pmId && (project.status === 'Draft' || project.status === 'Planning') && canEditProject && (
             <button className="btn btn-primary" onClick={handleSendToCharter}>Enviar Charter a Sponsor</button>
           )}
-          {getProjectSponsorIds(project).includes(currentUser.id) && project.status === 'Charter Approval' && (
+          {getProjectSponsorIds(project).includes(currentUser.id) && project.status === 'Charter_Approval' && (
             <button className="btn btn-success" onClick={() => onUpdateProject(project.id, { status: 'Active', rejectionComments: '' })}>Aprobar Project Charter</button>
           )}
           <button className="btn btn-secondary">
@@ -2758,7 +2786,7 @@ const ProjectDetail = ({
             )}
 
             {/* PANEL DE APROBACIÓN DEL SPONSOR */}
-            {project.status === 'Charter Approval' && getProjectSponsorIds(project).includes(currentUser.id) && (
+            {project.status === 'Charter_Approval' && getProjectSponsorIds(project).includes(currentUser.id) && (
               <div className="card" style={{ border: '2px solid var(--accent)', backgroundColor: '#eff6ff', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
@@ -2774,8 +2802,8 @@ const ProjectDetail = ({
                     </button>
                     <button 
                       className="btn btn-success" 
-                      onClick={() => {
-                        onUpdateProject(project.id, { status: 'Active', rejectionComments: '' });
+                      onClick={async () => {
+                        await onUpdateProject(project.id, { status: 'Active', rejectionComments: '' });
                         alert("¡Project Charter Aprobado! El proyecto ahora está en fase de ejecución.");
                       }}
                     >
@@ -3298,10 +3326,11 @@ const ProjectDetail = ({
           onOpenModal={() => setActiveModal('risk')} 
           onOpenRiskDetail={(riskId) => navigate(`/projects/${project.id}/risks/${riskId}`)}
           setSelectedRisk={setSelectedRisk}
+          canAddRisks={canAddRisks}
         />
       )}
       
-      {activeTab === 'stakeholders' && <StakeholderMatrix stakeholders={projectStakeholders} onOpenModal={() => setActiveModal('stakeholder')} />}
+      {activeTab === 'stakeholders' && <StakeholderMatrix stakeholders={projectStakeholders} onOpenModal={() => setActiveModal('stakeholder')} canAddStakeholders={canAddStakeholders} />}
 
       {activeTab === 'sppm' && (
         <SPPMReport 
@@ -3820,8 +3849,8 @@ const ProjectDetail = ({
           <button 
             className="btn btn-error" 
             disabled={!rejectionComment.trim()}
-            onClick={() => {
-              onUpdateProject(project.id, { 
+            onClick={async () => {
+              await onUpdateProject(project.id, { 
                 status: 'Draft', 
                 rejectionComments: rejectionComment 
               });
@@ -4629,8 +4658,17 @@ export default function App() {
     }
   };
 
-  const handleUpdateProject = (id: string, updates: Partial<Project>) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+  const handleUpdateProject = async (id: string, updates: Partial<Project>) => {
+    try {
+      // Update in database
+      await apiService.updateProject(id, updates);
+      
+      // Update state locally
+      setProjects(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+    } catch (error) {
+      console.error('Error updating project:', error);
+      alert('Error al actualizar el proyecto. Por favor, intente de nuevo.');
+    }
   };
 
   const handleAddMilestone = async (projectId: string, name: string, weight: number, startDate: string, endDate: string) => {
@@ -4889,7 +4927,7 @@ export default function App() {
         }
         return p;
       }));
-      alert('Nueva línea de presupuesto registrada. El Sponsor debe aprobarla.');
+      alert('Nueva línea de presupuesto registrada.');
     } catch (error) {
       console.error('Error al crear línea de presupuesto:', error);
       alert('No se pudo crear la línea de presupuesto. Intente de nuevo.');
@@ -5124,6 +5162,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Dashboard projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
               <Route path="/projects" element={<ProjectListView projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
+              <Route path="/tasks" element={<MyTasksView tasks={tasks} milestones={milestones} projects={projects} currentUser={currentUser!} onUpdateTask={handleUpdateTask} />} />
               <Route path="/global-risks" element={<GlobalRisks risks={risks} projects={projects} />} />
               <Route path="/global-issues" element={<GlobalIssues issues={issues} projects={projects} onResolveIssue={handleResolveIssue} />} />
               <Route path="/change-control" element={<ChangeControlBoard changeRequests={changeRequests} projects={projects} tasks={tasks} milestones={milestones} onProcessCR={handleProcessChangeRequest} />} />

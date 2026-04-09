@@ -16,6 +16,7 @@ describe('PMBOK EVM Calculations', () => {
     sponsorIds: [],
     teamMemberIds: [],
     progress: 50, // 50% Complete
+    pmCanEdit: true,
   };
 
   const mockMilestones: Milestone[] = [

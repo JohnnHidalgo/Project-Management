@@ -32,6 +32,7 @@ export const mockProjects: Project[] = [
     assumptions: 'AWS mantiene precios competitivos; El equipo interno tiene tiempo para capacitación.',
     constraints: 'Debe terminarse antes del vencimiento del contrato del datacenter actual.',
     progress: 45,
+    pmCanEdit: true,
     budgetLines: [
       { id: 'bl1', category: 'Services', budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, executionDate: '2026-01-05', status: 'Approved' },
       { id: 'bl2', category: 'Labor', budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, executionDate: '2026-02-01', status: 'Approved' },
@@ -58,6 +59,7 @@ export const mockProjects: Project[] = [
     strategicAlignment: 'Excelencia en el Cliente',
     businessCase: 'Actualmente perdemos el 30% de leads por falta de seguimiento centralizado.',
     progress: 10,
+    pmCanEdit: false,
     budgetLines: [
       { id: 'bl2_1', category: 'Software', budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, executionDate: '2026-03-05', status: 'Pending' },
       { id: 'bl2_2', category: 'Services', budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, executionDate: '2026-04-01', status: 'Pending' }
@@ -81,7 +83,8 @@ export const mockProjects: Project[] = [
       { id: 'so3_2', description: 'Instalar sistema de racks automáticos', successCriteria: '1000 picks por hora alcanzados', kpi: 'Picks por hora' }
     ],
     strategicAlignment: 'Crecimiento Logístico',
-    progress: 0
+    progress: 0,
+    pmCanEdit: false
   },
   {
     id: 'p4',
@@ -106,7 +109,8 @@ export const mockProjects: Project[] = [
     budgetLines: [
       { id: 'bl4_1', category: 'Hardware', budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, executionDate: '2026-02-20', status: 'Approved' },
       { id: 'bl4_2', category: 'Services', budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, executionDate: '2026-03-10', status: 'Approved' }
-    ]
+    ],
+    pmCanEdit: true
   },
   {
     id: 'p5',
@@ -126,7 +130,8 @@ export const mockProjects: Project[] = [
       { id: 'so5_2', description: 'Lograr 10,000 usuarios activos', successCriteria: 'Descargas y registros únicos', kpi: 'Usuarios Activos Mensuales' }
     ],
     strategicAlignment: 'Digitalización del Cliente',
-    progress: 5
+    progress: 5,
+    pmCanEdit: false
   },
   {
     id: 'p6',
@@ -150,7 +155,8 @@ export const mockProjects: Project[] = [
     budgetLines: [
       { id: 'bl6_1', category: 'Services', budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, executionDate: '2026-02-10', status: 'Approved' },
       { id: 'bl6_2', category: 'Labor', budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, executionDate: '2026-03-01', status: 'Approved' }
-    ]
+    ],
+    pmCanEdit: true
   },
   {
     id: 'p7',
@@ -169,7 +175,8 @@ export const mockProjects: Project[] = [
       { id: 'so7_1', description: 'Migración de fibra óptica', successCriteria: 'Backbone de 40Gbps operativo', kpi: 'Ancho de banda disponible (Gbps)' }
     ],
     strategicAlignment: 'Infraestructura Tecnológica',
-    progress: 100
+    progress: 100,
+    pmCanEdit: true
   }
 ];
 
@@ -186,7 +193,12 @@ export const mockTasks: Task[] = [
   { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: '2026-01-16', endDate: '2026-01-30', assignedTo: '5', progress: 100, status: 'Completed', priority: 'High', weight: 50 },
   { id: 't3', milestoneId: 'm2', name: 'Limpieza de Datos', description: 'Eliminar registros obsoletos', startDate: '2026-02-20', endDate: '2026-03-30', assignedTo: '4', progress: 80, status: 'In_Progress', priority: 'Medium', weight: 50 },
   { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: '2026-04-01', endDate: '2026-05-15', assignedTo: '5', progress: 10, status: 'Pending', priority: 'High', weight: 50 },
-  { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: '2026-03-05', endDate: '2026-03-25', assignedTo: '6', progress: 40, status: 'In_Progress', priority: 'High', weight: 100 }
+  { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: '2026-03-05', endDate: '2026-03-25', assignedTo: '6', progress: 40, status: 'In_Progress', priority: 'High', weight: 100 },
+  { id: 't6', milestoneId: 'm3', name: 'Coordinación con Equipo', description: 'Reuniones de seguimiento semanales', startDate: '2026-06-01', endDate: '2026-08-30', assignedTo: '3', progress: 25, status: 'In_Progress', priority: 'Medium', weight: 30 },
+  { id: 't7', milestoneId: 'm5', name: 'Evaluación de Riesgos', description: 'Análisis de riesgos del proyecto', startDate: '2026-02-15', endDate: '2026-02-28', assignedTo: '2', progress: 60, status: 'In_Progress', priority: 'High', weight: 40 },
+  { id: 't8', milestoneId: 'm6', name: 'Pruebas de Integración', description: 'Validación de interfaces entre módulos', startDate: '2026-03-10', endDate: '2026-03-20', assignedTo: '4', progress: 0, status: 'Pending', priority: 'High', weight: 60 },
+  { id: 't9', milestoneId: 'm7', name: 'Documentación Técnica', description: 'Elaboración de manuales de usuario', startDate: '2026-04-15', endDate: '2026-05-10', assignedTo: '6', progress: 15, status: 'In_Progress', priority: 'Low', weight: 25 },
+  { id: 't10', milestoneId: 'm8', name: 'Capacitación del Equipo', description: 'Sesiones de formación en nuevas tecnologías', startDate: '2026-05-01', endDate: '2026-05-15', assignedTo: '3', progress: 0, status: 'Pending', priority: 'Medium', weight: 35 }
 ];
 
 export const mockExpenses: Expense[] = [
