@@ -583,6 +583,7 @@ const SPPMReport = ({
   stakeholders: Stakeholder[]
 }) => {
   const [highlights, setHighlights] = useState('');
+  const [tooltip, setTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
   const projectExpenses = (expenses || []).filter(e => e.projectId === project.id);
   const projectMilestones = (milestones || []).filter(m => m.projectId === project.id);
   const projectTasks = (tasks || []).filter(t => projectMilestones.some(m => m.id === t.milestoneId));
@@ -651,15 +652,57 @@ const SPPMReport = ({
             <div className="indicator-row" style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
               <div className="indicator">
                 <div className={`dot dot-${evm.spi >= 1 ? 'success' : (evm.spi > 0.8 ? 'warning' : 'error')}`}></div>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>SPI: {evm.spi.toFixed(2)}</span>
+                <span 
+                  style={{ fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}
+                  onMouseEnter={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setTooltip({
+                      text: `SPI = EV / PV (${evm.ev.toLocaleString()} / ${evm.pv.toLocaleString()})\n\nEV (Valor Ganado): ${project.progress}% × Presupuesto (${evm.bac.toLocaleString()}) = ${evm.ev.toLocaleString()}\nPV (Valor Planificado): Tiempo transcurrido × Presupuesto = ${evm.pv.toLocaleString()}\nAC (Costo Real): Suma gastos aprobados/pagados = ${evm.ac.toLocaleString()}`,
+                      x: rect.left + rect.width / 2,
+                      y: rect.top - 10
+                    });
+                  }}
+                  onMouseLeave={() => setTooltip(null)}
+                >
+                  SPI: {evm.spi.toFixed(2)}
+                </span>
               </div>
               <div className="indicator">
                 <div className={`dot dot-${evm.cpi >= 1 ? 'success' : (evm.cpi > 0.8 ? 'warning' : 'error')}`}></div>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>CPI: {evm.cpi.toFixed(2)}</span>
+                <span 
+                  style={{ fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}
+                  onMouseEnter={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    setTooltip({
+                      text: `CPI = EV / AC (${evm.ev.toLocaleString()} / ${evm.ac.toLocaleString()})\n\nEV (Valor Ganado): ${project.progress}% × Presupuesto (${evm.bac.toLocaleString()}) = ${evm.ev.toLocaleString()}\nPV (Valor Planificado): Tiempo transcurrido × Presupuesto = ${evm.pv.toLocaleString()}\nAC (Costo Real): Suma gastos aprobados/pagados = ${evm.ac.toLocaleString()}`,
+                      x: rect.left + rect.width / 2,
+                      y: rect.top - 10
+                    });
+                  }}
+                  onMouseLeave={() => setTooltip(null)}
+                >
+                  CPI: {evm.cpi.toFixed(2)}
+                </span>
               </div>
               <div className="indicator">
                 <div className="dot dot-success"></div>
-                <span style={{ fontSize: '0.7rem', fontWeight: 700 }}>PROG: {calculatedProjectProgress}%</span>
+                <span 
+                  style={{ fontSize: '0.7rem', fontWeight: 700, cursor: 'pointer' }}
+                  onMouseEnter={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const milestoneDetails = projectMilestones.map(m => 
+                      `${m.name}: ${m.progress}% × ${m.weight}% = ${(m.progress * m.weight / 100).toFixed(1)}%`
+                    ).join('\n');
+                    setTooltip({
+                      text: `Progreso ponderado de ${projectMilestones.length} hitos\n\n${milestoneDetails}\n\nTotal: ${calculatedProjectProgress}%`,
+                      x: rect.left + rect.width / 2,
+                      y: rect.top - 10
+                    });
+                  }}
+                  onMouseLeave={() => setTooltip(null)}
+                >
+                  PROG: {calculatedProjectProgress}%
+                </span>
               </div>
             </div>
           </div>
@@ -774,6 +817,30 @@ const SPPMReport = ({
           <div className="empty-state">No hay snapshots generados aún para este proyecto.</div>
         )}
       </div>
+
+      {/* Custom Tooltip */}
+      {tooltip && (
+        <div 
+          style={{
+            position: 'fixed',
+            left: tooltip.x,
+            top: tooltip.y,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            color: 'white',
+            padding: '8px 12px',
+            borderRadius: '4px',
+            fontSize: '0.75rem',
+            whiteSpace: 'pre-line',
+            zIndex: 1000,
+            pointerEvents: 'none',
+            transform: 'translate(-50%, -100%)',
+            maxWidth: '300px',
+            textAlign: 'center'
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
     </div>
   );
 };
