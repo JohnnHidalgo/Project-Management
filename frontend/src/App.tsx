@@ -2387,7 +2387,7 @@ const ProjectDetail = ({
   
   // Check if user can edit this project
   const canEditProject = currentUser.role === 'PMO' || currentUser.role === 'Admin' || 
-    (currentUser.role === 'PM' && project?.pmId === currentUser.id && project?.pmCanEdit && project?.status !== 'Charter_Approval');
+    (currentUser.role === 'PM' && project?.pmId === currentUser.id && project?.pmCanEdit && (project?.status !== 'Charter_Approval' && project?.status !== 'Charter Approval'));
   const canAddRisks = canEditProject && currentUser.role !== 'Sponsor';
   
   // Check if user can add stakeholders (Sponsors cannot)
@@ -2621,7 +2621,7 @@ const ProjectDetail = ({
   const handleApproveProject = () => {
     let nextStatus: ProjectStatus = project.status;
     if (project.status === 'Pending Initial Approval') nextStatus = 'Planning';
-    if (project.status === 'Charter_Approval') nextStatus = 'Active';
+    if (project.status === 'Charter_Approval' || project.status === 'Charter Approval') nextStatus = 'Active';
     
     onUpdateProject(project.id, { status: nextStatus });
   };
@@ -2671,7 +2671,7 @@ const ProjectDetail = ({
           {currentUser.id === project.pmId && (project.status === 'Draft' || project.status === 'Planning') && canEditProject && (
             <button className="btn btn-primary" onClick={handleSendToCharter}>Enviar Charter a Sponsor</button>
           )}
-          {getProjectSponsorIds(project).includes(currentUser.id) && project.status === 'Charter_Approval' && (
+          {getProjectSponsorIds(project).includes(currentUser.id) && (project.status === 'Charter_Approval' || project.status === 'Charter Approval') && (
             <button className="btn btn-success" onClick={() => onUpdateProject(project.id, { status: 'Active', rejectionComments: '' })}>Aprobar Project Charter</button>
           )}
           <button className="btn btn-secondary">
@@ -2786,7 +2786,7 @@ const ProjectDetail = ({
             )}
 
             {/* PANEL DE APROBACIÓN DEL SPONSOR */}
-            {project.status === 'Charter_Approval' && getProjectSponsorIds(project).includes(currentUser.id) && (
+            { (project.status === 'Charter_Approval' || project.status === 'Charter Approval') && getProjectSponsorIds(project).includes(currentUser.id) && (
               <div className="card" style={{ border: '2px solid var(--accent)', backgroundColor: '#eff6ff', marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>

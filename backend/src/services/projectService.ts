@@ -112,7 +112,7 @@ export class ProjectService {
       if (existingProject.pmId !== userId) {
         throw new Error('Only the assigned PM can edit this project');
       }
-      if (existingProject.status === 'Charter_Approval') {
+      if (existingProject.status === 'Charter_Approval' || existingProject.status === 'Charter Approval') {
         throw new Error('PM cannot edit project during Charter_Approval');
       }
       if (!existingProject.pmCanEdit) {
@@ -123,7 +123,7 @@ export class ProjectService {
         throw new Error('You are not a sponsor for this project');
       }
       // Sponsors can only change status during Charter_Approval
-      if (existingProject.status !== 'Charter_Approval' && data.status !== undefined) {
+      if ((existingProject.status !== 'Charter_Approval' && existingProject.status !== 'Charter Approval') && data.status !== undefined) {
         throw new Error('Sponsors can only approve or reject projects in Charter_Approval status');
       }
     } else if (userRole !== 'PMO' && userRole !== 'Admin') {
