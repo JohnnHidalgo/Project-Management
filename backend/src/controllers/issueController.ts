@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { IssueService } from '../services/issueService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '@prisma/client';
 
 export class IssueController {
   private issueService: IssueService;

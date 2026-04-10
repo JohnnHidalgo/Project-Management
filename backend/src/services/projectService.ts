@@ -1,6 +1,6 @@
 import { ProjectRepository } from '../repositories/projectRepository.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Project, ProjectStatus, Prisma } from '../../dist/.prisma/client';
+import { Project, ProjectStatus, Prisma } from '@prisma/client';
 
 export class ProjectService {
   private projectRepository: ProjectRepository;

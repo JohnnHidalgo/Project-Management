@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient, BudgetCategory, MilestoneStatus, TaskStatus, TaskPriority, ExpenseStatus, RiskStatus, RiskCategory, RiskStrategy, ApprovalStatus, StakeholderPower, IssueSeverity, IssueStatus, ChangeRequestStatus, SnapshotStatus, LessonCategory, BudgetType, StakeholderInterest } from '../dist/.prisma/client';
+import { PrismaClient, BudgetCategory, MilestoneStatus, TaskStatus, TaskPriority, ExpenseStatus, RiskStatus, RiskCategory, RiskStrategy, ApprovalStatus, StakeholderPower, IssueSeverity, IssueStatus, ChangeRequestStatus, SnapshotStatus, LessonCategory, BudgetType, StakeholderInterest } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcrypt';
 

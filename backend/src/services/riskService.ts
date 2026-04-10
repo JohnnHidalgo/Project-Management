@@ -1,6 +1,6 @@
 import { RiskRepository } from '../repositories/riskRepository.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '@prisma/client';
 
 export class RiskService {
   private riskRepository: RiskRepository;

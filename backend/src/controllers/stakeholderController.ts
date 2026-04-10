@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { StakeholderService } from '../services/stakeholderService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '@prisma/client';
 
 export class StakeholderController {
   private stakeholderService: StakeholderService;

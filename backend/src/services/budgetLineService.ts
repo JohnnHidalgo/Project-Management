@@ -1,6 +1,6 @@
 import { BudgetLineRepository } from '../repositories/budgetLineRepository.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '@prisma/client';
 
 export class BudgetLineService {
   private budgetLineRepository: BudgetLineRepository;
