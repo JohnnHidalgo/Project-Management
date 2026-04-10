@@ -58,6 +58,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           </button>
         </form>
 
+        <div className="login-info">
+          <h3>Usuarios de prueba:</h3>
+          <ul>
+            <li>juan.pm@inti.com - password123 (PM)</li>
+            <li>ana.pmo@inti.com - password123 (PMO)</li>
+            <li>rafael.sponsor@inti.com - password123 (Sponsor)</li>
+            <li>elena.dev@inti.com - password123 (Team_Member)</li>
+            <li>carlos.tech@inti.com - password123 (Team_Member)</li>
+            <li>maria.marketing@inti.com - password123 (Stakeholder)</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

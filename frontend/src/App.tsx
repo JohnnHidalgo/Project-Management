@@ -2567,6 +2567,9 @@ const ProjectDetail = ({
       if (!h.details) return '';
       const d = h.details;
 
+      // If details is a string, return it directly (for readable messages)
+      if (typeof d === 'string') return d;
+
       const simple = (obj: any) => Object.entries(obj)
         .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
         .join(' | ');

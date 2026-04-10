@@ -74,16 +74,35 @@ export class ProjectService {
     async updateProject(id, data, userId, userRole) {
         // Validate the project exists
         const existingProject = await this.getProjectById(id);
-        // Check permissions based on pmCanEdit and user role
-        if (userRole === 'PM' && !existingProject.pmCanEdit) {
-            throw new Error('PM cannot edit project until PMO grants permission');
-        }
-        // PMO and Admin can always edit
-        if (userRole !== 'PMO' && userRole !== 'Admin') {
-            // Check if user is the assigned PM for this project
+        // Get all sponsor IDs for this project
+        const sponsorIds = existingProject.sponsors?.map((s) => s.sponsorId) || [];
+        const isProjectSponsor = sponsorIds.includes(userId);
+        // Authorization logic:
+        // 1. PM can only edit when pmCanEdit is true (not during Charter_Approval)
+        // 2. Sponsors can edit when project is in Charter_Approval status
+        // 3. PMO and Admin can always edit
+        if (userRole === 'PM') {
             if (existingProject.pmId !== userId) {
-                throw new Error('Only assigned PM, PMO, or Admin can edit this project');
+                throw new Error('Only the assigned PM can edit this project');
             }
+            if (existingProject.status === 'Charter_Approval') {
+                throw new Error('PM cannot edit project during Charter_Approval');
+            }
+            if (!existingProject.pmCanEdit) {
+                throw new Error('PM cannot edit project until PMO grants permission');
+            }
+        }
+        else if (userRole === 'Sponsor') {
+            if (!isProjectSponsor) {
+                throw new Error('You are not a sponsor for this project');
+            }
+            // Sponsors can only change status during Charter_Approval
+            if (existingProject.status !== 'Charter_Approval' && data.status !== undefined) {
+                throw new Error('Sponsors can only approve or reject projects in Charter_Approval status');
+            }
+        }
+        else if (userRole !== 'PMO' && userRole !== 'Admin') {
+            throw new Error('You do not have permission to edit this project');
         }
         // Business logic validation
         if (data.budget !== undefined && data.budget < 0) {

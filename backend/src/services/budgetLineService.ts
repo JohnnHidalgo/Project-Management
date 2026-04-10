@@ -63,12 +63,15 @@ export class BudgetLineService {
 
     const createdBudgetLine = await this.budgetLineRepository.create(payload);
 
+    // Format readable details for history
+    const readableDetails = `Created BudgetLine: ${createdBudgetLine.category} ${createdBudgetLine.budgetType} "${createdBudgetLine.description}" for project "${createdBudgetLine.project.name}" with planned amount $${createdBudgetLine.plannedAmount.toLocaleString()}`;
+
     await this.projectHistoryService.record(
       projectId,
       'BudgetLine',
       createdBudgetLine.id,
       'Created',
-      { budgetLine: createdBudgetLine },
+      readableDetails,
       undefined
     );
 
@@ -86,12 +89,15 @@ export class BudgetLineService {
 
     const updatedBudgetLine = await this.budgetLineRepository.update(id, payload);
 
+    // Format readable details for history
+    const readableDetails = `Updated BudgetLine: ${updatedBudgetLine.category} ${updatedBudgetLine.budgetType} "${updatedBudgetLine.description}" for project "${updatedBudgetLine.project.name}"`;
+
     await this.projectHistoryService.record(
       existingLine.projectId || null,
       'BudgetLine',
       id,
       'Updated',
-      { updates: data, budgetLine: updatedBudgetLine },
+      readableDetails,
       (data as any).approvedBy || null
     );
 
@@ -104,12 +110,15 @@ export class BudgetLineService {
 
     const deletedBudgetLine = await this.budgetLineRepository.delete(id);
 
+    // Format readable details for history
+    const readableDetails = `Deleted BudgetLine: ${budgetLineToDelete.category} ${budgetLineToDelete.budgetType} "${budgetLineToDelete.description}" for project "${budgetLineToDelete.project.name}"`;
+
     await this.projectHistoryService.record(
       budgetLineToDelete.projectId || null,
       'BudgetLine',
       id,
       'Deleted',
-      { budgetLine: budgetLineToDelete }
+      readableDetails
     );
 
     return deletedBudgetLine;

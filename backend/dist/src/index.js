@@ -25,7 +25,7 @@ const prisma = new PrismaClient({
     adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
 });
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 // Health check
