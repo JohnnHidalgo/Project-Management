@@ -12,16 +12,19 @@ services:
   #     - db_data:/var/lib/postgresql/data
   #   ports:
   #     - '5432:5432'
+  #   networks:
+  #     - pm_network
 
   backend:
     build: ./backend
     container_name: pm_backend
     restart: always
-    environment:
-      DATABASE_URL: postgresql://dbaqas1:Dba_qa_JH@192.168.103.15:5432/project_management
-      PORT: 3002
+    env_file:
+      - ./backend/.env
     ports:
       - "3002:3002"
+    networks:
+      - pm_network
 
   frontend:
     build: ./frontend
@@ -31,6 +34,12 @@ services:
       - backend
     ports:
       - "82:82"
+    networks:
+      - pm_network
+
+networks:
+  pm_network:
+    driver: bridge
 
 # volumes:
 #   db_data:  # Comentado para producción
