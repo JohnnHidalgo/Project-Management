@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { ExpenseService } from '../services/expenseService.js';
-import { Prisma } from '../../.prisma/client';
+import { Prisma } from '../../dist/.prisma/client';
 
 export class ExpenseController {
   private expenseService: ExpenseService;
