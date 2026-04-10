@@ -8,7 +8,7 @@ if (!defaultUrl) {
   throw new Error('DATABASE_URL not set in .env');
 }
 
-const targetDbName = process.env.NEW_DATABASE_NAME ?? 'project_management_production';
+const targetDbName = process.env.NEW_DATABASE_NAME ?? 'project_management';
 const connectionString = new URL(defaultUrl);
 
 // Connect to a superuser database (template1) to create database
