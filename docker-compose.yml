@@ -33,7 +33,7 @@ services:
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL}
     ports:
-      - '80:80'
+      - '82:82'
     depends_on:
       - backend
 
