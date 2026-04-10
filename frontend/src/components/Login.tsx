@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { apiService } from '../services/apiService';
 import { User } from '../types';
+import logo from '../assets/logo_inti.jpg';
 
 interface LoginProps {
   onLogin: (user: User, token: string) => void;
@@ -30,6 +31,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className="login-container">
       <div className="login-form">
+        <img src={logo} alt="INTI logo" className="login-logo" />
         <h2>Iniciar Sesión</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -57,18 +59,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             {loading ? 'Iniciando...' : 'Iniciar Sesión'}
           </button>
         </form>
-
-        <div className="login-info">
-          <h3>Usuarios de prueba:</h3>
-          <ul>
-            <li>juan.pm@inti.com - password123 (PM)</li>
-            <li>ana.pmo@inti.com - password123 (PMO)</li>
-            <li>rafael.sponsor@inti.com - password123 (Sponsor)</li>
-            <li>elena.dev@inti.com - password123 (Team_Member)</li>
-            <li>carlos.tech@inti.com - password123 (Team_Member)</li>
-            <li>maria.marketing@inti.com - password123 (Stakeholder)</li>
-          </ul>
-        </div>
       </div>
     </div>
   );
