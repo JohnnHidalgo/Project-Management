@@ -3,10 +3,7 @@ WORKDIR /app
 
 # Install dependencies and generate Prisma client
 COPY package.json package-lock.json tsconfig.json prisma/ ./
-RUN npm ci
-RUN npx prisma generate
-
-# Copy source and build
+COPY .env ./
 COPY src ./src
 RUN npm run build
 
