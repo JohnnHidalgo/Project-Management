@@ -3,14 +3,13 @@
 
 Set-Location "c:\Users\johnn.hidalgo\OneDrive - DROGUERIA INTI S.A\Documentos\INTI\TI\Project Management\backend"
 
-Write-Host "Creando la base de datos project_management..."
-npm run create-db
-
-Write-Host "Ejecutando migraciones de Prisma..."
-npx prisma migrate deploy
+Write-Host "Ejecutando script completo de creación de base de datos..."
+# Ejecutar el script SQL completo que incluye creación de BD, tablas y datos
+# Nota: Asegúrate de tener psql instalado y en el PATH
+psql $env:DATABASE_URL -f "..\create-full-database.sql"
 
 Write-Host "Generando cliente de Prisma..."
 npx prisma generate
 
 Write-Host "Migración completada."
-Write-Host "Si deseas poblar datos iniciales, ejecuta: npx prisma db seed"
+Write-Host "La base de datos está lista con esquema y datos iniciales."

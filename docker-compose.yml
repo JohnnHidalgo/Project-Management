@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  # db:  # Comentado para producción - usar base de datos externa
+  #   image: postgres:15-alpine
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  #     POSTGRES_DB: ${POSTGRES_DB:-project_management}
+  #   volumes:
+  #     - db_data:/var/lib/postgresql/data
+  #   ports:
+  #     - '5432:5432'
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - '3001:3001'
+    # depends_on:
+    #   - db  # Comentado para producción
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+
+# volumes:
+#   db_data:  # Comentado para producción
