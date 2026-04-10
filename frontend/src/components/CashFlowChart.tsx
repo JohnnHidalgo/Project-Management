@@ -158,10 +158,13 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
                 borderRadius: '8px',
                 padding: '12px'
               }}
-              formatter={(value: any, name: any) => [
-                `${Number(value).toFixed(1)}%`,
-                name === 'plannedPercentage' ? 'Planeado Acumulado' : 'Ejecutado Acumulado'
-              ]}
+              formatter={(value: any, name: any) => {
+                const label = name === 'plannedPercentage' || name === 'Planeado Acumulado'
+                  ? 'Planeado Acumulado'
+                  : 'Ejecutado Acumulado';
+
+                return [`${Number(value).toFixed(1)}%`, label];
+              }}
               labelStyle={{ color: '#111827', fontWeight: 600 }}
             />
             <Legend
