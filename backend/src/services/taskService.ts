@@ -1,6 +1,6 @@
 import { TaskRepository } from '../repositories/taskRepository.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../dist/.prisma/client';
 
 export class TaskService {
   private taskRepository: TaskRepository;

@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../dist/.prisma/client';
 import { prisma } from '../index.js';
 
 export class ExpenseRepository {

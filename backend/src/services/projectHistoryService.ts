@@ -1,5 +1,5 @@
 import { ProjectHistoryRepository } from '../repositories/projectHistoryRepository.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../dist/.prisma/client';
 
 export class ProjectHistoryService {
   private projectHistoryRepository: ProjectHistoryRepository;

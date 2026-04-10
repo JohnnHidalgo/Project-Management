@@ -1,6 +1,6 @@
 import { ExpenseRepository } from '../repositories/expenseRepository.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../dist/.prisma/client';
 
 export class ExpenseService {
   private expenseRepository: ExpenseRepository;

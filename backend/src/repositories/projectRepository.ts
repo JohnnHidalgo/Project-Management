@@ -1,4 +1,4 @@
-import { Prisma, Project, ProjectStatus } from '@prisma/client';
+import { Prisma, Project, ProjectStatus } from '../../dist/.prisma/client';
 import { prisma } from '../index.js';
 
 export class ProjectRepository {

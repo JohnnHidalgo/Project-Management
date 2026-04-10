@@ -5,7 +5,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../.prisma/client"
+  output   = "../dist/.prisma/client"
 }
 
 datasource db {
@@ -140,6 +140,8 @@ enum LessonCategory {
 model User {
   id         String   @id
   name       String
+  email      String   @unique
+  password   String
   role       UserRole
   department String?
   phone      String?
@@ -183,6 +185,7 @@ model Project {
   actualCost         Float?
   cpi                Float?
   spi                Float?
+  pmCanEdit          Boolean       @default(false) // Controla si el PM puede editar la información del proyecto
 
   pm  User? @relation("ProjectPM", fields: [pmId], references: [id], onDelete: Cascade)
   pmo User? @relation("ProjectPMO", fields: [pmoId], references: [id], onDelete: Cascade)
@@ -198,6 +201,7 @@ model Project {
   stakeholders       Stakeholder[]
   projectSnapshots   ProjectSnapshot[]
   lessonsLearned     LessonLearned[]
+  projectHistories   ProjectHistory[]
 }
 
 model ProjectSponsor {
@@ -237,6 +241,7 @@ model BudgetLine {
   budgetType    BudgetType
   description   String
   plannedAmount Float
+  executionDate DateTime
   status        ApprovalStatus
   approvedBy    String?
   approvalDate  DateTime?
@@ -264,7 +269,8 @@ model Milestone {
 
 model Task {
   id            String       @id
-  milestoneId   String
+  milestoneId   String?
+  riskActionId  String?
   name          String
   description   String?
   startDate     DateTime?
@@ -276,7 +282,8 @@ model Task {
   weight        Int          @default(0)
   predecessorId String?
 
-  milestone      Milestone       @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  milestone      Milestone?      @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  riskAction     RiskAction?     @relation(fields: [riskActionId], references: [id], onDelete: Cascade)
   assignedUser   User?           @relation("TaskAssigned", fields: [assignedTo], references: [id], onDelete: SetNull)
   predecessor    Task?           @relation("TaskPredecessor", fields: [predecessorId], references: [id], onDelete: SetNull)
   successor      Task[]          @relation("TaskPredecessor")
@@ -297,6 +304,19 @@ model TaskLog {
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ProjectHistory {
+  id        String   @id
+  projectId String?
+  entity    String
+  entityId  String?
+  action    String
+  details   Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model Risk {
@@ -324,8 +344,9 @@ model RiskAction {
   dueDate     DateTime?
   status      ApprovalStatus
 
-  risk  Risk  @relation(fields: [riskId], references: [id], onDelete: Cascade)
-  owner User? @relation("RiskActionOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  risk  Risk   @relation(fields: [riskId], references: [id], onDelete: Cascade)
+  owner User?  @relation("RiskActionOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  tasks Task[]
 }
 
 model Issue {
@@ -386,19 +407,26 @@ model Stakeholder {
 }
 
 model ProjectSnapshot {
-  id           String         @id
-  projectId    String
-  date         DateTime
-  highlights   String
-  plannedValue Float
-  earnedValue  Float
-  actualSpent  Float
-  cv           Float
-  sv           Float
-  cpi          Float
-  spi          Float
-  eac          Float
-  status       SnapshotStatus
+  id                 String         @id
+  projectId          String
+  date               DateTime
+  highlights         String
+  risksIds           Json?
+  issuesIds          Json?
+  milestonesProgress Json?
+  overviewData       Json?
+  reportData         Json?
+  savedBudgetLines   Json?
+  savedExpenses      Json?
+  plannedValue       Float
+  earnedValue        Float
+  actualSpent        Float
+  cv                 Float
+  sv                 Float
+  cpi                Float
+  spi                Float
+  eac                Float
+  status             SnapshotStatus
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }

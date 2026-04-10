@@ -3,7 +3,7 @@ import { TaskRepository } from '../repositories/taskRepository.js';
 import { TaskService } from './taskService.js';
 import { MilestoneService } from './milestoneService.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../dist/.prisma/client';
 
 export class TaskLogService {
   private taskLogRepository: TaskLogRepository;
