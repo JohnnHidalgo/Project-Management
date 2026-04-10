@@ -18,7 +18,7 @@ services:
     container_name: pm_backend
     restart: always
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/project_management
+      DATABASE_URL: postgresql://dbaqas1:Dba_qa_JH@192.168.103.15:5432/project_management
       PORT: 3002
     ports:
       - "3002:3002"
