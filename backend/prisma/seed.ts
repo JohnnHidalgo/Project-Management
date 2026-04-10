@@ -162,7 +162,8 @@ async function main() {
       { projectId: 'p1', sponsorId: '1' }, { projectId: 'p2', sponsorId: '1' }, { projectId: 'p3', sponsorId: '1' },
       { projectId: 'p4', sponsorId: '1' }, { projectId: 'p5', sponsorId: '1' }, { projectId: 'p6', sponsorId: '1' },
       { projectId: 'p7', sponsorId: '1' }
-    ]
+    ],
+    skipDuplicates: true,
   });
 
   await prisma.projectTeamMember.createMany({
@@ -172,118 +173,171 @@ async function main() {
       { projectId: 'p4', teamMemberId: '5' }, { projectId: 'p5', teamMemberId: '4' },
       { projectId: 'p5', teamMemberId: '6' }, { projectId: 'p6', teamMemberId: '5' },
       { projectId: 'p7', teamMemberId: '5' }
-    ]
+    ],
+    skipDuplicates: true,
   });
 
   // Specific objectives
-  await prisma.projectSpecificObjective.createMany({
-    data: [
-      { id: 'so1', projectId: 'p1', description: 'Migrar BD productiva sin pérdida de datos', successCriteria: '0 registros perdidos', kpi: '% Integridad de datos' },
-      { id: 'so2', projectId: 'p1', description: 'Reducir latencia de acceso externo', successCriteria: 'Latencia < 100ms', kpi: 'Tiempo de respuesta (ms)' },
-      { id: 'so2_1', projectId: 'p2', description: 'Integrar con el ERP actual', successCriteria: 'Sincronización en tiempo real', kpi: 'Tasa de error de sincronización' },
-      { id: 'so2_2', projectId: 'p2', description: 'Capacitar al 100% del equipo comercial', successCriteria: 'Examen de certificación interna aprobado', kpi: '% Personal capacitado' },
-      { id: 'so3_1', projectId: 'p3', description: 'Construcción de Nave C', successCriteria: 'Entrega de obra civil sin observaciones', kpi: 'm2 construidos' },
-      { id: 'so3_2', projectId: 'p3', description: 'Instalar sistema de racks automáticos', successCriteria: '1000 picks por hora alcanzados', kpi: 'Picks por hora' },
-      { id: 'so4_1', projectId: 'p4', description: 'Instalar 4 celdas robóticas', successCriteria: 'Operación continua 24/7', kpi: 'OEE (Eficiencia General)' },
-      { id: 'so4_2', projectId: 'p4', description: 'Integrar con sistema de control SCADA', successCriteria: 'Monitoreo en tiempo real', kpi: 'Latencia de datos de sensores' },
-      { id: 'so5_1', projectId: 'p5', description: 'Lanzar MVP en 3 meses', successCriteria: 'Funcionalidades básicas de pedido activas', kpi: 'Días para lanzamiento' },
-      { id: 'so5_2', projectId: 'p5', description: 'Lograr 10,000 usuarios activos', successCriteria: 'Descargas y registros únicos', kpi: 'Usuarios Activos Mensuales' },
-      { id: 'so6_1', projectId: 'p6', description: 'Mapear 100% de activos críticos', successCriteria: 'Inventario validado por auditoría externa', kpi: '% Activos Inventariados' },
-      { id: 'so6_2', projectId: 'p6', description: 'Implementar controles de acceso biométricos', successCriteria: 'Instalación en site principal', kpi: 'Puntos de acceso asegurados' },
-      { id: 'so7_1', projectId: 'p7', description: 'Migración de fibra óptica', successCriteria: 'Backbone de 40Gbps operativo', kpi: 'Ancho de banda disponible (Gbps)' }
-    ]
-  });
+  const objectives = [
+    { id: 'so1', projectId: 'p1', description: 'Migrar BD productiva sin pérdida de datos', successCriteria: '0 registros perdidos', kpi: '% Integridad de datos' },
+    { id: 'so2', projectId: 'p1', description: 'Reducir latencia de acceso externo', successCriteria: 'Latencia < 100ms', kpi: 'Tiempo de respuesta (ms)' },
+    { id: 'so2_1', projectId: 'p2', description: 'Integrar con el ERP actual', successCriteria: 'Sincronización en tiempo real', kpi: 'Tasa de error de sincronización' },
+    { id: 'so2_2', projectId: 'p2', description: 'Capacitar al 100% del equipo comercial', successCriteria: 'Examen de certificación interna aprobado', kpi: '% Personal capacitado' },
+    { id: 'so3_1', projectId: 'p3', description: 'Construcción de Nave C', successCriteria: 'Entrega de obra civil sin observaciones', kpi: 'm2 construidos' },
+    { id: 'so3_2', projectId: 'p3', description: 'Instalar sistema de racks automáticos', successCriteria: '1000 picks por hora alcanzados', kpi: 'Picks por hora' },
+    { id: 'so4_1', projectId: 'p4', description: 'Instalar 4 celdas robóticas', successCriteria: 'Operación continua 24/7', kpi: 'OEE (Eficiencia General)' },
+    { id: 'so4_2', projectId: 'p4', description: 'Integrar con sistema de control SCADA', successCriteria: 'Monitoreo en tiempo real', kpi: 'Latencia de datos de sensores' },
+    { id: 'so5_1', projectId: 'p5', description: 'Lanzar MVP en 3 meses', successCriteria: 'Funcionalidades básicas de pedido activas', kpi: 'Días para lanzamiento' },
+    { id: 'so5_2', projectId: 'p5', description: 'Lograr 10,000 usuarios activos', successCriteria: 'Descargas y registros únicos', kpi: 'Usuarios Activos Mensuales' },
+    { id: 'so6_1', projectId: 'p6', description: 'Mapear 100% de activos críticos', successCriteria: 'Inventario validado por auditoría externa', kpi: '% Activos Inventariados' },
+    { id: 'so6_2', projectId: 'p6', description: 'Implementar controles de acceso biométricos', successCriteria: 'Instalación en site principal', kpi: 'Puntos de acceso asegurados' },
+    { id: 'so7_1', projectId: 'p7', description: 'Migración de fibra óptica', successCriteria: 'Backbone de 40Gbps operativo', kpi: 'Ancho de banda disponible (Gbps)' }
+  ];
+
+  for (const obj of objectives) {
+    await prisma.projectSpecificObjective.upsert({
+      where: { id: obj.id },
+      update: obj,
+      create: obj
+    });
+  }
 
   // Budget lines
-  await prisma.budgetLine.createMany({
-    data: [
-      { id: 'bl1', projectId: 'p1', category: 'Services', budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, executionDate: new Date('2026-01-05'), status: 'Approved' },
-      { id: 'bl2', projectId: 'p1', category: 'Labor', budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, executionDate: new Date('2026-02-01'), status: 'Approved' },
-      { id: 'bl3', projectId: 'p1', category: 'Hardware', budgetType: 'CAPEX', description: 'Servidores de Respaldo Local', plannedAmount: 20000, executionDate: new Date('2026-03-15'), status: 'Approved' },
-      { id: 'bl2_1', projectId: 'p2', category: 'Software', budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, executionDate: new Date('2026-03-05'), status: 'Pending' },
-      { id: 'bl2_2', projectId: 'p2', category: 'Services', budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, executionDate: new Date('2026-04-01'), status: 'Pending' },
-      { id: 'bl4_1', projectId: 'p4', category: 'Hardware', budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, executionDate: new Date('2026-02-20'), status: 'Approved' },
-      { id: 'bl4_2', projectId: 'p4', category: 'Services', budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, executionDate: new Date('2026-03-10'), status: 'Approved' },
-      { id: 'bl6_1', projectId: 'p6', category: 'Services', budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, executionDate: new Date('2026-02-10'), status: 'Approved' },
-      { id: 'bl6_2', projectId: 'p6', category: 'Labor', budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, executionDate: new Date('2026-03-01'), status: 'Approved' }
-    ]
-  });
+  const budgetLines = [
+    { id: 'bl1', projectId: 'p1', category: 'Services', budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, executionDate: new Date('2026-01-05'), status: 'Approved' },
+    { id: 'bl2', projectId: 'p1', category: 'Labor', budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, executionDate: new Date('2026-02-01'), status: 'Approved' },
+    { id: 'bl3', projectId: 'p1', category: 'Hardware', budgetType: 'CAPEX', description: 'Servidores de Respaldo Local', plannedAmount: 20000, executionDate: new Date('2026-03-15'), status: 'Approved' },
+    { id: 'bl2_1', projectId: 'p2', category: 'Software', budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, executionDate: new Date('2026-03-05'), status: 'Pending' },
+    { id: 'bl2_2', projectId: 'p2', category: 'Services', budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, executionDate: new Date('2026-04-01'), status: 'Pending' },
+    { id: 'bl4_1', projectId: 'p4', category: 'Hardware', budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, executionDate: new Date('2026-02-20'), status: 'Approved' },
+    { id: 'bl4_2', projectId: 'p4', category: 'Services', budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, executionDate: new Date('2026-03-10'), status: 'Approved' },
+    { id: 'bl6_1', projectId: 'p6', category: 'Services', budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, executionDate: new Date('2026-02-10'), status: 'Approved' },
+    { id: 'bl6_2', projectId: 'p6', category: 'Labor', budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, executionDate: new Date('2026-03-01'), status: 'Approved' }
+  ];
+
+  for (const bl of budgetLines) {
+    await prisma.budgetLine.upsert({
+      where: { id: bl.id },
+      update: bl,
+      create: bl
+    });
+  }
 
   // Milestones
-  await prisma.milestone.createMany({
-    data: [
-      { id: 'm1', projectId: 'p1', name: 'Arquitectura y Redes', description: '', startDate: new Date('2026-01-01'), endDate: new Date('2026-02-15'), weight: 20, status: 'Completed', progress: 100 },
-      { id: 'm2', projectId: 'p1', name: 'Migración Base Datos', description: '', startDate: new Date('2026-02-16'), endDate: new Date('2026-05-30'), weight: 40, status: 'In_Progress', progress: 50 },
-      { id: 'm3', projectId: 'p1', name: 'Pruebas de Aceptación', description: '', startDate: new Date('2026-06-01'), endDate: new Date('2026-08-30'), weight: 40, status: 'Pending', progress: 0 },
-      { id: 'm4', projectId: 'p2', name: 'Diseño de Procesos', description: '', startDate: new Date('2026-03-01'), endDate: new Date('2026-04-15'), weight: 30, status: 'In_Progress', progress: 20 },
-      { id: 'm5', projectId: 'p2', name: 'Configuración CRM', description: '', startDate: new Date('2026-04-16'), endDate: new Date('2026-07-30'), weight: 70, status: 'Pending', progress: 0 }
-    ]
-  });
+  const milestones = [
+    { id: 'm1', projectId: 'p1', name: 'Arquitectura y Redes', description: '', startDate: new Date('2026-01-01'), endDate: new Date('2026-02-15'), weight: 20, status: 'Completed', progress: 100 },
+    { id: 'm2', projectId: 'p1', name: 'Migración Base Datos', description: '', startDate: new Date('2026-02-16'), endDate: new Date('2026-05-30'), weight: 40, status: 'In_Progress', progress: 50 },
+    { id: 'm3', projectId: 'p1', name: 'Pruebas de Aceptación', description: '', startDate: new Date('2026-06-01'), endDate: new Date('2026-08-30'), weight: 40, status: 'Pending', progress: 0 },
+    { id: 'm4', projectId: 'p2', name: 'Diseño de Procesos', description: '', startDate: new Date('2026-03-01'), endDate: new Date('2026-04-15'), weight: 30, status: 'In_Progress', progress: 20 },
+    { id: 'm5', projectId: 'p2', name: 'Configuración CRM', description: '', startDate: new Date('2026-04-16'), endDate: new Date('2026-07-30'), weight: 70, status: 'Pending', progress: 0 }
+  ];
+
+  for (const m of milestones) {
+    await prisma.milestone.upsert({
+      where: { id: m.id },
+      update: m,
+      create: m
+    });
+  }
 
   // Tasks
-  await prisma.task.createMany({
-    data: [
-      { id: 't1', milestoneId: 'm1', name: 'Diseño de VPC', description: 'Definir subredes y seguridad', startDate: new Date('2026-01-05'), endDate: new Date('2026-01-15'), assignedTo: '4', progress: 100, status: 'Completed', priority: 'High' },
-      { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: new Date('2026-01-16'), endDate: new Date('2026-01-30'), assignedTo: '5', progress: 100, status: 'Completed', priority: 'High', predecessorId: 't1' },
-      { id: 't3', milestoneId: 'm2', name: 'Limpieza de Datos', description: 'Eliminar registros obsoletos', startDate: new Date('2026-02-20'), endDate: new Date('2026-03-30'), assignedTo: '4', progress: 80, status: 'In_Progress', priority: 'Medium' },
-      { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: new Date('2026-04-01'), endDate: new Date('2026-05-15'), assignedTo: '5', progress: 10, status: 'Pending', priority: 'High', predecessorId: 't3' },
-      { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: new Date('2026-03-05'), endDate: new Date('2026-03-25'), assignedTo: '6', progress: 40, status: 'In_Progress', priority: 'High' }
-    ]
-  });
+  const tasks = [
+    { id: 't1', milestoneId: 'm1', name: 'Diseño de VPC', description: 'Definir subredes y seguridad', startDate: new Date('2026-01-05'), endDate: new Date('2026-01-15'), assignedTo: '4', progress: 100, status: 'Completed', priority: 'High' },
+    { id: 't2', milestoneId: 'm1', name: 'Túnel VPN con Local', description: 'Conectividad segura', startDate: new Date('2026-01-16'), endDate: new Date('2026-01-30'), assignedTo: '5', progress: 100, status: 'Completed', priority: 'High', predecessorId: 't1' },
+    { id: 't3', milestoneId: 'm2', name: 'Limpieza de Datos', description: 'Eliminar registros obsoletos', startDate: new Date('2026-02-20'), endDate: new Date('2026-03-30'), assignedTo: '4', progress: 80, status: 'In_Progress', priority: 'Medium' },
+    { id: 't4', milestoneId: 'm2', name: 'Script de Migración', description: 'Desarrollo de ETL', startDate: new Date('2026-04-01'), endDate: new Date('2026-05-15'), assignedTo: '5', progress: 10, status: 'Pending', priority: 'High', predecessorId: 't3' },
+    { id: 't5', milestoneId: 'm4', name: 'Levantamiento Requerimientos', description: 'Entrevistas con ventas', startDate: new Date('2026-03-05'), endDate: new Date('2026-03-25'), assignedTo: '6', progress: 40, status: 'In_Progress', priority: 'High' }
+  ];
+
+  for (const t of tasks) {
+    await prisma.task.upsert({
+      where: { id: t.id },
+      update: t,
+      create: t
+    });
+  }
 
   // Expenses
-  await prisma.expense.createMany({
-    data: [
-      { id: 'e1', projectId: 'p1', budgetLineId: 'bl1', amount: 12000, date: new Date('2026-01-10'), description: 'Suscripción AWS Q1', category: 'Services', status: 'Paid' },
-      { id: 'e2', projectId: 'p1', budgetLineId: 'bl2', amount: 8000, date: new Date('2026-02-05'), description: 'Consultoría inicial', category: 'Services', status: 'Paid' }
-    ]
-  });
+  const expenses = [
+    { id: 'e1', projectId: 'p1', budgetLineId: 'bl1', amount: 12000, date: new Date('2026-01-10'), description: 'Suscripción AWS Q1', category: 'Services', status: 'Paid' },
+    { id: 'e2', projectId: 'p1', budgetLineId: 'bl2', amount: 8000, date: new Date('2026-02-05'), description: 'Consultoría inicial', category: 'Services', status: 'Paid' }
+  ];
+
+  for (const e of expenses) {
+    await prisma.expense.upsert({
+      where: { id: e.id },
+      update: e,
+      create: e
+    });
+  }
 
   // Risks
-  await prisma.risk.createMany({
-    data: [
-      { id: 'r1', projectId: 'p1', description: 'Latencia excesiva en sincronización de datos', probability: 0.3, impact: 0.8, status: 'Open', category: 'Time', strategy: 'Mitigate', ownerId: '4' },
-      { id: 'r2', projectId: 'p1', description: 'Sobrecosto en consumo de storage AWS', probability: 0.5, impact: 0.6, status: 'Open', category: 'Cost', strategy: 'Mitigate', ownerId: '3' },
-      { id: 'r4', projectId: 'p1', description: 'Indisponibilidad de consultores clave SAP', probability: 0.2, impact: 0.9, status: 'Open', category: 'Resources', strategy: 'Avoid', ownerId: '2' },
-      { id: 'r5', projectId: 'p1', description: 'Incompatibilidad de versiones de API legacy', probability: 0.6, impact: 0.7, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '4' },
-      { id: 'r4_1', projectId: 'p4', description: 'Retraso en importación de brazos robóticos', probability: 0.4, impact: 0.9, status: 'Open', category: 'Time', strategy: 'Transfer', ownerId: '3' },
-      { id: 'r4_2', projectId: 'p4', description: 'Fallas en la integración SCADA-ERP', probability: 0.7, impact: 0.8, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '5' },
-      { id: 'r4_3', projectId: 'p4', description: 'Accidentes durante la instalación mecánica', probability: 0.1, impact: 1.0, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '1' },
-      { id: 'r6_1', projectId: 'p6', description: 'Falta de compromiso de los jefes de área', probability: 0.8, impact: 0.7, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '2' },
-      { id: 'r6_2', projectId: 'p6', description: 'Hallazgos críticos en pre-auditoría', probability: 0.5, impact: 0.8, status: 'Open', category: 'Time', strategy: 'Avoid', ownerId: '3' },
-      { id: 'r6_3', projectId: 'p6', description: 'Fuga de información durante el proceso', probability: 0.2, impact: 0.9, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '5' },
-      { id: 'r_gen1', projectId: 'p2', description: 'Resistencia al cambio del equipo comercial', probability: 0.7, impact: 0.9, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '6' },
-      { id: 'r_crit1', projectId: 'p1', description: 'Intento de ciberataque masivo (Ransomware)', probability: 0.8, impact: 1.0, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '5' },
-      { id: 'r_crit2', projectId: 'p4', description: 'Huelga nacional de transporte (Afecta logística)', probability: 0.7, impact: 0.8, status: 'Open', category: 'Time', strategy: 'Avoid', ownerId: '1' },
-      { id: 'r_crit3', projectId: 'p6', description: 'Pérdida de backups históricos durante auditoría', probability: 0.65, impact: 0.9, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '3' },
-      { id: 'r_low1', projectId: 'p1', description: 'Retraso en entrega de papelería administrativa', probability: 0.2, impact: 0.1, status: 'Open', category: 'Cost', strategy: 'Accept', ownerId: '3' },
-      { id: 'r_low2', projectId: 'p5', description: 'Desajuste menor en paleta de colores del portal', probability: 0.4, impact: 0.2, status: 'Open', category: 'Scope', strategy: 'Accept', ownerId: '4' },
-      { id: 'r_low3', projectId: 'p2', description: 'Indisponibilidad breve de sala de juntas para capacitación', probability: 0.3, impact: 0.2, status: 'Open', category: 'Time', strategy: 'Accept', ownerId: '2' },
-      { id: 'r_low4', projectId: 'p4', description: 'Cambio de marca en herramientas de mano secundarias', probability: 0.1, impact: 0.1, status: 'Open', category: 'Cost', strategy: 'Accept', ownerId: '5' }
-    ]
-  });
+  const risks = [
+    { id: 'r1', projectId: 'p1', description: 'Latencia excesiva en sincronización de datos', probability: 0.3, impact: 0.8, status: 'Open', category: 'Time', strategy: 'Mitigate', ownerId: '4' },
+    { id: 'r2', projectId: 'p1', description: 'Sobrecosto en consumo de storage AWS', probability: 0.5, impact: 0.6, status: 'Open', category: 'Cost', strategy: 'Mitigate', ownerId: '3' },
+    { id: 'r4', projectId: 'p1', description: 'Indisponibilidad de consultores clave SAP', probability: 0.2, impact: 0.9, status: 'Open', category: 'Resources', strategy: 'Avoid', ownerId: '2' },
+    { id: 'r5', projectId: 'p1', description: 'Incompatibilidad de versiones de API legacy', probability: 0.6, impact: 0.7, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '4' },
+    { id: 'r4_1', projectId: 'p4', description: 'Retraso en importación de brazos robóticos', probability: 0.4, impact: 0.9, status: 'Open', category: 'Time', strategy: 'Transfer', ownerId: '3' },
+    { id: 'r4_2', projectId: 'p4', description: 'Fallas en la integración SCADA-ERP', probability: 0.7, impact: 0.8, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '5' },
+    { id: 'r4_3', projectId: 'p4', description: 'Accidentes durante la instalación mecánica', probability: 0.1, impact: 1.0, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '1' },
+    { id: 'r6_1', projectId: 'p6', description: 'Falta de compromiso de los jefes de área', probability: 0.8, impact: 0.7, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '2' },
+    { id: 'r6_2', projectId: 'p6', description: 'Hallazgos críticos en pre-auditoría', probability: 0.5, impact: 0.8, status: 'Open', category: 'Time', strategy: 'Avoid', ownerId: '3' },
+    { id: 'r6_3', projectId: 'p6', description: 'Fuga de información durante el proceso', probability: 0.2, impact: 0.9, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '5' },
+    { id: 'r_gen1', projectId: 'p2', description: 'Resistencia al cambio del equipo comercial', probability: 0.7, impact: 0.9, status: 'Open', category: 'Scope', strategy: 'Mitigate', ownerId: '6' },
+    { id: 'r_crit1', projectId: 'p1', description: 'Intento de ciberataque masivo (Ransomware)', probability: 0.8, impact: 1.0, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '5' },
+    { id: 'r_crit2', projectId: 'p4', description: 'Huelga nacional de transporte (Afecta logística)', probability: 0.7, impact: 0.8, status: 'Open', category: 'Time', strategy: 'Avoid', ownerId: '1' },
+    { id: 'r_crit3', projectId: 'p6', description: 'Pérdida de backups históricos durante auditoría', probability: 0.65, impact: 0.9, status: 'Open', category: 'Resources', strategy: 'Mitigate', ownerId: '3' },
+    { id: 'r_low1', projectId: 'p1', description: 'Retraso en entrega de papelería administrativa', probability: 0.2, impact: 0.1, status: 'Open', category: 'Cost', strategy: 'Accept', ownerId: '3' },
+    { id: 'r_low2', projectId: 'p5', description: 'Desajuste menor en paleta de colores del portal', probability: 0.4, impact: 0.2, status: 'Open', category: 'Scope', strategy: 'Accept', ownerId: '4' },
+    { id: 'r_low3', projectId: 'p2', description: 'Indisponibilidad breve de sala de juntas para capacitación', probability: 0.3, impact: 0.2, status: 'Open', category: 'Time', strategy: 'Accept', ownerId: '2' },
+    { id: 'r_low4', projectId: 'p4', description: 'Cambio de marca en herramientas de mano secundarias', probability: 0.1, impact: 0.1, status: 'Open', category: 'Cost', strategy: 'Accept', ownerId: '5' }
+  ];
+
+  for (const r of risks) {
+    await prisma.risk.upsert({
+      where: { id: r.id },
+      update: r,
+      create: r
+    });
+  }
 
   // Risk actions
-  await prisma.riskAction.createMany({
-    data: [
-      { id: 'ra1', riskId: 'r1', description: 'Implementar compresión de datos en el túnel VPN', ownerId: '5', dueDate: new Date('2026-02-28'), status: 'Pending' },
-      { id: 'ra2', riskId: 'r4_2', description: 'Contratar soporte premium del fabricante SCADA', ownerId: '3', dueDate: new Date('2026-03-15'), status: 'Pending' },
-      { id: 'ra3', riskId: 'r6_1', description: 'Talleres de sensibilización con gerencia media', ownerId: '2', dueDate: new Date('2026-02-10'), status: 'Pending' },
-      { id: 'ra4', riskId: 'r4_1', description: 'Seguro de transporte internacional con cobertura total', ownerId: '1', dueDate: new Date('2026-02-01'), status: 'Pending' },
-      { id: 'ra5', riskId: 'r5', description: 'Desarrollo de middleware de compatibilidad', ownerId: '4', dueDate: new Date('2026-04-30'), status: 'Pending' }
-    ]
-  });
+  const riskActions = [
+    { id: 'ra1', riskId: 'r1', description: 'Implementar compresión de datos en el túnel VPN', ownerId: '5', dueDate: new Date('2026-02-28'), status: 'Pending' },
+    { id: 'ra2', riskId: 'r4_2', description: 'Contratar soporte premium del fabricante SCADA', ownerId: '3', dueDate: new Date('2026-03-15'), status: 'Pending' },
+    { id: 'ra3', riskId: 'r6_1', description: 'Talleres de sensibilización con gerencia media', ownerId: '2', dueDate: new Date('2026-02-10'), status: 'Pending' },
+    { id: 'ra4', riskId: 'r4_1', description: 'Seguro de transporte internacional con cobertura total', ownerId: '1', dueDate: new Date('2026-02-01'), status: 'Pending' },
+    { id: 'ra5', riskId: 'r5', description: 'Desarrollo de middleware de compatibilidad', ownerId: '4', dueDate: new Date('2026-04-30'), status: 'Pending' }
+  ];
+
+  for (const ra of riskActions) {
+    await prisma.riskAction.upsert({
+      where: { id: ra.id },
+      update: ra,
+      create: ra
+    });
+  }
 
   // Issues
-  await prisma.issue.create({
-    data: {
+  await prisma.issue.upsert({
+    where: { id: 'i1' },
+    update: {
+      projectId: 'p1', description: 'Latencia de red intermitente en el enlace dedicado', severity: 'High', status: 'Open', ownerId: '3'
+    },
+    create: {
       id: 'i1', projectId: 'p1', description: 'Latencia de red intermitente en el enlace dedicado', severity: 'High', status: 'Open', ownerId: '3'
     }
   });
 
   // Change request
-  await prisma.changeRequest.create({
-    data: {
+  await prisma.changeRequest.upsert({
+    where: { id: 'cr1' },
+    update: {
+      taskId: 't3', originalStartDate: new Date('2026-02-20'), originalEndDate: new Date('2026-03-20'),
+      newStartDate: new Date('2026-02-20'), newEndDate: new Date('2026-03-30'), justification: 'Se detectaron más tablas de las previstas inicialmente en el sistema legacy.',
+      status: 'Approved', requestedBy: '3', requestedDate: new Date('2026-02-15')
+    },
+    create: {
       id: 'cr1', taskId: 't3', originalStartDate: new Date('2026-02-20'), originalEndDate: new Date('2026-03-20'),
       newStartDate: new Date('2026-02-20'), newEndDate: new Date('2026-03-30'), justification: 'Se detectaron más tablas de las previstas inicialmente en el sistema legacy.',
       status: 'Approved', requestedBy: '3', requestedDate: new Date('2026-02-15')
@@ -291,23 +345,39 @@ async function main() {
   });
 
   // Stakeholders
-  await prisma.stakeholder.createMany({
-    data: [
-      { id: 's1', projectId: 'p1', userId: '1', power: 'High', interest: 'High', influenceStrategy: 'Reuniones mensuales de avance' },
-      { id: 's2', projectId: 'p1', userId: '6', power: 'Low', interest: 'High', influenceStrategy: 'Reportes de impacto en marketing' }
-    ]
-  });
+  const stakeholders = [
+    { id: 's1', projectId: 'p1', userId: '1', power: 'High', interest: 'High', influenceStrategy: 'Reuniones mensuales de avance' },
+    { id: 's2', projectId: 'p1', userId: '6', power: 'Low', interest: 'High', influenceStrategy: 'Reportes de impacto en marketing' }
+  ];
+
+  for (const s of stakeholders) {
+    await prisma.stakeholder.upsert({
+      where: { id: s.id },
+      update: s,
+      create: s
+    });
+  }
 
   // Optional snapshot and lesson learned
-  await prisma.projectSnapshot.create({
-    data: {
+  await prisma.projectSnapshot.upsert({
+    where: { id: 'ps1' },
+    update: {
+      projectId: 'p1', date: new Date('2026-04-01'), highlights: 'Primer avance significativo de migración', plannedValue: 45000,
+      earnedValue: 30000, actualSpent: 28000, cv: 2000, sv: 1500, cpi: 1.07, spi: 1.20, eac: 140000, status: 'Open'
+    },
+    create: {
       id: 'ps1', projectId: 'p1', date: new Date('2026-04-01'), highlights: 'Primer avance significativo de migración', plannedValue: 45000,
       earnedValue: 30000, actualSpent: 28000, cv: 2000, sv: 1500, cpi: 1.07, spi: 1.20, eac: 140000, status: 'Open'
     }
   });
 
-  await prisma.lessonLearned.create({
-    data: {
+  await prisma.lessonLearned.upsert({
+    where: { id: 'll1' },
+    update: {
+      projectId: 'p1', category: 'Technical', description: 'La migración de DB debe incluir copia de seguridad incremental diaria antes de cutover.',
+      recommendation: 'Implementar backup incremental y pruebas de restauración semanales.', submittedBy: '3', date: new Date('2026-03-20')
+    },
+    create: {
       id: 'll1', projectId: 'p1', category: 'Technical', description: 'La migración de DB debe incluir copia de seguridad incremental diaria antes de cutover.',
       recommendation: 'Implementar backup incremental y pruebas de restauración semanales.', submittedBy: '3', date: new Date('2026-03-20')
     }
