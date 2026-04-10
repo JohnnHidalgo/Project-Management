@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { PrismaClient, BudgetCategory, MilestoneStatus, TaskStatus, TaskPriority, ExpenseStatus, RiskStatus, RiskCategory, RiskStrategy, ApprovalStatus, StakeholderPower, IssueSeverity, IssueStatus, ChangeRequestStatus, SnapshotStatus, LessonCategory } from '../.prisma/client';
+import { PrismaClient, BudgetCategory, MilestoneStatus, TaskStatus, TaskPriority, ExpenseStatus, RiskStatus, RiskCategory, RiskStrategy, ApprovalStatus, StakeholderPower, IssueSeverity, IssueStatus, ChangeRequestStatus, SnapshotStatus, LessonCategory, BudgetType, StakeholderInterest } from '../.prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from 'bcrypt';
 
@@ -204,15 +204,15 @@ async function main() {
 
   // Budget lines
   const budgetLines = [
-    { id: 'bl1', projectId: 'p1', category: BudgetCategory.Services, budgetType: 'OPEX', description: 'Suscripción AWS Anual', plannedAmount: 50000, executionDate: new Date('2026-01-05'), status: ApprovalStatus.Approved },
-    { id: 'bl2', projectId: 'p1', category: BudgetCategory.Labor, budgetType: 'OPEX', description: 'Consultoría Migración', plannedAmount: 30000, executionDate: new Date('2026-02-01'), status: ApprovalStatus.Approved },
-    { id: 'bl3', projectId: 'p1', category: BudgetCategory.Hardware, budgetType: 'CAPEX', description: 'Servidores de Respaldo Local', plannedAmount: 20000, executionDate: new Date('2026-03-15'), status: ApprovalStatus.Approved },
-    { id: 'bl2_1', projectId: 'p2', category: BudgetCategory.Software, budgetType: 'OPEX', description: 'Licencias Salesforce 1er año', plannedAmount: 45000, executionDate: new Date('2026-03-05'), status: ApprovalStatus.Pending },
-    { id: 'bl2_2', projectId: 'p2', category: BudgetCategory.Services, budgetType: 'OPEX', description: 'Partners de Implementación', plannedAmount: 40000, executionDate: new Date('2026-04-01'), status: ApprovalStatus.Pending },
-    { id: 'bl4_1', projectId: 'p4', category: BudgetCategory.Hardware, budgetType: 'CAPEX', description: 'Brazos Robóticos Kuka', plannedAmount: 600000, executionDate: new Date('2026-02-20'), status: ApprovalStatus.Approved },
-    { id: 'bl4_2', projectId: 'p4', category: BudgetCategory.Services, budgetType: 'OPEX', description: 'Consultoría Integración SCADA', plannedAmount: 150000, executionDate: new Date('2026-03-10'), status: ApprovalStatus.Approved },
-    { id: 'bl6_1', projectId: 'p6', category: BudgetCategory.Services, budgetType: 'OPEX', description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, executionDate: new Date('2026-02-10'), status: ApprovalStatus.Approved },
-    { id: 'bl6_2', projectId: 'p6', category: BudgetCategory.Labor, budgetType: 'OPEX', description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, executionDate: new Date('2026-03-01'), status: ApprovalStatus.Approved }
+    { id: 'bl1', projectId: 'p1', category: BudgetCategory.Services, budgetType: BudgetType.OPEX, description: 'Suscripción AWS Anual', plannedAmount: 50000, executionDate: new Date('2026-01-05'), status: ApprovalStatus.Approved },
+    { id: 'bl2', projectId: 'p1', category: BudgetCategory.Labor, budgetType: BudgetType.OPEX, description: 'Consultoría Migración', plannedAmount: 30000, executionDate: new Date('2026-02-01'), status: ApprovalStatus.Approved },
+    { id: 'bl3', projectId: 'p1', category: BudgetCategory.Hardware, budgetType: BudgetType.CAPEX, description: 'Servidores de Respaldo Local', plannedAmount: 20000, executionDate: new Date('2026-03-15'), status: ApprovalStatus.Approved },
+    { id: 'bl2_1', projectId: 'p2', category: BudgetCategory.Software, budgetType: BudgetType.OPEX, description: 'Licencias Salesforce 1er año', plannedAmount: 45000, executionDate: new Date('2026-03-05'), status: ApprovalStatus.Pending },
+    { id: 'bl2_2', projectId: 'p2', category: BudgetCategory.Services, budgetType: BudgetType.OPEX, description: 'Partners de Implementación', plannedAmount: 40000, executionDate: new Date('2026-04-01'), status: ApprovalStatus.Pending },
+    { id: 'bl4_1', projectId: 'p4', category: BudgetCategory.Hardware, budgetType: BudgetType.CAPEX, description: 'Brazos Robóticos Kuka', plannedAmount: 600000, executionDate: new Date('2026-02-20'), status: ApprovalStatus.Approved },
+    { id: 'bl4_2', projectId: 'p4', category: BudgetCategory.Services, budgetType: BudgetType.OPEX, description: 'Consultoría Integración SCADA', plannedAmount: 150000, executionDate: new Date('2026-03-10'), status: ApprovalStatus.Approved },
+    { id: 'bl6_1', projectId: 'p6', category: BudgetCategory.Services, budgetType: BudgetType.OPEX, description: 'Entidad Certificadora (BSI)', plannedAmount: 20000, executionDate: new Date('2026-02-10'), status: ApprovalStatus.Approved },
+    { id: 'bl6_2', projectId: 'p6', category: BudgetCategory.Labor, budgetType: BudgetType.OPEX, description: 'Capacitación en Ciberseguridad', plannedAmount: 15000, executionDate: new Date('2026-03-01'), status: ApprovalStatus.Approved }
   ];
 
   for (const bl of budgetLines) {
@@ -346,8 +346,8 @@ async function main() {
 
   // Stakeholders
   const stakeholders = [
-    { id: 's1', projectId: 'p1', userId: '1', power: StakeholderPower.High, interest: 'High', influenceStrategy: 'Reuniones mensuales de avance' },
-    { id: 's2', projectId: 'p1', userId: '6', power: StakeholderPower.Low, interest: 'High', influenceStrategy: 'Reportes de impacto en marketing' }
+    { id: 's1', projectId: 'p1', userId: '1', power: StakeholderPower.High, interest: StakeholderInterest.High, influenceStrategy: 'Reuniones mensuales de avance' },
+    { id: 's2', projectId: 'p1', userId: '6', power: StakeholderPower.Low, interest: StakeholderInterest.High, influenceStrategy: 'Reportes de impacto en marketing' }
   ];
 
   for (const s of stakeholders) {
