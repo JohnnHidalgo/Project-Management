@@ -1,14 +1,23 @@
+version: '3.9'
 
 services:
   backend:
     build: .
     image: project-management-backend:latest
+    container_name: pm_backend
     restart: unless-stopped
-    env_file: .env
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - NODE_ENV=production
+      DATABASE_URL: ${DATABASE_URL}
+      NODE_ENV: production
     ports:
-      - '3002:3002'
+      - "3002:3002"
     command: ["./docker-entrypoint.sh"]
+    networks:
+      - pm_network
+
+networks:
+  pm_network:
+    external: true
 

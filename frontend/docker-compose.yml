@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  frontend:
+    build: .
+    container_name: pm_frontend
+    restart: always
+    ports:
+      - "82:82"
+    networks:
+      - pm_network
+
+networks:
+  pm_network:
+    external: true
