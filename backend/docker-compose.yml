@@ -3,8 +3,7 @@ version: '3.9'
 services:
   backend:
     build: .
-    image: project-management-backend:latest
-    container_name: pm_backend
+    image: project-management-backend
     restart: unless-stopped
     env_file:
       - .env
@@ -15,7 +14,9 @@ services:
       - "3002:3002"
     command: ["./docker-entrypoint.sh"]
     networks:
-      - pm_network
+      pm_network:
+        aliases:
+          - backend
 
 networks:
   pm_network:

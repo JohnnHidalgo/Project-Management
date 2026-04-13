@@ -3,12 +3,14 @@ version: '3.9'
 services:
   frontend:
     build: .
-    container_name: pm_frontend
+    image: project-management-frontend
     restart: always
     ports:
       - "82:82"
     networks:
-      - pm_network
+      pm_network:
+        aliases:
+          - frontend
 
 networks:
   pm_network:
