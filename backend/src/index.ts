@@ -28,7 +28,7 @@ const prisma = new PrismaClient({
 });
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = Number(process.env.PORT) || 3002;
 
 // Configure CORS: allow specific frontend origin or allow all in development
 const FRONTEND_URL = process.env.FRONTEND_URL || process.env.ALLOWED_ORIGIN;
