@@ -26,7 +26,19 @@ const prisma = new PrismaClient({
 });
 const app = express();
 const PORT = process.env.PORT || 3002;
-app.use(cors());
+// Configure CORS: allow specific frontend origin or allow all in development
+const FRONTEND_URL = process.env.FRONTEND_URL || process.env.ALLOWED_ORIGIN;
+const allowCredentials = process.env.CORS_ALLOW_CREDENTIALS === 'true';
+const corsOptions = {
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    credentials: allowCredentials,
+};
+// Allow all origins (open CORS) as requested. To restrict, set FRONTEND_URL.
+corsOptions.origin = true;
+app.use(cors(corsOptions));
+// allow preflight for all routes
+app.options('*', cors(corsOptions));
 app.use(express.json());
 // Health check
 app.get('/api/health', (req, res) => {
