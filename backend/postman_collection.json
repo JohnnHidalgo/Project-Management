@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "project-management-backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3002/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login" }
+          }
+        },
+        {
+          "name": "GET /auth/profile",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/auth/profile" } }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        { "name": "GET /users", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/users" } } },
+        { "name": "GET /users/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/users/:id" } } },
+        { "name": "POST /users", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Example\",\n  \"email\": \"user@example.com\",\n  \"password\": \"secret\",\n  \"role\": \"Team_Member\"\n}" }, "url": { "raw": "{{baseUrl}}/users" } } },
+        { "name": "PUT /users/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated\"\n}" }, "url": { "raw": "{{baseUrl}}/users/:id" } } },
+        { "name": "DELETE /users/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/users/:id" } } }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        { "name": "GET /projects", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/projects" } } },
+        { "name": "GET /projects/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/projects/:id" } } },
+        { "name": "POST /projects", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Project\",\n  \"description\": \"...\"\n}" }, "url": { "raw": "{{baseUrl}}/projects" } } },
+        { "name": "PUT /projects/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Project\"\n}" }, "url": { "raw": "{{baseUrl}}/projects/:id" } } },
+        { "name": "PUT /projects/:id/toggle-edit", "request": { "method": "PUT", "url": { "raw": "{{baseUrl}}/projects/:id/toggle-edit" } } },
+        { "name": "DELETE /projects/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/projects/:id" } } }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        { "name": "GET /tasks", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/tasks" } } },
+        { "name": "GET /tasks/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/tasks/:id" } } },
+        { "name": "GET /tasks/milestone/:milestoneId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/tasks/milestone/:milestoneId" } } },
+        { "name": "GET /tasks/risk-action/:riskActionId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/tasks/risk-action/:riskActionId" } } },
+        { "name": "GET /tasks/critical-path/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/tasks/critical-path/:projectId" } } },
+        { "name": "POST /tasks", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Task name\",\n  \"milestoneId\": \"...\"\n}" }, "url": { "raw": "{{baseUrl}}/tasks" } } },
+        { "name": "PUT /tasks/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"progress\": 50\n}" }, "url": { "raw": "{{baseUrl}}/tasks/:id" } } },
+        { "name": "DELETE /tasks/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/tasks/:id" } } }
+      ]
+    },
+    {
+      "name": "TaskLogs",
+      "item": [
+        { "name": "GET /taskLogs", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/taskLogs" } } },
+        { "name": "GET /taskLogs/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/taskLogs/:id" } } },
+        { "name": "GET /taskLogs/task/:taskId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/taskLogs/task/:taskId" } } },
+        { "name": "POST /taskLogs", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"taskId\": \"...\",\n  \"userId\": \"...\",\n  \"comment\": \"Worked\",\n  \"newProgress\": 20\n}" }, "url": { "raw": "{{baseUrl}}/taskLogs" } } },
+        { "name": "PUT /taskLogs/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"comment\": \"Updated comment\"\n}" }, "url": { "raw": "{{baseUrl}}/taskLogs/:id" } } },
+        { "name": "DELETE /taskLogs/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/taskLogs/:id" } } }
+      ]
+    },
+    {
+      "name": "Risks",
+      "item": [
+        { "name": "GET /risks", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/risks" } } },
+        { "name": "GET /risks/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/risks/:id" } } },
+        { "name": "GET /risks/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/risks/project/:projectId" } } },
+        { "name": "POST /risks", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"projectId\": \"...\",\n  \"description\": \"Risk\",\n  \"probability\": 0.5,\n  \"impact\": 0.5\n}" }, "url": { "raw": "{{baseUrl}}/risks" } } },
+        { "name": "PUT /risks/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"Closed\"\n}" }, "url": { "raw": "{{baseUrl}}/risks/:id" } } },
+        { "name": "DELETE /risks/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/risks/:id" } } }
+      ]
+    },
+    {
+      "name": "RiskActions",
+      "item": [
+        { "name": "GET /riskActions", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/riskActions" } } },
+        { "name": "GET /riskActions/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/riskActions/:id" } } },
+        { "name": "GET /riskActions/risk/:riskId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/riskActions/risk/:riskId" } } },
+        { "name": "POST /riskActions", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"riskId\": \"...\",\n  \"description\": \"Action\"\n}" }, "url": { "raw": "{{baseUrl}}/riskActions" } } },
+        { "name": "PUT /riskActions/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"Approved\"\n}" }, "url": { "raw": "{{baseUrl}}/riskActions/:id" } } },
+        { "name": "DELETE /riskActions/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/riskActions/:id" } } }
+      ]
+    },
+    {
+      "name": "ProjectSnapshots",
+      "item": [
+        { "name": "GET /snapshots", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/snapshots" } } },
+        { "name": "GET /snapshots/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/snapshots/:id" } } },
+        { "name": "GET /snapshots/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/snapshots/project/:projectId" } } },
+        { "name": "POST /snapshots", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"projectId\": \"...\",\n  \"highlights\": \"...\"\n}" }, "url": { "raw": "{{baseUrl}}/snapshots" } } }
+      ]
+    },
+    {
+      "name": "ProjectHistory",
+      "item": [
+        { "name": "GET /projectHistory", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/projectHistory" } } },
+        { "name": "GET /projectHistory/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/projectHistory/project/:projectId" } } }
+      ]
+    },
+    {
+      "name": "Milestones",
+      "item": [
+        { "name": "GET /milestones", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/milestones" } } },
+        { "name": "GET /milestones/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/milestones/:id" } } },
+        { "name": "GET /milestones/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/milestones/project/:projectId" } } },
+        { "name": "POST /milestones", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"projectId\": \"...\",\n  \"name\": \"Milestone\"\n}" }, "url": { "raw": "{{baseUrl}}/milestones" } } },
+        { "name": "PUT /milestones/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"progress\": 50\n}" }, "url": { "raw": "{{baseUrl}}/milestones/:id" } } },
+        { "name": "DELETE /milestones/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/milestones/:id" } } }
+      ]
+    },
+    {
+      "name": "Issues",
+      "item": [
+        { "name": "GET /issues", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/issues" } } },
+        { "name": "GET /issues/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/issues/:id" } } },
+        { "name": "GET /issues/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/issues/project/:projectId" } } },
+        { "name": "POST /issues", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"projectId\": \"...\",\n  \"description\": \"Issue\"\n}" }, "url": { "raw": "{{baseUrl}}/issues" } } },
+        { "name": "PUT /issues/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"Resolved\"\n}" }, "url": { "raw": "{{baseUrl}}/issues/:id" } } },
+        { "name": "DELETE /issues/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/issues/:id" } } }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        { "name": "GET /expenses", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/expenses" } } },
+        { "name": "GET /expenses/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/expenses/:id" } } },
+        { "name": "GET /expenses/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/expenses/project/:projectId" } } },
+        { "name": "POST /expenses", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"projectId\": \"...\",\n  \"amount\": 100.0\n}" }, "url": { "raw": "{{baseUrl}}/expenses" } } },
+        { "name": "PUT /expenses/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"amount\": 120.0\n}" }, "url": { "raw": "{{baseUrl}}/expenses/:id" } } },
+        { "name": "DELETE /expenses/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/expenses/:id" } } }
+      ]
+    },
+    {
+      "name": "ChangeRequests",
+      "item": [
+        { "name": "GET /changeRequests", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/changeRequests" } } },
+        { "name": "GET /changeRequests/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/changeRequests/:id" } } },
+        { "name": "GET /changeRequests/task/:taskId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/changeRequests/task/:taskId" } } },
+        { "name": "POST /changeRequests", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"taskId\": \"...\",\n  \"justification\": \"Reason\"\n}" }, "url": { "raw": "{{baseUrl}}/changeRequests" } } },
+        { "name": "PUT /changeRequests/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"newEndDate\": \"2026-05-01T00:00:00Z\"\n}" }, "url": { "raw": "{{baseUrl}}/changeRequests/:id" } } },
+        { "name": "PUT /changeRequests/:id/process", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"action\": \"approve\"\n}" }, "url": { "raw": "{{baseUrl}}/changeRequests/:id/process" } } },
+        { "name": "DELETE /changeRequests/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/changeRequests/:id" } } }
+      ]
+    },
+    {
+      "name": "BudgetLines",
+      "item": [
+        { "name": "GET /budgetLines", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/budgetLines" } } },
+        { "name": "GET /budgetLines/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/budgetLines/:id" } } },
+        { "name": "GET /budgetLines/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/budgetLines/project/:projectId" } } },
+        { "name": "POST /budgetLines", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"projectId\": \"...\",\n  \"plannedAmount\": 1000.0\n}" }, "url": { "raw": "{{baseUrl}}/budgetLines" } } },
+        { "name": "PUT /budgetLines/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"Approved\"\n}" }, "url": { "raw": "{{baseUrl}}/budgetLines/:id" } } },
+        { "name": "DELETE /budgetLines/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/budgetLines/:id" } } }
+      ]
+    },
+    {
+      "name": "Stakeholders",
+      "item": [
+        { "name": "GET /stakeholders", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/stakeholders" } } },
+        { "name": "GET /stakeholders/:id", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/stakeholders/:id" } } },
+        { "name": "GET /stakeholders/project/:projectId", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/stakeholders/project/:projectId" } } },
+        { "name": "POST /stakeholders", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"projectId\": \"...\",\n  \"userId\": \"...\"\n}" }, "url": { "raw": "{{baseUrl}}/stakeholders" } } },
+        { "name": "PUT /stakeholders/:id", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"influenceStrategy\": \"Engage\"\n}" }, "url": { "raw": "{{baseUrl}}/stakeholders/:id" } } },
+        { "name": "DELETE /stakeholders/:id", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/stakeholders/:id" } } }
+      ]
+    }
+  ]
+}
