@@ -1,4 +1,4 @@
-import { Prisma, ProjectSnapshot } from '../../dist/.prisma/client';
+import { Prisma, ProjectSnapshot } from '../../.prisma/client';
 import { prisma } from '../index.js';
 
 export class ProjectSnapshotRepository {

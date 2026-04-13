@@ -1,0 +1,13 @@
+
+services:
+  backend:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - NODE_ENV=production
+    ports:
+      - '3002:3002'
+    command: ["./docker-entrypoint.sh"]
+

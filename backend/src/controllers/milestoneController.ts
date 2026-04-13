@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { MilestoneService } from '../services/milestoneService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '../../.prisma/client';
 
 export class MilestoneController {
   private milestoneService: MilestoneService;

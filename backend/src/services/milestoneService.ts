@@ -1,6 +1,6 @@
 import { MilestoneRepository } from '../repositories/milestoneRepository.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '../../.prisma/client';
 
 export class MilestoneService {
   private milestoneRepository: MilestoneRepository;

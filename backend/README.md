@@ -50,3 +50,23 @@ Backend API for the PMBOK-compliant project management system.
 
 - `DATABASE_URL` - PostgreSQL connection string
 - `PORT` - Server port (default: 3001)
+
+## Docker
+
+Build the production image (runs `prisma generate` and builds the project during image build):
+
+```bash
+docker build -t project-management-backend .
+```
+
+Start app + postgres using `docker-compose`:
+
+```bash
+docker-compose up -d --build
+```
+
+The compose file exposes the app on port `3002` and Postgres on `5432`.
+
+Environment / runtime notes:
+- The image runs `npx prisma migrate deploy` at startup and retries until the DB is ready.
+- To run the seed script after migrations set `SEED=true` in the environment for the `app` service.

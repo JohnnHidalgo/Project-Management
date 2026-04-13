@@ -1,6 +1,6 @@
 import { IssueRepository } from '../repositories/issueRepository.js';
 import { ProjectHistoryService } from './projectHistoryService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '../../.prisma/client';
 
 export class IssueService {
   private issueRepository: IssueRepository;

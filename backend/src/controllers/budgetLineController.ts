@@ -1,5 +1,5 @@
 import { BudgetLineService } from '../services/budgetLineService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '../../.prisma/client';
 
 export class BudgetLineController {
   private budgetLineService: BudgetLineService;

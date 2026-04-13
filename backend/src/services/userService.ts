@@ -1,5 +1,5 @@
 import { UserRepository } from '../repositories/userRepository.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '../../.prisma/client';
 import bcrypt from 'bcrypt';
 
 export class UserService {

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService.js';
-import { Prisma } from '../../dist/.prisma/client';
+import { Prisma } from '../../.prisma/client';
 
 export class UserController {
   private userService: UserService;
