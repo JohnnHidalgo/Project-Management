@@ -20,10 +20,16 @@ import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbo
 import { mockUsers, mockProjects, mockMilestones, mockTasks, mockRisks, mockIssues, mockExpenses, mockStakeholders, mockTaskLogs, mockChangeRequests, mockRiskActions } from './mockData';
 import CashFlowChart from './components/CashFlowChart';
 import Login from './components/Login';
+import UsersView from './components/UsersView';
 import './globals.css';
 
 const getProjectSponsorIds = (project: any): string[] => project?.sponsorIds ?? project?.sponsors?.map((s: any) => s.sponsorId) ?? [];
 const getProjectTeamMemberIds = (project: any): string[] => project?.teamMemberIds ?? project?.teamMembers?.map((t: any) => t.teamMemberId) ?? [];
+
+const roleLabel = (r: string) => {
+  if (r === 'Admin') return 'Administrador';
+  return r.replace(/_/g, ' ');
+};
 
 // --- Sub-components (Layout) ---
 
@@ -67,14 +73,23 @@ const Sidebar = ({ currentUser, onLogout }: { currentUser: User, onLogout: () =>
             </Link>
           </>
         )}
+        {currentUser.role === 'Admin' && (
+          <>
+            <div style={{ margin: '1rem 0 0.5rem 1rem', fontSize: '0.7rem', color: '#93c5fd', fontWeight: 700, textTransform: 'uppercase' }}>Administración</div>
+            <Link to="/users" className="nav-item">
+              <UserCircle size={20} />
+              <span>Usuarios</span>
+            </Link>
+          </>
+        )}
       </nav>
 
-      <div className="sidebar-footer">
+        <div className="sidebar-footer">
         <div className="user-profile">
           <UserCircle size={24} />
           <div className="user-info">
             <p className="user-name">{currentUser.name}</p>
-            <p className="user-role">{currentUser.role}</p>
+            <p className="user-role">{roleLabel(currentUser.role)}</p>
           </div>
         </div>
         <button 
@@ -92,7 +107,7 @@ const Sidebar = ({ currentUser, onLogout }: { currentUser: User, onLogout: () =>
 
 // --- Page Components ---
 
-const ProjectForm = ({ onSave }: { onSave: (p: Partial<Project>) => void }) => {
+const ProjectForm = ({ onSave, users }: { onSave: (p: Partial<Project>) => void, users: User[] }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -170,7 +185,7 @@ const ProjectForm = ({ onSave }: { onSave: (p: Partial<Project>) => void }) => {
               onChange={e => setFormData({...formData, pmId: e.target.value})}
             >
               <option value="">Seleccione un PM...</option>
-              {mockUsers.filter(u => u.role === 'PM' || u.role === 'Admin').map(u => (
+              {users.filter(u => u.role === 'PM').map(u => (
                 <option key={u.id} value={u.id}>{u.name}</option>
               ))}
             </select>
@@ -183,7 +198,7 @@ const ProjectForm = ({ onSave }: { onSave: (p: Partial<Project>) => void }) => {
               onChange={e => setFormData({...formData, sponsorId: e.target.value})}
             >
               <option value="">Seleccione un Sponsor...</option>
-              {mockUsers.filter(u => u.role === 'Sponsor' || u.role === 'Admin').map(u => (
+              {users.filter(u => u.role === 'Sponsor').map(u => (
                 <option key={u.id} value={u.id}>{u.name}</option>
               ))}
             </select>
@@ -1732,7 +1747,7 @@ const RiskActionModal = ({
   );
 };
 
-const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders }: { stakeholders: Stakeholder[], onOpenModal: () => void, canAddStakeholders: boolean }) => {
+const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders, users }: { stakeholders: Stakeholder[], onOpenModal: () => void, canAddStakeholders: boolean, users: User[] }) => {
   return (
     <div className="stakeholder-view">
       <div className="card" style={{ marginBottom: '2rem' }}>
@@ -1747,7 +1762,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders }: { 
             <p className="quadrant-title">Gestionar Atentamente</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'High' && s.interest === 'High').map(s => (
-                <span key={s.id} className="stakeholder-tag">{mockUsers.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1755,7 +1770,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders }: { 
             <p className="quadrant-title">Mantener Satisfecho</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'High' && s.interest === 'Low').map(s => (
-                <span key={s.id} className="stakeholder-tag">{mockUsers.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1763,7 +1778,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders }: { 
             <p className="quadrant-title">Mantener Informado</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'Low' && s.interest === 'High').map(s => (
-                <span key={s.id} className="stakeholder-tag">{mockUsers.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1771,7 +1786,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders }: { 
             <p className="quadrant-title">Monitorear</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'Low' && s.interest === 'Low').map(s => (
-                <span key={s.id} className="stakeholder-tag">{mockUsers.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1787,7 +1802,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders }: { 
           <tbody>
             {stakeholders.map(s => (
               <tr key={s.id}>
-                <td>{mockUsers.find(u => u.id === s.userId)?.name}</td>
+                <td>{users.find(u => u.id === s.userId)?.name}</td>
                 <td>{s.power}</td>
                 <td>{s.interest}</td>
                 <td>{s.influenceStrategy}</td>
@@ -2329,7 +2344,7 @@ const ChangeControlBoard = ({
 };
 
 const ProjectDetail = ({ 
-  projects, currentUser, milestones, tasks, expenses,
+  projects, currentUser, milestones, tasks, expenses, users,
   onUpdateProject, onAddMilestone, onDeleteMilestone, onUpdateMilestone, onAddTask, onUpdateTask,
   onAddExpense, onUpdateExpense, onAddBudgetLine, onApproveBudgetLine,
   snapshots, onAddSnapshot, risks, onAddRisk, stakeholders, onAddStakeholder,
@@ -2342,6 +2357,7 @@ const ProjectDetail = ({
   milestones: Milestone[],
   tasks: Task[],
   expenses: Expense[],
+  users: User[],
   onUpdateProject: (id: string, updates: Partial<Project>) => Promise<void>,
   onAddMilestone: (projectId: string, name: string, weight: number, startDate: string, endDate: string) => void,
   onDeleteMilestone: (id: string) => void,
@@ -3333,7 +3349,7 @@ const ProjectDetail = ({
         />
       )}
       
-      {activeTab === 'stakeholders' && <StakeholderMatrix stakeholders={projectStakeholders} onOpenModal={() => setActiveModal('stakeholder')} canAddStakeholders={canAddStakeholders} />}
+      {activeTab === 'stakeholders' && <StakeholderMatrix stakeholders={projectStakeholders} onOpenModal={() => setActiveModal('stakeholder')} canAddStakeholders={canAddStakeholders} users={users} />}
 
       {activeTab === 'sppm' && (
         <SPPMReport 
@@ -3475,7 +3491,11 @@ const ProjectDetail = ({
           <div className="form-group">
             <label>Asignado a</label>
             <select name="assignedTo" required>
-              {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+              <option value="">Seleccione...</option>
+              {projectStakeholders.map(s => {
+                const user = users.find(u => u.id === s.userId);
+                return <option key={s.id} value={user?.id}>{user?.name || '(usuario eliminado)'}</option>;
+              })}
             </select>
           </div>
           <div className="form-group">
@@ -3689,7 +3709,7 @@ const ProjectDetail = ({
             <label>Seleccionar Usuario</label>
             <select name="userId" required>
               <option value="">Seleccione...</option>
-              {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+              {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
             </select>
           </div>
           <div className="form-row">
@@ -4280,7 +4300,7 @@ const RiskDetail = ({
                                 </span>
                               </div>
                               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                                Peso: {task.weight}% • Dueño: {mockUsers.find(u => u.id === task.assignedTo)?.name || 'Sin asignar'}
+                                Peso: {task.weight}% • Dueño: {users.find(u => u.id === task.assignedTo)?.name || 'Sin asignar'}
                               </div>
                             </div>
                             <div style={{ display: 'flex', gap: '0.25rem' }}>
@@ -4334,9 +4354,9 @@ const RiskDetail = ({
           <div className="form-row">
             <div className="form-group">
               <label>Dueño</label>
-              <select name="ownerId" required>
+                <select name="ownerId" required>
                 <option value="">Seleccione...</option>
-                {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+                {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
               </select>
             </div>
             <div className="form-group">
@@ -4391,7 +4411,10 @@ const RiskDetail = ({
               <label>Asignado a</label>
               <select name="assignedTo" required>
                 <option value="">Seleccione...</option>
-                {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+                {projectStakeholders.map(s => {
+                  const u = users.find(u => u.id === s.userId);
+                  return <option key={s.id} value={u?.id}>{u?.name || '(usuario eliminado)'}</option>;
+                })}
               </select>
             </div>
             <div className="form-group">
@@ -4482,6 +4505,7 @@ const RiskDetail = ({
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>(mockUsers);
   const [projects, setProjects] = useState<Project[]>(mockProjects);
   const [milestones, setMilestones] = useState<Milestone[]>(mockMilestones);
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
@@ -4563,12 +4587,13 @@ export default function App() {
           specificObjectives: project.specificObjectives ?? [],
           budgetLines: project.budgetLines ?? [],
           progress: project.progress ?? 0,
-          status: project.status?.replace('_', ' ') as Project['status'] ?? 'Draft',
+          status: project.status as Project['status'] ?? 'Draft',
           startDate: project.startDate?.split?.('T')[0] ?? project.startDate ?? '',
           endDate: project.endDate?.split?.('T')[0] ?? project.endDate ?? ''
         });
 
         setProjects(Array.isArray(projectsData) ? projectsData.map(normalizeProject) : mockProjects);
+        setUsers(Array.isArray(usersData) ? usersData : mockUsers);
         setMilestones(Array.isArray(milestonesData) ? milestonesData.map((m: any) => ({ ...m, startDate: m.startDate?.split?.('T')[0] ?? m.startDate ?? '', endDate: m.endDate?.split?.('T')[0] ?? m.endDate ?? '' })) : mockMilestones);
         setTasks(Array.isArray(tasksData) ? tasksData.map((t: any) => ({ ...t, startDate: t.startDate?.split?.('T')[0] ?? t.startDate ?? '', endDate: t.endDate?.split?.('T')[0] ?? t.endDate ?? '' })) : mockTasks);
         setRisks(Array.isArray(risksData) ? risksData : mockRisks);
@@ -5158,14 +5183,22 @@ export default function App() {
     <Router>
       {!isAuthenticated ? (
         <Login onLogin={handleLogin} />
-      ) : (
-        <div className="app-container">
+      ) : !currentUser ? (
+          <div className="page">
+            <div className="card empty-state">
+              <h3>Cargando perfil de usuario...</h3>
+              <p className="text-muted">Espere un momento mientras se recuperan los datos.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="app-container">
           <Sidebar currentUser={currentUser!} onLogout={handleLogout} />
           <main className="main-layout">
             <Routes>
               <Route path="/" element={<Dashboard projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
               <Route path="/projects" element={<ProjectListView projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
               <Route path="/tasks" element={<MyTasksView tasks={tasks} milestones={milestones} projects={projects} currentUser={currentUser!} onUpdateTask={handleUpdateTask} />} />
+              <Route path="/users" element={<UsersView currentUser={currentUser!} />} />
               <Route path="/global-risks" element={<GlobalRisks risks={risks} projects={projects} />} />
               <Route path="/global-issues" element={<GlobalIssues issues={issues} projects={projects} onResolveIssue={handleResolveIssue} />} />
               <Route path="/change-control" element={<ChangeControlBoard changeRequests={changeRequests} projects={projects} tasks={tasks} milestones={milestones} onProcessCR={handleProcessChangeRequest} />} />
@@ -5176,6 +5209,7 @@ export default function App() {
                   milestones={milestones}
                 tasks={tasks}
                 expenses={expenses}
+                users={users}
                 snapshots={snapshots}
                 onUpdateProject={handleUpdateProject}
                 onAddMilestone={handleAddMilestone}
@@ -5204,7 +5238,7 @@ export default function App() {
                 onAddTaskToRiskAction={handleAddTaskToRiskAction}
               />
             } />
-            <Route path="/new-project" element={<ProjectForm onSave={handleSaveProject} />} />
+            <Route path="/new-project" element={<ProjectForm onSave={handleSaveProject} users={users} />} />
             <Route path="/projects/:id/risks/:riskId" element={
               <RiskDetail 
                 projects={projects} 

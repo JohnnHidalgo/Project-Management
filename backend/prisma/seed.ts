@@ -25,7 +25,8 @@ async function main() {
     { id: '3', name: 'Juan PM', email: 'juan.pm@inti.com', password: hashedPassword, role: 'PM', department: 'TI', phone: '345678', position: 'Project Manager Senior' },
     { id: '4', name: 'Elena Dev', email: 'elena.dev@inti.com', password: hashedPassword, role: 'Team_Member', department: 'Desarrollo', phone: '901234', position: 'Lead Engineer' },
     { id: '5', name: 'Carlos Tech', email: 'carlos.tech@inti.com', password: hashedPassword, role: 'Team_Member', department: 'Sistemas', phone: '567890', position: 'SysAdmin' },
-    { id: '6', name: 'Maria Marketing', email: 'maria.marketing@inti.com', password: hashedPassword, role: 'Stakeholder', department: 'Marketing', position: 'Directora de Marca' }
+    { id: '6', name: 'Maria Marketing', email: 'maria.marketing@inti.com', password: hashedPassword, role: 'Stakeholder', department: 'Marketing', position: 'Directora de Marca' },
+    { id: '7', name: 'Admin', email: 'admin@inti.com', password: hashedPassword, role: 'Admin', department: 'Administración', position: 'Administrador del Sistema' }
   ];
 
   for (const user of users) {
