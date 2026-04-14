@@ -4066,7 +4066,9 @@ const RiskDetail = ({
   onDeleteTask,
   onAddTaskLog,
   taskLogs,
-  changeRequests
+  changeRequests,
+  stakeholders,
+  users
 }: {
   projects: Project[];
   risks: Risk[];
@@ -4081,6 +4083,8 @@ const RiskDetail = ({
   onAddTaskLog: (log: Partial<TaskLog>) => void;
   taskLogs: TaskLog[];
   changeRequests: ChangeRequest[];
+  stakeholders: Stakeholder[];
+  users: User[];
 }) => {
   const { id: projectId, riskId } = useParams<{ id: string; riskId: string }>();
   const navigate = useNavigate();
@@ -4094,6 +4098,8 @@ const RiskDetail = ({
 
   const actions = riskActions.filter(a => a.riskId === risk.id);
   const allTasks = tasks.filter(t => actions.some(a => a.id === t.riskActionId));
+
+  const projectStakeholders = (stakeholders || []).filter(s => s.projectId === projectId);
   
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -5254,6 +5260,8 @@ export default function App() {
                 onAddTaskLog={handleAddTaskLog}
                 taskLogs={taskLogs}
                 changeRequests={changeRequests}
+                stakeholders={stakeholders}
+                users={users}
               />
             } />
           </Routes>
