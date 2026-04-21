@@ -372,7 +372,7 @@ const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses, u
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div>
             <h1>Mis Proyectos</h1>
-            <p className="text-muted">Gestión operativa y seguimiento de proyectos asignados</p>
+          <div className="tooltip" />
           </div>
           {(currentUser.role === 'PMO' || currentUser.role === 'Admin' || currentUser.role === 'PM') && (
             <Link to="/new-project" className="btn btn-primary">+ Nuevo Proyecto</Link>
@@ -477,13 +477,7 @@ const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses, u
           </tbody>
         </table>
       </div>
-      {/* Tooltip overlay (Gantt) */}
-      {tooltip && tooltip.visible && (
-        <div className="gantt-tooltip" style={{ position: 'absolute', left: (tooltip.x || 0) + 250, top: (tooltip.y || 0) + 8, background: '#111827', color: '#fff', padding: '0.5rem 0.6rem', borderRadius: 6, fontSize: '0.85rem', pointerEvents: 'none', transform: 'translate(-50%, 0)', zIndex: 9999 }}>
-          <div style={{ fontWeight: 700, marginBottom: '0.25rem' }}>{tooltip.title}</div>
-          {tooltip.lines.map((l, i) => <div key={i} style={{ opacity: 0.95 }}>{l}</div>)}
-        </div>
-      )}
+      {/* Tooltip overlay removed (was referencing undefined `tooltip`) */}
     </div>
   );
 };
