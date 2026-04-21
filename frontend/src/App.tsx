@@ -17,7 +17,7 @@ import {
 import { apiService } from './services/apiService';
 import { User, Project, UserRole, ProjectStatus, Milestone, Task, Expense, BudgetLine, ProjectSnapshot, Risk, Stakeholder, TaskLog, ChangeRequest, RiskAction, Issue, ProjectHistory, CriticalPathResult } from './types';
 import { calculateEVM, generateSnapshot, calculateRiskScore } from './utils/pmbokUtils';
-import { mockUsers, mockProjects, mockMilestones, mockTasks, mockRisks, mockIssues, mockExpenses, mockStakeholders, mockTaskLogs, mockChangeRequests, mockRiskActions } from './mockData';
+// mock data removed to ensure app always loads from backend
 import CashFlowChart from './components/CashFlowChart';
 import Login from './components/Login';
 import UsersView from './components/UsersView';
@@ -92,6 +92,8 @@ const Sidebar = ({ currentUser, onLogout }: { currentUser: User, onLogout: () =>
             <p className="user-role">{roleLabel(currentUser.role)}</p>
           </div>
         </div>
+
+        
         <button 
           onClick={onLogout}
           className="btn btn-secondary btn-sm"
@@ -335,7 +337,7 @@ const ProjectForm = ({ onSave, users }: { onSave: (p: Partial<Project>) => void,
   );
 };
 
-const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses }: { projects: Project[], currentUser: User, milestones: Milestone[], tasks: Task[], expenses: Expense[] }) => {
+const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses, users }: { projects: Project[], currentUser: User, milestones: Milestone[], tasks: Task[], expenses: Expense[], users: User[] }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
 
@@ -432,7 +434,7 @@ const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses }:
                 <tr key={project.id}>
                   <td>
                     <div style={{ fontWeight: 700 }}>{project.name}</div>
-                    <div className="text-muted" style={{ fontSize: '0.7rem' }}>PM: {mockUsers.find(u => u.id === project.pmId)?.name}</div>
+                    <div className="text-muted" style={{ fontSize: '0.7rem' }}>PM: {users.find((u: User) => u.id === project.pmId)?.name}</div>
                   </td>
                   <td>
                     <span className={`badge badge-${project.status.toLowerCase().replace(/ /g, '-')}`}>
@@ -475,6 +477,13 @@ const ProjectListView = ({ projects, currentUser, milestones, tasks, expenses }:
           </tbody>
         </table>
       </div>
+      {/* Tooltip overlay (Gantt) */}
+      {tooltip && tooltip.visible && (
+        <div className="gantt-tooltip" style={{ position: 'absolute', left: (tooltip.x || 0) + 250, top: (tooltip.y || 0) + 8, background: '#111827', color: '#fff', padding: '0.5rem 0.6rem', borderRadius: 6, fontSize: '0.85rem', pointerEvents: 'none', transform: 'translate(-50%, 0)', zIndex: 9999 }}>
+          <div style={{ fontWeight: 700, marginBottom: '0.25rem' }}>{tooltip.title}</div>
+          {tooltip.lines.map((l, i) => <div key={i} style={{ opacity: 0.95 }}>{l}</div>)}
+        </div>
+      )}
     </div>
   );
 };
@@ -1088,7 +1097,7 @@ const PMBOKHealthDashboard = ({ project, milestones, tasks, expenses }: { projec
   );
 };
 
-const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRiskDetail, setSelectedRisk, canAddRisks }: { 
+const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRiskDetail, setSelectedRisk, canAddRisks, users }: { 
   risks: Risk[], 
   actions: RiskAction[],
   tasks: Task[],
@@ -1097,6 +1106,7 @@ const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRis
   onOpenRiskDetail: (riskId: string) => void,
   setSelectedRisk: (r: Risk) => void,
   canAddRisks: boolean
+  users: User[]
 }) => {
   const [filterLevel, setFilterLevel] = useState<string | null>(null);
 
@@ -1268,7 +1278,7 @@ const RiskRegistry = ({ risks, actions, tasks, onAddRisk, onOpenModal, onOpenRis
           <tbody>
             {filteredRisks.map(r => {
               const score = calculateRiskScore(r.probability, r.impact);
-              const owner = mockUsers.find(u => u.id === r.ownerId);
+              const owner = users.find((u: User) => u.id === r.ownerId);
               const riskActionsForRisk = actions.filter(a => a.riskId === r.id);
               const completedActions = riskActionsForRisk.filter(a => a.status === 'Completed').length;
               const totalActions = riskActionsForRisk.length;
@@ -1407,6 +1417,8 @@ const RiskActionModal = ({
   currentUser,
   onOpenTaskLog,
   onEditTaskWeights
+  ,
+  users
 }: { 
   isOpen: boolean, 
   onClose: () => void, 
@@ -1420,7 +1432,8 @@ const RiskActionModal = ({
   onAddTaskLog: (log: Partial<TaskLog>) => void,
   currentUser: User,
   onOpenTaskLog: (task: Task) => void,
-  onEditTaskWeights: (riskActionId: string) => void
+  onEditTaskWeights: (riskActionId: string) => void,
+  users: User[]
 }) => {
   const [showTaskForm, setShowTaskForm] = useState<string | null>(null);
 
@@ -1479,7 +1492,7 @@ const RiskActionModal = ({
           <div className="form-group">
             <label>Responsable</label>
             <select name="ownerId" required>
-              {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+              {users.map((u: User) => <option key={u.id} value={u.id}>{u.name}</option>)}
             </select>
           </div>
           <div className="form-group">
@@ -1532,7 +1545,7 @@ const RiskActionModal = ({
                     {isOverdue && <span className="badge badge-error" style={{ fontSize: '0.6rem' }}>Vencida</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    <span>👤 {mockUsers.find(u => u.id === action.ownerId)?.name}</span>
+                    <span>👤 {users.find((u: User) => u.id === action.ownerId)?.name}</span>
                     <span>📅 {new Date(action.dueDate).toLocaleDateString('es-ES')}</span>
                     <span className={`badge badge-${action.status === 'Completed' ? 'success' : action.status === 'In Progress' ? 'accent' : 'warning'}`} 
                           style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem' }}>
@@ -1626,7 +1639,7 @@ const RiskActionModal = ({
                     <div className="form-group">
                       <label style={{ fontSize: '0.75rem' }}>Asignado a</label>
                       <select name="assignedTo" required style={{ fontSize: '0.8rem' }}>
-                        {mockUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                        {users.map((u: User) => <option key={u.id} value={u.id}>{u.name}</option>)}
                       </select>
                     </div>
                   </div>
@@ -1698,7 +1711,7 @@ const RiskActionModal = ({
                             </span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                            <span>👤 {mockUsers.find(u => u.id === task.assignedTo)?.name}</span>
+                            <span>👤 {users.find((u: User) => u.id === task.assignedTo)?.name}</span>
                             {task.startDate && <span>📅 {new Date(task.startDate).toLocaleDateString('es-ES')}</span>}
                             <span className={`badge badge-${task.status === 'Completed' ? 'success' : task.status === 'In_Progress' ? 'accent' : task.status === 'Blocked' ? 'error' : 'warning'}`} 
                                   style={{ fontSize: '0.6rem', padding: '0.15rem 0.3rem' }}>
@@ -1762,7 +1775,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders, user
             <p className="quadrant-title">Gestionar Atentamente</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'High' && s.interest === 'High').map(s => (
-                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find((u: User) => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1770,7 +1783,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders, user
             <p className="quadrant-title">Mantener Satisfecho</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'High' && s.interest === 'Low').map(s => (
-                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find((u: User) => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1778,7 +1791,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders, user
             <p className="quadrant-title">Mantener Informado</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'Low' && s.interest === 'High').map(s => (
-                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find((u: User) => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1786,7 +1799,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders, user
             <p className="quadrant-title">Monitorear</p>
             <div className="stakeholder-list">
               {stakeholders.filter(s => s.power === 'Low' && s.interest === 'Low').map(s => (
-                <span key={s.id} className="stakeholder-tag">{users.find(u => u.id === s.userId)?.name}</span>
+                <span key={s.id} className="stakeholder-tag">{users.find((u: User) => u.id === s.userId)?.name}</span>
               ))}
             </div>
           </div>
@@ -1802,7 +1815,7 @@ const StakeholderMatrix = ({ stakeholders, onOpenModal, canAddStakeholders, user
           <tbody>
             {stakeholders.map(s => (
               <tr key={s.id}>
-                <td>{users.find(u => u.id === s.userId)?.name}</td>
+                <td>{users.find((u: User) => u.id === s.userId)?.name}</td>
                 <td>{s.power}</td>
                 <td>{s.interest}</td>
                 <td>{s.influenceStrategy}</td>
@@ -1832,7 +1845,7 @@ const Modal = ({ isOpen, onClose, title, children, className }: { isOpen: boolea
   );
 };
 
-const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Task[] }) => {
+const GanttChart = ({ milestones, tasks, users, criticalPathData }: { milestones: Milestone[], tasks: Task[], users: User[], criticalPathData?: CriticalPathResult | null }) => {
   const sortedMilestones = [...milestones].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
   
   if (milestones.length === 0) return <div className="empty-state">No hay datos de cronograma para visualizar.</div>;
@@ -1855,14 +1868,50 @@ const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Tas
 
   const todayPos = getPosition(today);
 
+  // Hover / tooltip state for interactive highlighting
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const [hoveredTaskId, setHoveredTaskId] = React.useState<string | null>(null);
+  const [hoveredConnectorKey, setHoveredConnectorKey] = React.useState<string | null>(null);
+  const [tooltip, setTooltip] = React.useState<{ visible: boolean; x: number; y: number; title: string; lines: string[] } | null>(null);
+  const [showCritical, setShowCritical] = React.useState<boolean>(true);
+
+  // Prepare visible rows data to draw dependency connectors
+  const ROW_HEIGHT = 40; // matches .gantt-row height
+  const ROW_GAP = 8; // matches .gantt-body gap (0.5rem ≈ 8px)
+  const ROW_FULL = ROW_HEIGHT + ROW_GAP;
+  const BAR_CONTAINER_HEIGHT = 24; // matches .gantt-bar-container height
+  let _rowIndex = 0;
+  const visibleRows: { id: string; type: 'milestone' | 'task'; left: number; width: number; centerY: number; isCritical?: boolean }[] = [];
+  sortedMilestones.forEach(m => {
+    const left = getPosition(m.startDate);
+    const width = Math.max(getPosition(m.endDate) - getPosition(m.startDate), 2);
+    const centerY = _rowIndex * ROW_FULL + (ROW_HEIGHT - BAR_CONTAINER_HEIGHT) / 2 + BAR_CONTAINER_HEIGHT / 2;
+    visibleRows.push({ id: m.id, type: 'milestone', left, width, centerY, isCritical: false });
+    _rowIndex++;
+    const mTasks = tasks.filter(t => t.milestoneId === m.id);
+    mTasks.forEach(t => {
+      const leftT = getPosition(t.startDate);
+      const widthT = Math.max(getPosition(t.endDate) - getPosition(t.startDate), 1);
+      const isCritRaw = !!criticalPathData?.tasks?.find(tt => tt.id === t.id && (tt as any).isCritical);
+      const isCritEffective = showCritical && isCritRaw;
+      const centerYT = _rowIndex * ROW_FULL + (ROW_HEIGHT - BAR_CONTAINER_HEIGHT) / 2 + BAR_CONTAINER_HEIGHT / 2;
+      visibleRows.push({ id: t.id, type: 'task', left: leftT, width: widthT, centerY: centerYT, isCritical: isCritEffective });
+      _rowIndex++;
+    });
+  });
+  const svgHeight = Math.max(0, _rowIndex * ROW_FULL);
+
   return (
-    <div className="gantt-container card" style={{ position: 'relative', overflowX: 'visible' }}>
-      <div className="gantt-header">
+    <div ref={containerRef} className="gantt-container card" style={{ position: 'relative', overflowX: 'visible' }}>
+        <div className="gantt-header">
         <div className="gantt-label-col">EDT (Estructura de Desglose de Trabajo)</div>
         <div className="gantt-timeline-col">
           <span>{new Date(projectStart).toLocaleDateString()}</span>
           <span style={{ fontWeight: 800, color: 'var(--primary)', letterSpacing: '1px' }}>CRONOGRAMA MAESTRO (GANTT)</span>
           <span>{new Date(projectEnd).toLocaleDateString()}</span>
+        </div>
+        <div style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center' }}>
+          <button className={`btn ${showCritical ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setShowCritical(s => !s)}>Ruta Crítica</button>
         </div>
       </div>
       
@@ -1875,6 +1924,64 @@ const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Tas
         <div className="gantt-timeline-grid">
           {Array.from({ length: 10 }).map((_, i) => <div key={i} className="grid-line"></div>)}
         </div>
+
+        {/* Dependency connectors (SVG overlay).  */}
+        <svg
+          className="gantt-connectors"
+          style={{ position: 'absolute', left: '250px', top: 0, width: 'calc(100% - 250px)', height: svgHeight, pointerEvents: 'auto' }}
+          viewBox={`0 0 100 ${svgHeight}`}
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <marker id="gantt-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 L2,3 z" fill="currentColor" />
+            </marker>
+          </defs>
+          {visibleRows.filter(r => r.type === 'task').map(taskRow => {
+            const t = tasks.find(x => x.id === taskRow.id);
+            if (!t || !t.predecessorId) return null;
+            const src = visibleRows.find(v => v.id === t.predecessorId);
+            const tgt = taskRow;
+            if (!src) return null;
+            const x1 = src.left + src.width; // end of source bar (pct 0-100)
+            const x2 = tgt.left; // start of target bar (pct 0-100)
+            const y1 = src.centerY; // px
+            const y2 = tgt.centerY; // px
+            const midX = (x1 + x2) / 2;
+            const depCritical = !!(src.isCritical || tgt.isCritical);
+            // If showCritical is active, only draw connectors that are part of the critical path
+            if (showCritical && !depCritical) return null;
+            const color = depCritical ? '#facc15' : 'rgba(75,85,99,0.35)';
+            const key = `${src.id}-${tgt.id}`;
+            return (
+              <path
+                key={key}
+                d={`M ${x1} ${y1} C ${midX} ${y1} ${midX} ${y2} ${x2} ${y2}`}
+                stroke={color}
+                strokeWidth={hoveredConnectorKey === key ? 3 : 2}
+                fill="none"
+                style={{ color, cursor: 'pointer', opacity: hoveredConnectorKey && hoveredConnectorKey !== key ? 0.35 : 1 }}
+                markerEnd="url(#gantt-arrow)"
+                onMouseEnter={(e: any) => {
+                  setHoveredConnectorKey(key);
+                  const pred = tasks.find(tt => tt.id === src.id);
+                  const succ = tasks.find(tt => tt.id === tgt.id);
+                  const containerRect = containerRef.current?.getBoundingClientRect();
+                  const cx = containerRect ? e.clientX - containerRect.left : e.clientX;
+                  const cy = containerRect ? e.clientY - containerRect.top : e.clientY;
+                  setTooltip({ visible: true, x: cx, y: cy, title: 'Dependencia', lines: [pred ? `Predecesor: ${pred.name}` : 'Predecesor: -', succ ? `Sucesor: ${succ.name}` : 'Sucesor: -'] });
+                }}
+                onMouseMove={(e: any) => {
+                  const containerRect = containerRef.current?.getBoundingClientRect();
+                  const cx = containerRect ? e.clientX - containerRect.left : e.clientX;
+                  const cy = containerRect ? e.clientY - containerRect.top : e.clientY;
+                  setTooltip(prev => prev ? { ...prev, x: cx, y: cy } : prev);
+                }}
+                onMouseLeave={() => { setHoveredConnectorKey(null); setTooltip(null); }}
+              />
+            );
+          })}
+        </svg>
 
         {sortedMilestones.map(m => (
           <React.Fragment key={m.id}>
@@ -1897,8 +2004,10 @@ const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Tas
               </div>
             </div>
             {tasks.filter(t => t.milestoneId === m.id).map(t => {
-              const assignee = mockUsers.find(u => u.id === t.assignedTo);
+              const assignee = users.find((u: User) => u.id === t.assignedTo);
               const delayed = isDelayed(t);
+              const isCriticalRaw = !!criticalPathData?.tasks?.find(tt => tt.id === t.id && (tt as any).isCritical);
+              const isCritical = showCritical && isCriticalRaw;
               return (
                 <div key={t.id} className="gantt-row task-row">
                   <div className="gantt-label">
@@ -1909,10 +2018,31 @@ const GanttChart = ({ milestones, tasks }: { milestones: Milestone[], tasks: Tas
                   <div className="gantt-bar-container">
                     <div 
                       className="gantt-bar task-bar" 
+                      onMouseEnter={(e) => {
+                        setHoveredTaskId(t.id);
+                        const predecessor = tasks.find(tt => tt.id === t.predecessorId);
+                        const containerRect = containerRef.current?.getBoundingClientRect();
+                        const cx = containerRect ? (e as React.MouseEvent).clientX - containerRect.left : (e as any).clientX;
+                        const cy = containerRect ? (e as React.MouseEvent).clientY - containerRect.top : (e as any).clientY;
+                        setTooltip({ visible: true, x: cx, y: cy, title: t.name, lines: [`${t.startDate} → ${t.endDate}`, predecessor ? `Predecesor: ${predecessor.name}` : 'Sin predecesor'] });
+                      }}
+                      onMouseMove={(e) => {
+                        const containerRect = containerRef.current?.getBoundingClientRect();
+                        const cx = containerRect ? (e as React.MouseEvent).clientX - containerRect.left : (e as any).clientX;
+                        const cy = containerRect ? (e as React.MouseEvent).clientY - containerRect.top : (e as any).clientY;
+                        setTooltip(prev => prev ? { ...prev, x: cx, y: cy } : prev);
+                      }}
+                      onMouseLeave={() => { setHoveredTaskId(null); setTooltip(null); }}
                       style={{ 
                         left: `${getPosition(t.startDate)}%`, 
                         width: `${Math.max(getPosition(t.endDate) - getPosition(t.startDate), 1)}%`,
-                        backgroundColor: delayed ? '#ef4444' : (t.status === 'Completed' ? 'var(--success)' : (t.status === 'Blocked' ? 'var(--error)' : '#94a3b8'))
+                        backgroundColor: delayed ? '#ef4444' : (isCritical ? '#facc15' : (t.status === 'Completed' ? 'var(--success)' : (t.status === 'Blocked' ? 'var(--error)' : '#94a3b8'))),
+                        /* Keep original colors for all tasks; when showing critical path, emphasize critical tasks without desaturating others */
+                        boxShadow: (isCritical && showCritical) ? '0 0 0 8px rgba(250,204,21,0.18)' : (hoveredTaskId === t.id ? '0 6px 18px rgba(0,0,0,0.12)' : undefined),
+                        border: (isCritical && showCritical) ? '2px solid rgba(250,204,21,0.95)' : (hoveredTaskId === t.id ? '1px solid rgba(0,0,0,0.06)' : undefined),
+                        zIndex: (isCritical && showCritical) || hoveredTaskId === t.id ? 4 : undefined,
+                        transform: hoveredTaskId === t.id ? 'scale(1.02)' : undefined,
+                        transition: 'transform .12s ease, box-shadow .12s ease'
                       }}
                     >
                       <div className="gantt-bar-progress" style={{ width: `${t.progress}%` }}></div>
@@ -1987,7 +2117,8 @@ const TaskHistoryModal = ({
   logs, 
   onAddLog,
   currentUser,
-  changeRequests
+  changeRequests,
+  users
 }: { 
   isOpen: boolean, 
   onClose: () => void, 
@@ -1995,7 +2126,8 @@ const TaskHistoryModal = ({
   logs: TaskLog[], 
   onAddLog: (log: Partial<TaskLog>) => void,
   currentUser: User,
-  changeRequests: ChangeRequest[]
+  changeRequests: ChangeRequest[],
+  users: User[]
 }) => {
   const [comment, setComment] = useState('');
   const [newProgress, setNewProgress] = useState(task?.progress || 0);
@@ -2074,7 +2206,7 @@ const TaskHistoryModal = ({
             return (
               <div key={log.id} className="card" style={{ padding: '1rem', marginBottom: '0.75rem', backgroundColor: '#f8fafc' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>📝 {mockUsers.find(u => u.id === log.userId)?.name}</span>
+                  <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>📝 {users.find((u: User) => u.id === log.userId)?.name}</span>
                   <span className="text-muted" style={{ fontSize: '0.75rem' }}>{log.date}</span>
                 </div>
                 <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>{log.comment}</p>
@@ -2088,7 +2220,7 @@ const TaskHistoryModal = ({
             return (
               <div key={cr.id} className="card" style={{ padding: '1rem', marginBottom: '0.75rem', backgroundColor: '#fef3c7', borderLeft: '3px solid #f59e0b' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>🔄 Solicitud de Cambio por {mockUsers.find(u => u.id === cr.requestedBy)?.name}</span>
+                  <span style={{ fontWeight: 600, fontSize: '0.875rem' }}>🔄 Solicitud de Cambio por {users.find((u: User) => u.id === cr.requestedBy)?.name}</span>
                   <span className={`badge badge-${cr.status.toLowerCase()}`}>{cr.status}</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#7c3aed', marginBottom: '0.5rem', fontWeight: 500 }}>
@@ -2549,7 +2681,7 @@ const ProjectDetail = ({
         date: log.date,
         type: 'Tarea',
         description: `Actualización en "${task?.name}": ${log.comment} (${log.previousProgress}% -> ${log.newProgress}%)`,
-        user: mockUsers.find(u => u.id === log.userId)?.name,
+        user: users.find(u => u.id === log.userId)?.name,
         icon: '📝'
       });
     });
@@ -2562,7 +2694,7 @@ const ProjectDetail = ({
         date: cr.requestedDate,
         type: 'Control de Cambios',
         description: `Solicitud de reprogramación para "${task?.name}": ${cr.justification} [${cr.status}]`,
-        user: mockUsers.find(u => u.id === cr.requestedBy)?.name,
+        user: users.find(u => u.id === cr.requestedBy)?.name,
         icon: '🔄'
       });
     });
@@ -3104,7 +3236,7 @@ const ProjectDetail = ({
                         </thead>
                         <tbody>
                           {mTasks.map(t => {
-                            const user = mockUsers.find(u => u.id === t.assignedTo);
+                            const user = users.find(u => u.id === t.assignedTo);
                             return (
                               <tr key={t.id}>
                                 <td>
@@ -3169,7 +3301,7 @@ const ProjectDetail = ({
                         </div>
                       </td>
                       <td style={{ maxWidth: '300px', fontSize: '0.8rem' }}>{cr.justification}</td>
-                      <td>{mockUsers.find(u => u.id === cr.requestedBy)?.name}</td>
+                      <td>{users.find(u => u.id === cr.requestedBy)?.name}</td>
                       <td><span className={`badge badge-${cr.status.toLowerCase()}`}>{cr.status}</span></td>
                       <td>
                         {cr.status === 'Pending' && (
@@ -3208,7 +3340,7 @@ const ProjectDetail = ({
           </div>
           
           {scheduleView === 'gantt' ? (
-            <GanttChart milestones={projectMilestones} tasks={projectTasks} />
+            <GanttChart milestones={projectMilestones} tasks={projectTasks} users={users} criticalPathData={criticalPathData} />
           ) : (
             <CalendarView milestones={projectMilestones} tasks={projectTasks} />
           )}
@@ -3341,6 +3473,7 @@ const ProjectDetail = ({
           risks={projectRisks} 
           actions={riskActions}
           tasks={tasks}
+          users={users}
           onAddRisk={(r) => onAddRisk(project.id, r)} 
           onOpenModal={() => setActiveModal('risk')} 
           onOpenRiskDetail={(riskId) => navigate(`/projects/${project.id}/risks/${riskId}`)}
@@ -3624,6 +3757,7 @@ const ProjectDetail = ({
         onAddLog={onAddTaskLog}
         currentUser={currentUser}
         changeRequests={changeRequests}
+        users={users}
       />
 
       <ChangeRequestModal 
@@ -3709,7 +3843,7 @@ const ProjectDetail = ({
             <label>Seleccionar Usuario</label>
             <select name="userId" required>
               <option value="">Seleccione...</option>
-              {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+              {users.map((u: User) => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
             </select>
           </div>
           <div className="form-row">
@@ -4182,7 +4316,7 @@ const RiskDetail = ({
           </div>
           <div>
             <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DUEÑO</label>
-            <p>{mockUsers.find(u => u.id === risk.ownerId)?.name || 'Sin asignar'}</p>
+            <p>{users.find(u => u.id === risk.ownerId)?.name || 'Sin asignar'}</p>
           </div>
         </div>
       </div>
@@ -4218,7 +4352,7 @@ const RiskDetail = ({
                     <div style={{ flex: 1 }}>
                       <h4 style={{ margin: '0 0 0.5rem 0' }}>{action.description}</h4>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                        <span>Dueño: {mockUsers.find(u => u.id === action.ownerId)?.name || 'Sin asignar'}</span>
+                        <span>Dueño: {users.find(u => u.id === action.ownerId)?.name || 'Sin asignar'}</span>
                         <span>Fecha límite: {new Date(action.dueDate).toLocaleDateString()}</span>
                         <span className={`badge badge-${action.status === 'Completed' ? 'success' : action.status === 'In Progress' ? 'warning' : 'secondary'}`}>
                           {action.status}
@@ -4362,7 +4496,7 @@ const RiskDetail = ({
               <label>Dueño</label>
                 <select name="ownerId" required>
                 <option value="">Seleccione...</option>
-                {users.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
+                {users.map((u: User) => <option key={u.id} value={u.id}>{u.name} ({u.role})</option>)}
               </select>
             </div>
             <div className="form-group">
@@ -4444,6 +4578,7 @@ const RiskDetail = ({
         onAddLog={onAddTaskLog}
         currentUser={currentUser}
         changeRequests={changeRequests}
+        users={users}
       />
 
       <Modal
@@ -4511,18 +4646,18 @@ const RiskDetail = ({
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>(mockUsers);
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
-  const [milestones, setMilestones] = useState<Milestone[]>(mockMilestones);
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
-  const [expenses, setExpenses] = useState<Expense[]>(mockExpenses);
+  const [users, setUsers] = useState<User[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [snapshots, setSnapshots] = useState<ProjectSnapshot[]>([]);
-  const [risks, setRisks] = useState<Risk[]>(mockRisks);
-  const [stakeholders, setStakeholders] = useState<Stakeholder[]>(mockStakeholders);
-  const [taskLogs, setTaskLogs] = useState<TaskLog[]>(mockTaskLogs);
-  const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>(mockChangeRequests);
+  const [risks, setRisks] = useState<Risk[]>([]);
+  const [stakeholders, setStakeholders] = useState<Stakeholder[]>([]);
+  const [taskLogs, setTaskLogs] = useState<TaskLog[]>([]);
+  const [changeRequests, setChangeRequests] = useState<ChangeRequest[]>([]);
   const [riskActions, setRiskActions] = useState<RiskAction[]>([]);
-  const [issues, setIssues] = useState<Issue[]>(mockIssues);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [projectHistory, setProjectHistory] = useState<ProjectHistory[]>([]);
 
   // Check for existing authentication on mount
@@ -4541,9 +4676,10 @@ export default function App() {
   }, []);
 
   const handleLogin = (user: User, token: string) => {
+    // Set token first so subsequent data loads use the authenticated session
+    apiService.setToken(token);
     setCurrentUser(user);
     setIsAuthenticated(true);
-    apiService.setToken(token);
   };
 
   const handleLogout = () => {
@@ -4552,7 +4688,7 @@ export default function App() {
     apiService.logout();
   };
 
-  // Load data from APIs on component mount
+  // Load data from APIs on component mount and when authentication changes
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -4571,17 +4707,17 @@ export default function App() {
           projectHistoryData,
           snapshotsData
         ] = await Promise.all([
-          apiService.getProjects().catch(() => mockProjects),
-          apiService.getUsers().catch(() => mockUsers),
-          apiService.getMilestones().catch(() => mockMilestones),
-          apiService.getTasks().catch(() => mockTasks),
-          apiService.getRisks().catch(() => mockRisks),
-          apiService.getIssues().catch(() => mockIssues),
-          apiService.getExpenses().catch(() => mockExpenses),
-          apiService.getStakeholders().catch(() => mockStakeholders),
-          apiService.getTaskLogs().catch(() => mockTaskLogs),
-          apiService.getChangeRequests().catch(() => mockChangeRequests),
-          apiService.getRiskActions().catch(() => mockRiskActions),
+          apiService.getProjects().catch(() => []),
+          apiService.getUsers().catch(() => []),
+          apiService.getMilestones().catch(() => []),
+          apiService.getTasks().catch(() => []),
+          apiService.getRisks().catch(() => []),
+          apiService.getIssues().catch(() => []),
+          apiService.getExpenses().catch(() => []),
+          apiService.getStakeholders().catch(() => []),
+          apiService.getTaskLogs().catch(() => []),
+          apiService.getChangeRequests().catch(() => []),
+          apiService.getRiskActions().catch(() => []),
           apiService.getProjectHistory().catch(() => []),
           apiService.getSnapshots().catch(() => [])
         ]);
@@ -4598,30 +4734,28 @@ export default function App() {
           endDate: project.endDate?.split?.('T')[0] ?? project.endDate ?? ''
         });
 
-        setProjects(Array.isArray(projectsData) ? projectsData.map(normalizeProject) : mockProjects);
-        setUsers(Array.isArray(usersData) ? usersData : mockUsers);
-        setMilestones(Array.isArray(milestonesData) ? milestonesData.map((m: any) => ({ ...m, startDate: m.startDate?.split?.('T')[0] ?? m.startDate ?? '', endDate: m.endDate?.split?.('T')[0] ?? m.endDate ?? '' })) : mockMilestones);
-        setTasks(Array.isArray(tasksData) ? tasksData.map((t: any) => ({ ...t, startDate: t.startDate?.split?.('T')[0] ?? t.startDate ?? '', endDate: t.endDate?.split?.('T')[0] ?? t.endDate ?? '' })) : mockTasks);
-        setRisks(Array.isArray(risksData) ? risksData : mockRisks);
-        setIssues(Array.isArray(issuesData) ? issuesData : mockIssues);
-        setExpenses(Array.isArray(expensesData) ? expensesData.map((e: any) => ({ ...e, date: e.date?.split?.('T')[0] ?? e.date ?? '' })) : mockExpenses);
-        setStakeholders(Array.isArray(stakeholdersData) ? stakeholdersData : mockStakeholders);
-        setTaskLogs(Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
-        setChangeRequests(Array.isArray(changeRequestsData) ? changeRequestsData : mockChangeRequests);
-        setRiskActions(Array.isArray(riskActionsData) ? riskActionsData.map((ra: any) => ({ ...ra, dueDate: ra.dueDate?.split?.('T')[0] ?? ra.dueDate ?? '' })) : mockRiskActions);
+        setProjects(Array.isArray(projectsData) ? projectsData.map(normalizeProject) : []);
+        setUsers(Array.isArray(usersData) ? usersData : []);
+        setMilestones(Array.isArray(milestonesData) ? milestonesData.map((m: any) => ({ ...m, startDate: m.startDate?.split?.('T')[0] ?? m.startDate ?? '', endDate: m.endDate?.split?.('T')[0] ?? m.endDate ?? '' })) : []);
+        setTasks(Array.isArray(tasksData) ? tasksData.map((t: any) => ({ ...t, startDate: t.startDate?.split?.('T')[0] ?? t.startDate ?? '', endDate: t.endDate?.split?.('T')[0] ?? t.endDate ?? '' })) : []);
+        setRisks(Array.isArray(risksData) ? risksData : []);
+        setIssues(Array.isArray(issuesData) ? issuesData : []);
+        setExpenses(Array.isArray(expensesData) ? expensesData.map((e: any) => ({ ...e, date: e.date?.split?.('T')[0] ?? e.date ?? '' })) : []);
+        setStakeholders(Array.isArray(stakeholdersData) ? stakeholdersData : []);
+        setTaskLogs(Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : []);
+        setChangeRequests(Array.isArray(changeRequestsData) ? changeRequestsData : []);
+        setRiskActions(Array.isArray(riskActionsData) ? riskActionsData.map((ra: any) => ({ ...ra, dueDate: ra.dueDate?.split?.('T')[0] ?? ra.dueDate ?? '' })) : []);
         setProjectHistory(Array.isArray(projectHistoryData) ? projectHistoryData.map((h: any) => ({ ...h, createdAt: h.createdAt?.split?.('T')[0] ?? h.createdAt ?? '' })) : []);
         setSnapshots(Array.isArray(snapshotsData) ? snapshotsData.map((s: any) => ({ ...s, date: s.date?.split?.('T')[0] ?? s.date ?? '' })) : []);
 
-        console.log('Loaded taskLogsData:', taskLogsData);
-        console.log('Final taskLogs state:', Array.isArray(taskLogsData) ? taskLogsData.map((log: any) => ({ ...log, date: log.date?.split?.('T')[0] ?? log.date ?? '' })) : mockTaskLogs);
+        console.log('Loaded taskLogsData length:', Array.isArray(taskLogsData) ? taskLogsData.length : 0);
       } catch (error) {
-        console.warn('Failed to load data from API, using mock data:', error);
-        // Mock data is already set as initial state
+        console.warn('Failed to load data from API:', error);
       }
     };
 
     loadData();
-  }, []);
+  }, [isAuthenticated]);
 
   // Function to refresh project data after task log creation
   const refreshProjectData = async () => {
@@ -5202,7 +5336,7 @@ export default function App() {
           <main className="main-layout">
             <Routes>
               <Route path="/" element={<Dashboard projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
-              <Route path="/projects" element={<ProjectListView projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} />} />
+              <Route path="/projects" element={<ProjectListView projects={projects} currentUser={currentUser!} milestones={milestones} tasks={tasks} expenses={expenses} users={users} />} />
               <Route path="/tasks" element={<MyTasksView tasks={tasks} milestones={milestones} projects={projects} currentUser={currentUser!} onUpdateTask={handleUpdateTask} />} />
               <Route path="/users" element={<UsersView currentUser={currentUser!} />} />
               <Route path="/global-risks" element={<GlobalRisks risks={risks} projects={projects} />} />

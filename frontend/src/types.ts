@@ -3,6 +3,7 @@ export type UserRole = 'PM' | 'PMO' | 'Sponsor' | 'Team Member' | 'Admin' | 'Sta
 export interface User {
   id: string;
   name: string;
+  email?: string;
   role: UserRole;
   department?: string;
   phone?: string;

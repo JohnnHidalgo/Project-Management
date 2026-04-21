@@ -28,19 +28,17 @@ const UsersView = ({ currentUser }: { currentUser: User }) => {
       setLoading(true);
       try {
         const data = await apiService.getUsers();
-        if (mounted) setUsers(data);
+        if (mounted) setUsers(Array.isArray(data) ? data : []);
       } catch (err) {
-        // fallback to mock data if API not available
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const { mockUsers } = require('../mockData');
-        if (mounted) setUsers(mockUsers);
+        // If API fails, show empty list (no mock data)
+        if (mounted) setUsers([]);
       } finally {
         if (mounted) setLoading(false);
       }
     };
     load();
     return () => { mounted = false; };
-  }, []);
+  }, [currentUser]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Eliminar usuario?')) return;
@@ -164,7 +162,7 @@ const UsersView = ({ currentUser }: { currentUser: User }) => {
               </tr>
             </thead>
             <tbody>
-              {users.map((u: any) => (
+              {users.map((u: User) => (
                 <tr key={u.id}>
                   <td>{u.name}</td>
                   <td>{u.email}</td>

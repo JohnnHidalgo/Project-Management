@@ -1006,6 +1006,11 @@ a {
 
 .gantt-bar {
   position: absolute;
+  .gantt-tooltip {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.16);
+    max-width: 260px;
+  }
+  .gantt-connectors { pointer-events: auto; }
   height: 100%;
   border-radius: 4px;
   min-width: 4px;
